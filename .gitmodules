@@ -1,0 +1,3 @@
+[submodule "beta"]
+	path = beta
+	url = git@bitbucket.org:treestoolbox/treestoolbox-private.git
