@@ -54,3 +54,5 @@ GUI related:
 New functions:
 - neuron_template_tree
 - updated soma_tree
+
+Git setup
