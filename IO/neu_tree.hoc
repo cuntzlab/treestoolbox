@@ -1,0 +1,68 @@
+// TREES package
+// neu_tree(name)
+// 
+// saves a neuron morphology into a conversion filetype
+// for the matlab TREES package. To keep things simple
+// please never load more than ONE cell before applying
+// this procedure. Read about restrictions in documentation
+// Run by calling:
+//
+// load_file("neu_tree.hoc")
+// neu_tree(name)
+// 
+// name::string: filename for the output file, extension
+//               should be ".neu"
+//
+// the TREES toolbox: edit, visualize and analyze neuronal trees
+// Copyright (C) 2009  Hermann Cuntz
+
+
+
+objref f1
+//nsec = 0
+//forall nsec = nsec + 1
+objref sr[1000000]   // this is a NEURON curiosity
+
+proc neu_tree() {
+  objref f1
+  f1 = new File()
+  f1.wopen($s1)
+  nsec = 0
+  forall nsec = nsec + 1
+  objref sr[nsec]
+  o=0
+  forall {
+    sr[o] = new SectionRef()
+    o = o + 1
+  }
+  f1.printf("// file created by neu_tree from the TREES package\n")
+  f1.printf("// Hermann Cuntz 2007 \n")
+  f1.printf("\n")
+  f1.printf("# section lines: %d\n", nsec)
+  f1.printf("\n")
+  ncount = 0
+  for ward = 0,nsec-1 {
+    sr[ward].sec f1.printf("%s ", secname())
+    if (sr[ward].has_parent==0) f1.printf("0 -1 0 ")
+    if (sr[ward].has_parent==1){
+      f1.printf("%d ", section_orientation())
+      sr[ward].parent f1.printf("%s ", secname())
+      sr[ward].sec f1.printf("%d ", parent_connection())
+    }
+    sr[ward].sec f1.printf("%d\n", n3d())
+    ncount = ncount + n3d()
+  }
+  
+  
+  
+  f1.printf("\n")
+  f1.printf("# 3d points: %d\n", ncount)
+  f1.printf("\n")
+
+  forall {
+    for ward = 0,n3d()-1 {
+      f1.printf("%e %e %e %e\n", x3d(ward),y3d(ward),z3d(ward),diam3d(ward))
+    }
+  }
+  f1.close()
+}
