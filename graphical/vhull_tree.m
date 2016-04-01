@@ -22,7 +22,7 @@
 %     '-w'   : waitbar
 %     '-r'   : lower resolution with reducepatch by 10x (for 3D)
 %     '-2d'  : 2D voronoi in 2D boundary
-%     {DEFAULT: '-s -w'}
+%     {DEFAULT: ''}
 %
 % Output
 % ------

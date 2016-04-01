@@ -26,7 +26,7 @@
 %        reflect the original path lengths in the tree. But the total
 %        tree size expands in the process (no good for automated
 %        reconstruction procedure for example)
-%     {DEFAULT: '-w'}
+%     {DEFAULT: ''}
 %
 % Output
 % ------
@@ -69,8 +69,8 @@ if (nargin < 2) || isempty (sr)
 end
 
 if (nargin < 3) || isempty (options)
-    % {DEFAULT: waitbar}
-    options  = '-w'; 
+    % {DEFAULT: ''}
+    options  = ''; 
 end
 
 if strfind   (options, '-s')

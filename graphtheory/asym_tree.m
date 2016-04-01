@@ -20,6 +20,10 @@
 % - options  ::string:
 %     '-s'   : show
 %     '-m'   : explanatory movie
+%     '-v'   : use van Pelt definition of tree asymmetry, see
+%              Van Pelt, Jaap, et al. "Tree asymmetry—a sensitive and 
+%              practical measure for binary topological trees." Bulletin 
+%              of mathematical biology 54.5 (1992): 759-784.
 %     {DEFAULT: ''}
 %
 % Output
@@ -65,6 +69,12 @@ if (nargin < 3) || isempty (options)
     options  = '';
 end
 
+if strfind(options, '-v')
+    vanpelt = true;
+else
+    vanpelt = false;
+end
+
 % index of branching points:
 iB               = find      (B_tree (intree));
 % parent index paths (see "ipar_tree"):
@@ -82,10 +92,18 @@ for counter      = 1 : length (iB)
     v1           = sum       (v (sub1));
     v2           = sum       (v (sub2));
     % calculation of asymmetry:
-    if v1 <= v2
-        asym (counter) = v1 / (v1 + v2);
+    if vanpelt
+        if v1 + v2 > 2
+            asym(counter) = abs(v1 - v2) / (v1 + v2 - 2);
+        else
+            asym(counter) = 0;
+        end
     else
-        asym (counter) = v2 / (v1 + v2);
+        if v1 <= v2
+            asym (counter) = v1 / (v1 + v2);
+        else
+            asym (counter) = v2 / (v1 + v2);
+        end
     end
     if strfind   (options, '-m')       % movie option
         clf;

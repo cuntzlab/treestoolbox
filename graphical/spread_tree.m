@@ -218,16 +218,16 @@ if strfind           (options, '-s')
                 for counter2 = 1 : length (intrees{counter1})
                     plot_tree ( ...
                         intrees{counter1}{counter2}, [], ...
-                        DD{counter1}{counter2});
+                        DD{counter1}{counter2}, [], [], options);
                 end
             end
         case         1
             clf;
             for counter = 1 : lent
-                plot_tree (intrees {counter}, [], DD{counter});
+                plot_tree (intrees {counter}, [], DD{counter}, [], [], options);
             end
-        case         0
-            plot_tree (intrees);
+        case     0
+            plot_tree (intrees, [], [], [], [], options);
     end
     title            ('spread trees');
     xlabel           ('x [\mum]');
