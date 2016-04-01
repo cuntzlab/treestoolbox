@@ -22,7 +22,7 @@
 %     '-w'   : waitbar
 %     '-r'   : lower resolution with reducepatch by 10x (for 3D)
 %     '-2d'  : 2D voronoi in 2D boundary
-%     {DEFAULT: '-s -w'}
+%     {DEFAULT: ''}
 %
 % Output
 % ------
@@ -50,7 +50,8 @@ global       trees
 
 if (nargin < 6) || isempty (options)
     % {DEFAULT: waitbar and show result}
-    options  = '-w -s';
+    % options  = '-w -s';
+    options  = '';
 end
 
 if (nargin < 1) || isempty(intree)

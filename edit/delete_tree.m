@@ -77,6 +77,12 @@ if (nargin < 3) || isempty (options)
     options  = '';
 end
 
+if strfind(options, '-x')
+    append_children = false;
+else
+    append_children = true;
+end
+
 % nodes get deleted one by one, therefore new index has to be calculated
 % each time, using sindex:
 sindex       = 1 : N;
@@ -102,14 +108,16 @@ for counter      = 1 : length (inodes)
     % this column contains ones at the node's child indices
     % find the parent index to inode
     idpar        = find (dA (inode, :));
-    if ~isempty  (idpar)
+    if append_children  && ~isempty  (idpar)
         % if it is not root then add inode's children to inode's parent
         dA (:, idpar) = dA (:, idpar) + ydA;
     end
     % get rid of the node in the adjacency matrix by eliminating row and
     % column inode.
+    %if ~append_children && ~isempty  (idpar)
     dA (:, inode) = [];
     dA (inode, :) = [];
+    %end
 end
 if strfind       (options, '-w')  % waitbar option: close
     if length    (inodes) > 499
@@ -142,11 +150,10 @@ end
 
 % if root was deleted and it was a branch point the result is many trees:
 iA               = find (sum (tree.dA, 2) == 0);
-if length (iA) > 1
+if ~append_children && length (iA) > 1
     s            = cell (1, length (iA));
     for counter1  = 1 : length (iA)
         [~, dtree]  = sub_tree (tree, iA (counter1));
-
         % shorten all vectors of form Nx1
         S        = fieldnames (dtree);
         for counter2      = 1 : length (S)
@@ -176,19 +183,20 @@ end
 if strfind       (options, '-s')
     clf; hold on;
     plot_tree    (intree);
+    colors = [0 1 0; 0 0 1; 0 0.5 0; 0 0.75 0.75; 0.75 0 0.75; 0.75 0.75 0; 0.5 0 0];
     if length    (tree) > 1
         for counter = 1 : length (tree)
-            plot_tree    (tree{counter}, [0 1 0], 100);
+            plot_tree    (tree{counter}, colors(mod(counter - 1, size(colors, 1)) + 1, :), 100);
         end
     else
         plot_tree    (tree, [0 1 0], 100);
+        HP (1)       = plot (1, 1, 'k-');
+        HP (2)       = plot (1, 1, 'g-');
+        legend       (HP, ...
+            {'original tree',      'trimmed tree'}); 
+        set          (HP, ...
+            'visible',             'off');
     end
-    HP (1)       = plot (1, 1, 'k-');
-    HP (2)       = plot (1, 1, 'g-');
-    legend       (HP, ...
-        {'original tree',      'trimmed tree'}); 
-    set          (HP, ...
-        'visible',             'off');
     title        ('find the differences: delete nodes in tree');
     xlabel       ('x [\mum]');
     ylabel       ('y [\mum]');

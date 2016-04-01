@@ -65,6 +65,12 @@ if (nargin < 3) || isempty (options)
     options  = '';
 end
 
+if strfind(options, '-vp')
+    vanpelt = true;
+else
+    vanpelt = false;
+end
+
 % index of branching points:
 iB           = find      (B_tree (intree));
 % parent index paths (see "ipar_tree"):
@@ -82,10 +88,18 @@ for counter      = 1 : length (iB)
     v1           = sum (v (sub1));
     v2           = sum (v (sub2));
     % calculation of asymmetry:
-    if v1 <= v2
-        asym (counter) = v1 / (v1 + v2);
+    if vanpelt
+        if v1 + v2 > 2
+            asym(counter) = abs(v1 - v2) / (v1 + v2 - 2);
+        else
+            asym(counter) = 0;
+        end
     else
-        asym (counter) = v2 / (v1 + v2);
+        if v1 <= v2
+            asym (counter) = v1 / (v1 + v2);
+        else
+            asym (counter) = v2 / (v1 + v2);
+        end
     end
     if strfind   (options, '-m')       % movie option
         clf; hold on;

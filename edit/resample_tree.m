@@ -70,7 +70,7 @@ end
 
 if (nargin < 3) || isempty (options)
     % {DEFAULT: waitbar}
-    options  = '-w'; 
+    options  = ''; 
 end
 
 if strfind   (options, '-s')
