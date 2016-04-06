@@ -42,7 +42,7 @@
 function [DD, outtrees] = spread_tree (intrees, dX, dY, options)
 
 % trees : contains the tree structures in the trees package
-global trees
+global       trees
 
 if (nargin < 1) || isempty (intrees)
     % {DEFAULT: trees cell array}
@@ -79,12 +79,12 @@ if (nargout > 1)
     outtrees = intrees;
 end
 
-switch           level
-    case         2
-        superY   = 0;
-        DD       = cell (1, length (intrees));
-        for counter1 = 1 : length (intrees)
-            lent     = length (intrees {counter1});
+switch               level
+    case             2
+        superY       = 0;
+        DD           = cell (1, length (intrees));
+        for counter1 =  1 : length (intrees)
+            lent     =      length (intrees{counter1});
             % minimum positions:
             X        = zeros (lent, 1);
             Y        = zeros (lent, 1);
@@ -127,7 +127,8 @@ switch           level
             for counter2  = 1 : length (ucY)
                 mmY (counter2) = max (mY (cY == ucY (counter2)));
             end
-            % DDY becomes the cumulative sum of these maximum deflections (+DY)
+            % DDY becomes the cumulative sum of these maximum deflections
+            % (+DY)
             mmY      = [0;  (-cumsum (mmY + dY))];
             DDXYZ    = [DDX (mmY (cY + 1))];
             % DDZ is kept zero, but for each cell:
@@ -145,15 +146,15 @@ switch           level
                 end
             end
         end
-    case 1
-        lent     = length (intrees); % number of trees
+    case             1
+        lent         = length (intrees); % number of trees
         % initialization
-        X        = zeros (lent, 1);
-        Y        = zeros (lent, 1);
-        Z        = zeros (lent, 1); % minimum positions
-        mX       = zeros (lent, 1);
-        mY       = zeros (lent, 1);
-        mZ       = zeros (lent, 1); % position ranges
+        X            = zeros (lent, 1);
+        Y            = zeros (lent, 1);
+        Z            = zeros (lent, 1); % minimum positions
+        mX           = zeros (lent, 1);
+        mY           = zeros (lent, 1);
+        mZ           = zeros (lent, 1); % position ranges
         for counter  = 1 : lent % walk through all trees
             % minimum positions:
             X  (counter) = min (intrees {counter}.X);
@@ -172,67 +173,69 @@ switch           level
         end
         % sqrtN gives a maximum deflection in X
         % (make the layout sort of square):
-        sqrtN    = sum (mX + dX) ./ sqrt (length (mX));
-        % divide summed up X ranges (+dX) by sqrtN and collect remainder in DDX:
-        DDX      = mod   ([0; (cumsum (mX + dX))], sqrtN);
-        cY       = floor ([0; (cumsum (mX + dX))] / sqrtN);
-        DDX      = DDX   (1 : end - 1);
-        cY       = cY    (1 : end - 1);
+        sqrtN        = sum (mX + dX) ./ sqrt (length (mX));
+        % divide summed up X ranges (+dX) by sqrtN and collect remainder in
+        % DDX:
+        DDX          = mod   ([0; (cumsum (mX + dX))], sqrtN);
+        cY           = floor ([0; (cumsum (mX + dX))] / sqrtN);
+        DDX          = DDX   (1 : end - 1);
+        cY           = cY    (1 : end - 1);
         % take from DDX the first empty bit in each line:
-        dDDX     = DDX ([1; (diff (cY))] > 0);
-        DDX      = DDX - dDDX (cY + 1);
+        dDDX         = DDX ([1; (diff (cY))] > 0);
+        DDX          = DDX - dDDX (cY + 1);
         % add in Y the maximum Y-deflection in each line:
-        ucY      = unique (cY);
-        mmY      = zeros (length (ucY), 1);
+        ucY          = unique (cY);
+        mmY          = zeros (length (ucY), 1);
         for counter  = 1 : length (ucY)
             mmY (counter) = max (mY (cY == ucY (counter)));
         end
         % DDY becomes the cumulative sum of these maximum deflections (+DY)
-        mmY      = [0;  (-cumsum (mmY + dY))];
-        DDXYZ    = [DDX (mmY (cY + 1))];
+        mmY          = [0;  (-cumsum (mmY + dY))];
+        DDXYZ        = [DDX (mmY (cY + 1))];
         % DDZ is kept zero, but for each cell:
-        dDD      = ...
+        dDD          = ...
             [DDXYZ (zeros (size (DDXYZ, 1), 1))] - ...
             [X Y Z];
-        DD       = num2cell (dDD, 2)';
+        DD           = num2cell (dDD, 2)';
         if (nargout > 1)
             for counter = 1 : length (intrees)
                 outtrees{counter} = tran_tree ( ...
                     intrees{counter}, DD{counter});
             end
         end
-    case         0
-        DD       = [0 0 0];
-        if (nargout > 1)
+    case             0
+        DD           = [0 0 0];
+        if (nargout  > 1)
             outtrees = tran_tree (intrees);
         end
 end
 
-if strfind       (options, '-s')
+if strfind           (options, '-s')
     clf;
     switch level
-        case 2
+        case         2
             for counter1 = 1 : length (intrees)
-                for counter2 = 1 : length (intrees {counter1})
+                for counter2 = 1 : length (intrees{counter1})
                     plot_tree ( ...
                         intrees{counter1}{counter2}, [], ...
-                        DD{counter1}{counter2}, [], [], options);
+                        DD{counter1}{counter2});
                 end
             end
-        case     1
+        case         1
             clf;
             for counter = 1 : lent
-                plot_tree (intrees {counter}, [], DD{counter}, [], [], options);
+                plot_tree (intrees {counter}, [], DD{counter});
             end
-        case     0
-            plot_tree (intrees, [], [], [], [], options);
+        case         0
+            plot_tree (intrees);
     end
-    title        ('spread trees');
-    xlabel       ('x [\mum]');
-    ylabel       ('y [\mum]');
-    zlabel       ('z [\mum]');
-    view         (2);
-    grid         on;
-    axis         image;
+    title            ('spread trees');
+    xlabel           ('x [\mum]');
+    ylabel           ('y [\mum]');
+    zlabel           ('z [\mum]');
+    view             (2);
+    grid             on;
+    axis             image;
 end
+
 

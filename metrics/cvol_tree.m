@@ -45,13 +45,17 @@ ver_tree     (intree); % verify that input is a tree structure
 isfrustum    = 0;
 if ~isstruct (intree)
     D        = trees{intree}.D;
-    if isfield (trees{intree}, 'frustum') && (trees{intree}.frustum == 1)
-        isfrustum = 1;
+    if ...
+            (isfield (trees{intree}, 'frustum')) && ...
+            (trees{intree}.frustum == 1)
+        isfrustum  = 1;
     end
 else
     D        = intree.D;
-    if isfield (intree, 'frustum') && (intree.frustum == 1)
-        isfrustum = 1;
+    if ...
+            (isfield (intree, 'frustum')) && ...
+            (intree.frustum == 1)
+        isfrustum  = 1;
     end
 end
 
@@ -79,7 +83,9 @@ end
 
 if strfind       (options, '-s') % show option
     clf; hold on; 
-    plot_tree    (intree, cvol);
+    HP           = plot_tree (intree, cvol, [], [], [], '-b');
+    set          (HP, ...
+        'edgecolor',           'none');
     colorbar;
     title        ('continuous volume');
     xlabel       ('x [\mum]');

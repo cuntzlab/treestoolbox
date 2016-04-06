@@ -29,7 +29,7 @@
 % Uses       ipar_tree ver_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2015  Hermann Cuntz
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 
 function child = child_tree (intree, v, options)
 
@@ -58,30 +58,31 @@ if (nargin < 3) || isempty (options)
     options  = '';
 end
 
-v            = [0; v];
-ipar2        = [ ...
+v                = [0; v];
+ipar2            = [ ...
     (zeros (1, size (ipar, 2) - 1)) ; ...
     (ipar  (:, 2 : end))];
 % accumulate along parent paths:
-child        = accumarray ( ...
+child            = accumarray ( ...
     reshape (ipar2 + 1, numel (ipar2), 1), ...
     repmat  (v, size (ipar2, 2), 1));
-child        = child (2 : end);
-if size      (child, 1) < N
-    child (N) = 0;
+child            = child (2 : end);
+if size          (child, 1) < N
+    child (N)    = 0;
 end
 
-if strfind (options,'-s') % show option
-    clf; hold on; 
-    plot_tree (intree, child);
+if strfind       (options,'-s') % show option
+    clf;
+    hold         on; 
+    plot_tree    (intree, child);
     colorbar;
-    title    ('child count');
-    xlabel   ('x [\mum]');
-    ylabel   ('y [\mum]');
-    zlabel   ('z [\mum]');
-    view     (2);
-    grid     on;
-    axis     image;
+    title        ('child count');
+    xlabel       ('x [\mum]');
+    ylabel       ('y [\mum]');
+    zlabel       ('z [\mum]');
+    view         (2);
+    grid         on;
+    axis         image;
 end
 
 %%% ALSO (mathematically more logical but more time consuming):
@@ -96,3 +97,6 @@ end
 %     N       = N + resW;
 % end
 % result      = full (sum (N));
+
+
+

@@ -26,7 +26,7 @@
 % Uses       ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2015  Hermann Cuntz
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 
 function C = C_tree (intree, options)
 
@@ -54,22 +54,18 @@ end
 
 % sum (dA) (actually faster than sum(dA)) ;-)
 % continuation points have one entry in dA:
-C            = ((ones (1, size (dA, 1)) * dA) == 1)';
+C                = ((ones (1, size (dA, 1)) * dA) == 1)';
 
-if strfind   (options,'-s') % show option
-    clf; hold on; 
-    HP       = plot_tree (intree);
-    set      (HP, ...
-        'facealpha',           0.2);
-    HP       = pointer_tree (intree, find (C), 50);
-    set      (HP, ...
-        'facealpha',           0.2);
-    title    ('branch points');
-    xlabel   ('x [\mum]');
-    ylabel   ('y [\mum]');
-    zlabel   ('z [\mum]');
-    view     (2);
-    grid     on;
-    axis     image;
-
+if strfind       (options,'-s') % show option
+    clf;
+    hold         on; 
+    plot_tree    (intree, [], [], [], [], '-b');
+    pointer_tree (intree, find (C), 50);
+    title        ('continuation points');
+    xlabel       ('x [\mum]');
+    ylabel       ('y [\mum]');
+    zlabel       ('z [\mum]');
+    view         (2);
+    grid         on;
+    axis         image;
 end

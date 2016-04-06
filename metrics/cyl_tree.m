@@ -104,10 +104,10 @@ else
     end
     % the sum of the elements over the rows would actually result in the
     % vector coordinates as above:
-    % X1 = X1 * ones (N, 1);
-    % X2 = X2 * ones (N, 1);
-    % Y1 = Y1 * ones (N, 1);
-    % Y2 = Y2 * ones (N, 1);
+    % X1         = X1 * ones (N, 1);
+    % X2         = X2 * ones (N, 1);
+    % Y1         = Y1 * ones (N, 1);
+    % Y2         = Y2 * ones (N, 1);
 end
 
 

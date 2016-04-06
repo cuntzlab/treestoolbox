@@ -27,7 +27,7 @@
 % Uses         ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2015  Hermann Cuntz
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 
 function idpar = idpar_tree (intree, options)
 
@@ -55,26 +55,37 @@ end
 
 % index to direct parent:
 % simple graph theory: feature of adjacency matrix:
-idpar        = dA * (1 : size (dA, 1))';
+idpar            = dA * (1 : size (dA, 1))';
 
-if isempty   (strfind (options, '-0'))
+if isempty       (strfind (options, '-0'))
     % null-compartment (root) becomes one
-    idpar    (idpar == 0) = 1;
+    idpar (idpar == 0) = 1;
 end
 
-if strfind   (options,'-s')            % show option
+if strfind       (options,'-s')            % show option
     clf; 
-    HP       = plot_tree(intree);
-    set      (HP,'facealpha',0.2);
-    T        = vtext_tree (intree, idpar, []);
-    set      (T, 'fontsize',14);
-    title    ('direct parend ID');
-    xlabel   ('x [\mum]');
-    ylabel   ('y [\mum]');
-    zlabel   ('z [\mum]');
-    view     (2);
-    grid     on;
-    axis     image;
+    HP           = plot_tree  (intree, [], [], [], [], '-b');
+    set          (HP, ...
+        'facealpha',           0.2, ...
+        'edgecolor',           'none');
+    
+    T            = vtext_tree (intree, [], [0 1 0], [-2 3 5]);
+    set          (T, ...
+        'fontsize',            14);
+    T            = vtext_tree (intree, idpar,      [],  [0 0 5]);
+    set          (T, ...
+        'fontsize',            14);
+%     
+%     T            = vtext_tree (intree, idpar, []);
+%     set          (T, ...
+%         'fontsize',            14);
+    title        ('direct parend ID');
+    xlabel       ('x [\mum]');
+    ylabel       ('y [\mum]');
+    zlabel       ('z [\mum]');
+    view         (2);
+    grid         on;
+    axis         image;
 end
 
 

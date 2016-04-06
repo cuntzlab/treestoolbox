@@ -14,6 +14,5 @@
 %   root_tree     - Add tiny segment at tree root.
 %   resample_tree - Redistributes nodes on tree.
 %
-% the TREES toolbox: edit, visualize and analyze neuronal trees
-% Copyright (C) 2009  Hermann Cuntz
-
+% the TREES toolbox: edit, generate, visualise and analyse neuronal trees
+% Copyright (C) 2009 - 2016  Hermann Cuntz

@@ -41,7 +41,7 @@
 % See also   ratio_tree child_tree Pvec_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2015  Hermann Cuntz
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 
 function [bi, bins, bh] = bin_tree (intree, v, bins, options)
 
@@ -68,23 +68,24 @@ if (nargin < 4) || isempty (options)
     options = '';
 end
 
-if numel (bins) == 1
-    bins     = ...
+if numel (bins)  == 1
+    bins         = ...
         min (v) : (max (v) * 1.0001 - min (v)) / bins : max (v) * 1.0001;
 end
 
-[bh, bi]     = histc (v, bins);
+[bh, bi]         = histc (v, bins);
 
-if strfind   (options,'-s') % show option
-    clf; hold on;
-    plot_tree (intree,bi);
-    title    ('bin index');
-    xlabel   ('x [\mum]');
-    ylabel   ('y [\mum]');
-    zlabel   ('z [\mum]');
-    view     (2);
-    grid     on;
-    axis     image;
+if strfind       (options,'-s') % show option
+    clf;
+    hold         on;
+    plot_tree    (intree,bi);
+    title        ('bin index');
+    xlabel       ('x [\mum]');
+    ylabel       ('y [\mum]');
+    zlabel       ('z [\mum]');
+    view         (2);
+    grid         on;
+    axis         image;
     colorbar;
 end
 

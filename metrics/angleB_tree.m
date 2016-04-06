@@ -39,7 +39,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 ver_tree     (intree); % verify that input is a tree structure
 
@@ -55,35 +55,37 @@ if (nargin < 2) || isempty (options)
     options  = '';
 end
 
-iB           = find  (B_tree (intree));  % branch point indices
-angleB       = zeros (length (iB), 1);   % angle values for each BP
-for ward     = 1 : length (iB)           % walk through all branch points
-    BB       = find (tree.dA (:, iB (ward)));  % indices of BP daughters 
-    Pr       = [ ...                     % coordinates of BP
-        (tree.X (iB (ward))) ...
-        (tree.Y (iB (ward))) ...
-        (tree.Z (iB (ward)))]; 
-    P1       = [ ...                     % coordinates of daughter 1
+iB               = find  (B_tree (intree));  % branch point indices
+angleB           = zeros (length (iB), 1);   % angle values for each BP
+for counter      = 1 : length (iB)      % walk through all branch points:
+    % indices of BP daughters:
+    BB           = find (tree.dA (:, iB (counter)));
+    Pr           = [ ...                     % coordinates of BP
+        (tree.X (iB (counter))) ...
+        (tree.Y (iB (counter))) ...
+        (tree.Z (iB (counter)))];
+    P1           = [ ...                     % coordinates of daughter 1
         (tree.X (BB (1))) ...
         (tree.Y (BB (1))) ...
-        (tree.Z (BB (1)))];    
-    P2       = [ ...                     % coordinates of daughter 2
-        (tree.X(BB(2))) ...
-        (tree.Y(BB(2))) ...
-        (tree.Z(BB(2)))];
-    V1       = P1 - Pr;                  % daughter branch 1
-    V2       = P2 - Pr;                  % daughter branch 2
+        (tree.Z (BB (1)))];
+    P2           = [ ...                     % coordinates of daughter 2
+        (tree.X (BB (2))) ...
+        (tree.Y (BB (2))) ...
+        (tree.Z (BB (2)))];
+    V1           = P1 - Pr;                  % daughter branch 1
+    V2           = P2 - Pr;                  % daughter branch 2
     % normalized vectors:
-    nV1      = V1 / sqrt (sum (V1.^2));
-    nV2      = V2 / sqrt (sum (V2.^2));
+    nV1          = V1 / sqrt (sum (V1.^2));
+    nV2          = V2 / sqrt (sum (V2.^2));
     % the angle between to vectors in 3D is simply the inverse cosine of
     % their dot-product.
-    angleB (ward) = acos (dot (nV1, nV2));
+    angleB (counter) = acos (dot (nV1, nV2));
     if strfind   (options, '-m') % show movie option
         clf; hold on;
-        HP       = plot_tree (intree);
+        HP       = plot_tree (intree, [], [], [], [], '-b');
         set      (HP, ...
-            'facealpha',     0.2);
+            'facealpha',     0.2, ...
+            'edgecolor',     'none');
         L (1)    = line ( ...
             [(Pr (1)) (Pr (1) + V1 (1))], ...
             [(Pr (2)) (Pr (2) + V1 (2))], ...
@@ -96,9 +98,9 @@ for ward     = 1 : length (iB)           % walk through all branch points
             'linewidth',     4, ...
             'color',         [1 0 0]);
         text     ( ...
-            tree.X (iB (ward)), ...
-            tree.Y (iB (ward)), ...
-            tree.Z (iB (ward)), num2str (angleB (ward)));
+            tree.X (iB (counter)), ...
+            tree.Y (iB (counter)), ...
+            tree.Z (iB (counter)), num2str (angleB (counter)));
         title    ('angle at b-points');
         xlabel   ('x [\mum]');
         ylabel   ('y [\mum]');
@@ -110,13 +112,17 @@ for ward     = 1 : length (iB)           % walk through all branch points
     end
 end
 % map angle on a Nx1 vector, rest becomes NaN:
-tangleB      = angleB;
-angleB       = NaN (size (tree.dA, 1), 1);
-angleB (iB)  = tangleB;
+tangleB          = angleB;
+angleB           = NaN (size (tree.dA, 1), 1);
+angleB (iB)      = tangleB;
 
 if strfind       (options, '-s') % show option
-    clf; hold on;
-    plot_tree    (intree, [], [], find (~B_tree (intree)));
+    clf;
+    hold         on;
+    HP           = plot_tree ( ...
+        intree, [], [], find (~B_tree (intree)), [], '-b');
+    set          (HP, ...
+        'edgecolor',           'none');
     axis         equal;
     iB           = find (B_tree (intree));
     plot_tree    (intree, angleB (iB), [], iB);

@@ -27,7 +27,7 @@
 % Uses       ver_tree typeN_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2015  Hermann Cuntz
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 
 function BO = BO_tree (intree, options)
 
@@ -53,33 +53,36 @@ if (nargin < 2) || isempty (options)
     options  = '';
 end
 
-N            = size(dA, 1); % number of nodes in tree
+N                = size(dA, 1); % number of nodes in tree
 % type (2:B, 1:C, 0:T) on the spot in a matrix sdA:
 % 2s potentiate and then taking the log2 to indicate branching point on the
 % way..
 % dA * diag(sum(dA)):
-sdA          = dA * spdiags (typeN_tree (intree), 0, N, N);
+sdA              = dA * spdiags (typeN_tree (intree), 0, N, N);
 % calculating weighted path length:
-BO           = sdA (:, 1);
-resBO        = BO;
+BO               = sdA (:, 1);
+resBO            = BO;
 while sum (resBO) ~= 0
-    resBO    = sdA * resBO; % use adjacency matrix to walk through tree
-    BO       = BO + resBO;
+    resBO        = sdA * resBO; % use adjacency matrix to walk through tree
+    BO           = BO  + resBO;
 end
-BO (1)       = 1;
-BO           = full (log2 (BO));
+BO (1)           = 1;
+BO               = full (log2 (BO));
 
-if strfind   (options,'-s') % show option
-    clf; hold on;
-    plot_tree (intree, BO);
+if strfind       (options,'-s') % show option
+    clf;
+    hold         on;
+    HP           = plot_tree (intree, BO, [], [], [], '-b');
+    set          (HP, ...
+        'edgecolor',           'none');
     colorbar;
-    title    ('branch order');
-    xlabel   ('x [\mum]');
-    ylabel   ('y [\mum]');
-    zlabel   ('z [\mum]');
-    view     (2);
-    grid     on;
-    axis     image;
+    title        ('branch order');
+    xlabel       ('x [\mum]');
+    ylabel       ('y [\mum]');
+    zlabel       ('z [\mum]');
+    view         (2);
+    grid         on;
+    axis         image;
 end
 
 

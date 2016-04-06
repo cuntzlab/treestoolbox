@@ -27,7 +27,7 @@
 % Uses ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2015  Hermann Cuntz
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 
 function varargout = root_tree (intree, options)
 
@@ -77,9 +77,7 @@ end
 
 if strfind       (options, '-s') % show option
     clf; hold on; 
-    HP           = pointer_tree (tree, 1); 
-    set          (HP, ...
-        'facealpha',           0.5);
+    pointer_tree (tree, 1); 
     xplore_tree  (tree);
     title        ('root tree');
     xlabel       ('x [\mum]');

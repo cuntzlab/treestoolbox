@@ -15,5 +15,5 @@
 %   x3d_tree             - Plots a tree as cylinders.
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2015  Hermann Cuntz
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 

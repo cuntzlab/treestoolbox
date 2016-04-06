@@ -111,8 +111,7 @@ else
 end
 
 if (nargin < 9) || isempty (options)
-    % options  = '-w';
-    options  = '';
+    options  = '-w';
 end
 
 if ~iscell       (msttrees)

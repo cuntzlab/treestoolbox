@@ -70,7 +70,7 @@ if length (DD) < 3
     DD       = [DD (zeros (1, 3 - length (DD)))];
 end
 
-tree         = tran_tree (tree, DD);
+tree             = tran_tree (tree, DD);
 
 if strfind       (options, '-1')
     hold         on;

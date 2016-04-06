@@ -42,7 +42,7 @@
 % delete_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2015  Hermann Cuntz
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 
 function varargout = resample_tree (intree, sr, options)
 
@@ -70,7 +70,7 @@ end
 
 if (nargin < 3) || isempty (options)
     % {DEFAULT: waitbar}
-    options  = ''; 
+    options  = '-w'; 
 end
 
 if strfind   (options, '-s')

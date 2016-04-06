@@ -27,7 +27,7 @@
 % Uses       ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2015  Hermann Cuntz
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 
 function  PL = PL_tree (intree, options)
 
@@ -67,7 +67,9 @@ PL           = full (PL);
 
 if strfind       (options, '-s')           % show option
     clf; hold on; 
-    plot_tree    (intree, PL);
+    HP           = plot_tree (intree, PL, [], [], [], '-b');
+    set          (HP, ...
+        'edgecolor',           'none');
     colorbar;
     title        ('topological path length');
     xlabel       ('x [\mum]');

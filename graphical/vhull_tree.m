@@ -22,7 +22,7 @@
 %     '-w'   : waitbar
 %     '-r'   : lower resolution with reducepatch by 10x (for 3D)
 %     '-2d'  : 2D voronoi in 2D boundary
-%     {DEFAULT: ''}
+%     {DEFAULT: '-s -w'}
 %
 % Output
 % ------
@@ -50,8 +50,7 @@ global       trees
 
 if (nargin < 6) || isempty (options)
     % {DEFAULT: waitbar and show result}
-    % options  = '-w -s';
-    options  = '';
+    options  = '-w -s';
 end
 
 if (nargin < 1) || isempty(intree)
@@ -118,13 +117,13 @@ X            = [(X (ipart)); (points (:, 1))] + DD (1);
 Y            = [(Y (ipart)); (points (:, 2))] + DD (2);
 HP           = zeros (length (ipart), 1);
 
-if strfind   (options, '-2d')
+if strfind       (options, '-2d')
     % voronoi doesn't like duplicate points
-    warning  ('off', 'MATLAB:voronoin:DuplicateDataPoints');
-    [V, C]   = voronoin ([X, Y]);
-    warning  ('on',  'MATLAB:voronoin:DuplicateDataPoints');
-    VI       = V;
-    if numel (points) > 0
+    warning      ('off', 'MATLAB:voronoin:DuplicateDataPoints');
+    [V, C]       = voronoin ([X, Y]);
+    warning      ('on',  'MATLAB:voronoin:DuplicateDataPoints');
+    VI           = V;
+    if numel     (points) > 0
         [IN, ON] = inpolygon ( ...
             V (:, 1), ...
             V (:, 2), ...
@@ -132,19 +131,19 @@ if strfind   (options, '-2d')
             points (:, 2) + DD (2));
         VI (~IN & ~ON) = NaN;
     end
-    parea    = zeros (length (ipart), 1);
+    parea        = zeros (length (ipart), 1);
     for counter  = 1 : length (ipart)
         parea (counter) = polyarea ( ...
             VI (C {counter}, 1), ...
             VI (C {counter}, 2));
     end
-    indy     = find ((~isnan (parea) & (parea ~= 0)));
+    indy         = find ((~isnan (parea) & (parea ~= 0)));
     if ~isempty (v)
-        v    = v (indy);
+        v        = v (indy);
     end
-    vol      = parea (indy);
-    KK       = C (indy);
-    VO       = VI;
+    vol          = parea (indy);
+    KK           = C (indy);
+    VO           = VI;
     if strfind       (options, '-s') % show option: update
         for counter  = 1 : length (KK)
             if isempty (v)
@@ -160,20 +159,20 @@ if strfind   (options, '-2d')
     end
     HP (HP == 0) = [];
 else
-    Z        = [(Z (ipart)); (points (:, 3))] + DD (3);
+    Z            = [(Z (ipart)); (points (:, 3))] + DD (3);
     % voronoin doesn't like duplicate points
-    warning  ('off', 'MATLAB:voronoin:DuplicateDataPoints');
-    [V, C]   = voronoin ([X, Y, Z]);
-    warning  ('on',  'MATLAB:voronoin:DuplicateDataPoints');
-    VO       = cell  (length (ipart), 1);
-    KK       = cell  (length (ipart), 1);
-    vol      = zeros (length (ipart), 1);
-    vox      = cell  (length (ipart), 1);
-    voy      = cell  (length (ipart), 1);
-    voz      = cell  (length (ipart), 1);
+    warning      ('off', 'MATLAB:voronoin:DuplicateDataPoints');
+    [V, C]       = voronoin ([X, Y, Z]);
+    warning      ('on',  'MATLAB:voronoin:DuplicateDataPoints');
+    VO           = cell  (length (ipart), 1);
+    KK           = cell  (length (ipart), 1);
+    vol          = zeros (length (ipart), 1);
+    vox          = cell  (length (ipart), 1);
+    voy          = cell  (length (ipart), 1);
+    voz          = cell  (length (ipart), 1);
     for counter  = 1 : length (ipart)
         vo       = V (C{counter}, :);
-        VO {counter} = vo;
+        VO{counter} = vo;
         if find  (isnan (vo) | isinf (vo))
             vol  (counter) = NaN;
         else
@@ -184,17 +183,17 @@ else
         voy{counter} = vo (:, 2);
         voz{counter} = vo (:, 3);
     end
-    indy     = find ((~isnan (vol) & (vol ~= 0)));
-    if ~isempty (v)
-        v    = v (indy);
+    indy         = find ((~isnan (vol) & (vol ~= 0)));
+    if ~isempty  (v)
+        v        = v (indy);
     end
-    vol      = vol (indy);
-    KK       = KK  (indy);
-    VO       = VO  (indy);
-    vox      = vox (indy);
-    voy      = voy (indy);
-    voz      = voz (indy);
-    if strfind (options, '-s') % show option: update
+    vol          = vol (indy);
+    KK           = KK  (indy);
+    VO           = VO  (indy);
+    vox          = vox (indy);
+    voy          = voy (indy);
+    voz          = voz (indy);
+    if strfind   (options, '-s') % show option: update
         for counter = 1 : length (KK)
             if isempty (v)
                 p    = patch ( ...
@@ -214,17 +213,17 @@ else
     
 end
 
-if strfind   (options, '-r') % reduce the complexity of the output patch
+if strfind       (options, '-r') % reduce the complexity of the output patch
     for counter  = 1 : length (HP)
         reducepatch  (HP (counter), 0.1);
     end
 end
 
-if strfind   (options, '-s') % show option
+if strfind       (options, '-s') % show option
     if ~isempty  (v)
         shading  flat;
     end
-    axis     equal
+    axis         equal
 end
 
 

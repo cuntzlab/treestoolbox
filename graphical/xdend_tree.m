@@ -57,18 +57,18 @@ end
 % this is still tricky because we have to obtain 
 % minT and maxT from ipar (T) - 
 % parent index structure (see "ipar_tree"):
-ipar         = ipar_tree (intree);
+ipar             = ipar_tree (intree);
 % parent index path only for termination points:
-iparT        = ipar      (T_tree (intree), :);
+iparT            = ipar      (T_tree (intree), :);
 % sorting iparT as a vector:
-[i1, i2]     = sort      (reshape (iparT', numel (iparT'), 1));
-[~, b]       = ind2sub   (size (iparT'), i2); % b is the label
-di           = [0; (diff (i1))];
-idi          = [(diff (i1)); 1];
-minT         = b (di  == 1);
-maxT         = b (idi == 1);
-maxT         = maxT (2 : length (maxT));
-xdend        = (maxT + minT) ./ 2;     % there you go
+[i1, i2]         = sort      (reshape (iparT', numel (iparT'), 1));
+[~, b]           = ind2sub   (size (iparT'), i2); % b is the label
+di               = [0; (diff (i1))];
+idi              = [(diff (i1)); 1];
+minT             = b (di  == 1);
+maxT             = b (idi == 1);
+maxT             = maxT (2 : length (maxT));
+xdend            = (maxT + minT) ./ 2;     % there you go
 
 if (nargout > 1) || ~isempty (strfind (options, '-s'))
     if ~isstruct (intree)

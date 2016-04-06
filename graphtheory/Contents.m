@@ -9,9 +9,9 @@
 %   BO_tree       - Branch order values in a tree.
 %   C_tree        - Continuation point indices in a tree.
 %   child_tree    - Attribute add-up child node values all nodes in a tree.
-%   tree.
 %   dissect_tree  - Groups together nodes belonging to same branches.
 %   dist_tree     - Index to tree nodes at um path distance away from root.
+%   gene_tree     - String describing tree topology.
 %   idpar_tree    - Index to direct parent node in a tree.
 %   ipar_tree     - Path to root: parent indices. 
 %   LO_tree       - Level order of all nodes of a tree.
@@ -25,6 +25,7 @@
 %   T_tree        - Termination point index in a tree.
 %   typeN_tree    - Tree node B-C-T info.
 %
-% the TREES toolbox: edit, visualize and analyze neuronal trees
-% Copyright (C) 2009  Hermann Cuntz
+% the TREES toolbox: edit, generate, visualise and analyse neuronal trees
+% Copyright (C) 2009 - 2016  Hermann Cuntz
+
 

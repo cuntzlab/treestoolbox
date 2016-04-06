@@ -33,16 +33,15 @@
 %       '-b1': patches are mapped on x y 
 %       '-b2': patches are mapped on x z
 %       '-b3': patches are mapped on y z
-%     '-p'  : correct cylinder representation but not yet flawless and a
+%     '-p'   : correct cylinder representation but not yet flawless and a
 %             bit slower than "blatt" representation.
-%     {DEFAULT: full cylinder representation}
-%     '-2l' : 2D (using only X and Y). forces line output (2D), no diameter
+%     '-2l'  : 2D (using only X and Y). forces line output (2D), no diameter
 %             (slower), color is mapped independently of matlab, always
 %             min to max.
-%     '-3l' : 3D. forces line output (2D), no diameter (slower, as '-2l')
-%     '-2q' : 2D (using only X and Y). edges are represented as arrows
+%     '-3l'  : 3D. forces line output (2D), no diameter (slower, as '-2l')
+%     '-2q'  : 2D (using only X and Y). edges are represented as arrows
 %             (using quiver) . Color vectors do not work.
-%     '-3q' : 3D. edges are represented as arrows (using quiver, as '-q')
+%     '-3q'  : 3D. edges are represented as arrows (using quiver, as '-q')
 %   additional options:
 %     '-thin'  : all diameters   1um, for line and quiver linewidth 0.25
 %     '-thick' : all diameters + 3um, for line and quiver linewidth 3
@@ -144,10 +143,10 @@ if strfind       (options, '-b')
     Z1           = Z1 (ipart) + DD (3);
     Z2           = Z2 (ipart) + DD (3);
     % direction vectors:
-    dP           = [ ...
-        (X2 - X1) ...
-        (Y2 - Y1) ...
-        (Z2 - Z1)] ./ ...
+    dP           = [   ...
+        (X2 - X1)      ...
+        (Y2 - Y1)      ...
+        (Z2 - Z1)] ./  ...
         repmat (sqrt ( ...
         (X2 - X1).^2 + ...
         (Y2 - Y1).^2 + ...
@@ -167,11 +166,11 @@ if strfind       (options, '-b')
     end
     switch       typ    % draw plates (4 coordinates for one cylinder):
         case     2
-            dP   = dP (:, [1 3]);
+            dP       = dP (:, [1 3]);
             % use rotation matrix to rotate the data
-            V1   = (dP * [0 -1;  1 0]) .* (repmat (D, 1, 2) ./ 2);
-            V2   = (dP * [0  1; -1 0]) .* (repmat (D, 1, 2) ./ 2);
-            if isfield (tree, 'frustum') && (tree.frustum == 1)
+            V1       = (dP * [0 -1;  1 0]) .* (repmat (D,    1, 2) ./ 2);
+            V2       = (dP * [0  1; -1 0]) .* (repmat (D,    1, 2) ./ 2);
+            if isfield (tree,   'frustum') && (tree.frustum == 1)
                 V3   = (dP * [0 -1;  1 0]) .* (repmat (parD, 1, 2) ./ 2);
                 V4   = (dP * [0  1; -1 0]) .* (repmat (parD, 1, 2) ./ 2);
                 MX   = [ ...
@@ -199,11 +198,11 @@ if strfind       (options, '-b')
                     (Z2 + V2 (:, 2))]';
             end
         case     3
-            dP   = dP (:, [2 3]);
+            dP       = dP (:, [2 3]);
             % use rotation matrix to rotate the data
-            V1   = (dP * [0 -1;  1 0]) .* (repmat (D, 1, 2) ./ 2);
-            V2   = (dP * [0  1; -1 0]) .* (repmat (D, 1, 2) ./ 2);
-            if isfield (tree, 'frustum') && (tree.frustum == 1)
+            V1       = (dP * [0 -1;  1 0]) .* (repmat (D,    1, 2) ./ 2);
+            V2       = (dP * [0  1; -1 0]) .* (repmat (D,    1, 2) ./ 2);
+            if isfield (tree,   'frustum') && (tree.frustum == 1)
                 V3   = (dP * [0 -1;  1 0]) .* (repmat (parD, 1, 2) ./ 2);
                 V4   = (dP * [0  1; -1 0]) .* (repmat (parD, 1, 2) ./ 2);
                 MX   = [X1 X1 X2 X2]';
@@ -231,11 +230,11 @@ if strfind       (options, '-b')
                     (Z2 + V2 (:, 2))]';
             end
         otherwise
-            dP   = dP (:, [1 2]);
+            dP       = dP (:, [1 2]);
             % use rotation matrix to rotate the data
-            V1   = (dP * [0 -1;  1 0]) .* (repmat (D, 1, 2) ./ 2);
-            V2   = (dP * [0  1; -1 0]) .* (repmat (D, 1, 2) ./ 2);
-            if isfield (tree, 'frustum') && (tree.frustum == 1)
+            V1       = (dP * [0 -1;  1 0]) .* (repmat (D,    1, 2) ./ 2);
+            V2       = (dP * [0  1; -1 0]) .* (repmat (D,    1, 2) ./ 2);
+            if isfield (tree,   'frustum') && (tree.frustum == 1)
                 V3   = (dP * [0 -1;  1 0]) .* (repmat (parD, 1, 2) ./ 2);
                 V4   = (dP * [0  1; -1 0]) .* (repmat (parD, 1, 2) ./ 2);
                 MX   = [ ...
@@ -298,7 +297,7 @@ if ~isempty      ([ ...
             colors     = map (color, :);
         end
     end
-    if ~isempty ([ ...
+    if ~isempty  ([ ...
             (strfind (options, '-2l')) ...
             (strfind (options, '-3l'))])
         if   strfind (options, '-2l')
@@ -307,7 +306,7 @@ if ~isempty      ([ ...
                 [(X1 (ipart)) (X2 (ipart))]' + DD (1), ...
                 [(Y1 (ipart)) (Y2 (ipart))]' + DD (2));
         end
-        if strfind (options, '-3l')
+        if   strfind (options, '-3l')
             [X1, X2, Y1, Y2, Z1, Z2] = cyl_tree (intree);
             HP         = line ( ...
                 [(X1 (ipart)) (X2 (ipart))]' + DD (1), ...
@@ -453,7 +452,8 @@ if strfind       (options, '-p')
         repmat (D / 2, 1, 3);
     % face index creation, start with the two points on the base level and
     % then connect them to the two others on the terminal level
-    % start with a standard poly list for a cylinder then replicate and shift
+    % start with a standard poly list for a cylinder then replicate and
+    % shift
     first_col    = (1       : 1 : res - 1)';
     second_col   = (2       : 1 : res)';
     third_col    = (res + 2 : 1 : 2 * res)';
@@ -493,10 +493,6 @@ end
 if ~(sum (get (gca, 'DataAspectRatio') == [1 1 1]) == 3)
     axis         equal
 end
-
-
-
-
 
 
 

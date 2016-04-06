@@ -108,8 +108,8 @@ if length (DD) < 3
 end
 
 % if color values are mapped:
-if size  (color, 1) > 1
-    if size  (color, 2) ~= 3
+if size              (color, 1) > 1
+    if size          (color, 2) ~= 3
         if islogical (color)
             color    = double (color);
         end
@@ -135,40 +135,39 @@ if size  (color, 1) > 1
     end
 end
 
-if strfind (options, '-2d')
-    vt       = num2str (v);
-    HP       = text ( ...
+if strfind           (options, '-2d')
+    vt               = num2str (v);
+    HP               = text ( ...
         X (ipart) + DD (1), ...
         Y (ipart) + DD (2), vt);
 else
-    vt       = num2str (v);
-    HP       = text ( ...
+    vt               = num2str (v);
+    HP               = text ( ...
         X (ipart) + DD (1), ...
         Y (ipart) + DD (2), ...
         Z (ipart) + DD (3), vt);
 end
 
-if size (color, 1) > 1
-    for ward = 1 : length (ipart)
-        set  (HP (ward), ...
-            'color',           colors (ward, :), ...
+if size (color, 1)   > 1
+    for counter      = 1 : length (ipart)
+        set          (HP (counter), ...
+            'color',           colors (counter, :), ...
             'fontsize',        14);
     end
 else
-    set      (HP, ...
+    set              (HP, ...
         'color',               color, ...
         'fontsize',            14);
 end
 
 if strfind (options, '-sc')
-    axis     equal;
-    xlim     ([(min (X)) (max (X))]);
-    ylim     ([(min (Y)) (max (Y))]);
-    if isempty (strfind  (options, '-2d'))
-        zlim ([(min (Z)) (max (Z))]);
+    axis             equal;
+    xlim             ([(min (X)) (max (X))]);
+    ylim             ([(min (Y)) (max (Y))]);
+    if isempty       (strfind  (options, '-2d'))
+        zlim         ([(min (Z)) (max (Z))]);
     end
 end
-
 
 
 

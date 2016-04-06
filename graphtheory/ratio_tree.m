@@ -29,7 +29,7 @@
 % Uses       idpar_tree ver_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2015  Hermann Cuntz
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 
 function ratio = ratio_tree (intree, v, options)
 
@@ -58,13 +58,16 @@ if (nargin < 3) || isempty (options)
 end
 
  % vector containing index to direct parent:
-idpar        = idpar_tree (intree);
+idpar            = idpar_tree (intree);
 % well yes, is this worth an extra function?:
-ratio        = v ./ v (idpar);      
+ratio            = v ./ v (idpar);      
 
 if strfind       (options, '-s')       % show option
-    clf; hold on; 
-    plot_tree    (intree, ratio);
+    clf;
+    hold         on; 
+    HP           = plot_tree (intree, ratio, [], [], [], '-b');
+    set          (HP, ...
+        'edgecolor',           'none');
     colorbar;
     title        ('parent daughter ratios');
     xlabel       ('x [\mum]');

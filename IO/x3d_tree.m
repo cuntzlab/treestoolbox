@@ -45,8 +45,8 @@
 %
 % code by Friedrich Forstner 12 December 2008
 %
-% the TREES toolbox: edit, visualize and analyze neuronal trees
-% Copyright (C) 2009  Hermann Cuntz
+% the TREES toolbox: edit, generate, visualise and analyse neuronal trees
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 
 function [tname path] = x3d_tree (intree, tname, color, DD, ipart, options)
 

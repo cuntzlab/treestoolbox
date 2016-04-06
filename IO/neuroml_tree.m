@@ -31,8 +31,8 @@
 %
 % code by Padraig Gleeson 16 March 2011
 %
-% the TREES toolbox: edit, visualize and analyze neuronal trees
-% Copyright (C) 2009  Hermann Cuntz
+% the TREES toolbox: edit, generate, visualise and analyse neuronal trees
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 
 function [tname path] = neuroml_tree (intree, tname, options)
 

@@ -33,7 +33,7 @@
 % neuron_tree (sample_tree);
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2013  Hermann Cuntz
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 
 function [tname, path] = neuron_template_tree (intree, tname, options)
 

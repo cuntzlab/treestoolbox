@@ -1,7 +1,7 @@
 // TREES package
-// neu_tree(name)
-// 
-// saves a neuron morphology into a conversion filetype
+// neu_tree (name)
+//
+//Saves a neuron morphology into a conversion filetype
 // for the matlab TREES package. To keep things simple
 // please never load more than ONE cell before applying
 // this procedure. Read about restrictions in documentation
@@ -9,12 +9,12 @@
 //
 // load_file("neu_tree.hoc")
 // neu_tree(name)
-// 
+//
 // name::string: filename for the output file, extension
 //               should be ".neu"
 //
-// the TREES toolbox: edit, visualize and analyze neuronal trees
-// Copyright (C) 2009  Hermann Cuntz
+// the TREES toolbox: edit, generate, visualise and analyse neuronal trees
+// Copyright (C) 2009 - 2016  Hermann Cuntz
 
 
 
@@ -36,7 +36,7 @@ proc neu_tree() {
     o = o + 1
   }
   f1.printf("// file created by neu_tree from the TREES package\n")
-  f1.printf("// Hermann Cuntz 2007 \n")
+  f1.printf("// Hermann Cuntz 2009 - 2016 \n")
   f1.printf("\n")
   f1.printf("# section lines: %d\n", nsec)
   f1.printf("\n")
@@ -52,9 +52,7 @@ proc neu_tree() {
     sr[ward].sec f1.printf("%d\n", n3d())
     ncount = ncount + n3d()
   }
-  
-  
-  
+
   f1.printf("\n")
   f1.printf("# 3d points: %d\n", ncount)
   f1.printf("\n")

@@ -1,6 +1,6 @@
 % ASYM_TREE   Branch point asymmetry.
 % (trees package)
-% 
+%
 % asym = asym_tree (intree, v, options)
 % -------------------------------------
 %
@@ -19,9 +19,9 @@
 %     {DEFAULT: count child terminals (== "T_tree")}
 % - options  ::string:
 %     '-s'   : show
-%     '-m'   : explanatory movie 
+%     '-m'   : explanatory movie
 %     {DEFAULT: ''}
-% 
+%
 % Output
 % ------
 % - asym     ::vector:       ratios for each branching points
@@ -34,7 +34,7 @@
 % Uses       ipar_tree B_tree ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2015  Hermann Cuntz
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 
 function asym = asym_tree (intree, v, options)
 
@@ -65,49 +65,36 @@ if (nargin < 3) || isempty (options)
     options  = '';
 end
 
-if strfind(options, '-vp')
-    vanpelt = true;
-else
-    vanpelt = false;
-end
-
 % index of branching points:
-iB           = find      (B_tree (intree));
+iB               = find      (B_tree (intree));
 % parent index paths (see "ipar_tree"):
-ipar         = ipar_tree (intree);
+ipar             = ipar_tree (intree);
 % vector containing asymmetry values for each BP:
-asym         = zeros     (length (iB), 1);
+asym             = zeros     (length (iB), 1);
 
 for counter      = 1 : length (iB)
-    BB           = find (dA (:, iB (counter)));
+    BB           = find      (dA (:, iB (counter)));
     % sub-tree1:
-    [sub1, ~]    = ind2sub (size (ipar), find (ipar == BB (1)));
+    [sub1, ~]    = ind2sub   (size (ipar), find (ipar == BB (1)));
     % sub-tree2:
-    [sub2, ~]    = ind2sub (size (ipar), find (ipar == BB (2)));
+    [sub2, ~]    = ind2sub   (size (ipar), find (ipar == BB (2)));
     % summed values for sub-trees:
-    v1           = sum (v (sub1));
-    v2           = sum (v (sub2));
+    v1           = sum       (v (sub1));
+    v2           = sum       (v (sub2));
     % calculation of asymmetry:
-    if vanpelt
-        if v1 + v2 > 2
-            asym(counter) = abs(v1 - v2) / (v1 + v2 - 2);
-        else
-            asym(counter) = 0;
-        end
+    if v1 <= v2
+        asym (counter) = v1 / (v1 + v2);
     else
-        if v1 <= v2
-            asym (counter) = v1 / (v1 + v2);
-        else
-            asym (counter) = v2 / (v1 + v2);
-        end
+        asym (counter) = v2 / (v1 + v2);
     end
     if strfind   (options, '-m')       % movie option
-        clf; hold on;
+        clf;
+        hold     on;
         HP       = plot_tree (intree);
         set      (HP, ...
             'facealpha', 0.2);
-        plot_tree    (intree, [1 0 0], [], sub1);
-        plot_tree    (intree, [0 1 0], [], sub2);
+        plot_tree (intree, [1 0 0], [], sub1);
+        plot_tree (intree, [0 1 0], [], sub2);
         HT       = text (0, 0, num2str (asym (counter)));
         set      (HT,...
             'fontsize',        12,...
@@ -123,27 +110,28 @@ for counter      = 1 : length (iB)
     end
 end
 % map asym on a Nx1 vector, rest becomes NaN:
-tasym        = asym;
-asym         = NaN (size (dA, 1), 1);
-asym (iB)    = tasym;
+tasym            = asym;
+asym             = NaN (size (dA, 1), 1);
+asym (iB)        = tasym;
 
-if strfind   (options, '-s') % show option
-    clf; hold on;
-    HP       = plot_tree (intree, [], [], find (~B_tree (intree)));
-    set      (HP, ...
-            'facealpha', 0.2);
-    iB       = find (B_tree (intree));
+if strfind       (options, '-s') % show option
+    clf;
+    hold         on;
+    HP           = plot_tree (intree, [], [], find (~B_tree (intree)));
+    set          (HP, ...
+        'facealpha',           0.2);
+    iB           = find (B_tree (intree));
     plot_tree    (intree, asym (iB), [], iB);
-    title    ([...
-            'asymmetry at branch points, mean: ' ...
-            (num2str (nanmean (asym)))]);
-    xlabel   ('x [\mum]');
-    ylabel   ('y [\mum]');
-    zlabel   ('z [\mum]');
-    view     (2);
-    grid     on;
-    axis     image;
-    set      (gca,...
-            'clim',[0 0.5]);
+    title        ([...
+        'asymmetry at branch points, mean: ' ...
+        (num2str (nanmean (asym)))]);
+    xlabel       ('x [\mum]');
+    ylabel       ('y [\mum]');
+    zlabel       ('z [\mum]');
+    view         (2);
+    grid         on;
+    axis         image;
+    set          (gca, ...
+        'clim',                [0 0.5]);
     colorbar;
 end

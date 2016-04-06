@@ -47,7 +47,7 @@ if (nargin < 1) || isempty (intree)
     intree   = length (trees);
 end
 
-ver_tree(intree); % verify that input is a tree structure
+ver_tree     (intree); % verify that input is a tree structure
 
 if (nargin < 3) || isempty (color)
     % {DEFAULT color: black}
@@ -76,25 +76,25 @@ if nargin < 6
 end
 
 % use only node position for this function
-if ~isstruct (intree)
-    X        = trees{intree}.X;
-    Y        = trees{intree}.Y;
-    Z        = trees{intree}.Z;
+if ~isstruct     (intree)
+    X            = trees{intree}.X;
+    Y            = trees{intree}.Y;
+    Z            = trees{intree}.Z;
 else
-    X        = intree.X;
-    Y        = intree.Y;
-    Z        = intree.Z;
+    X            = intree.X;
+    Y            = intree.Y;
+    Z            = intree.Z;
 end
 
 hold on;
-indy         = ipar  ( ...
+indy             = ipar  ( ...
     sect (1, 2), ...
     1 : find (ipar (sect (1, 2), :) == sect (1, 1)));
-HP           = plot3 ( ...
+HP               = plot3 ( ...
     X (indy) + DD (1), ...
     Y (indy) + DD (2), ...
     Z (indy) + DD (3), 'k-');
-set          (HP, ...
+set              (HP, ...
     'color',                   color);
 
 

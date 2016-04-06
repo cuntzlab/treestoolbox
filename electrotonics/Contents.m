@@ -9,12 +9,11 @@
 %   lambda_tree   - Length constants of the segments of a tree.
 %   loop_tree     - Builds conductance matrix of a tree, including loops.
 %   M_tree        - Conductance matrix of the electric circuitry in a tree.
-%   shunt_tree    - Steady-state synaptic electrotonic signature of a tree.
 %   sse_tree      - steady-state electrotonic signature of a tree.
 %   ssecat_tree   - Steady-state electrotonic signature of connected trees.
 %   syn_tree      - Steady-state synaptic electrotonic signature of a tree.
 %   syncat_tree   - Steady-state synaptic elect. signature of connected trees.
 %
-% the TREES toolbox: edit, visualize and analyze neuronal trees
-% Copyright (C) 2009  Hermann Cuntz
+% the TREES toolbox: edit, generate, visualise and analyse neuronal trees
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 

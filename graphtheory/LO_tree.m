@@ -27,7 +27,7 @@
 % Uses       PL_tree ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2015  Hermann Cuntz
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 
 function  LO = LO_tree (intree, options)
 
@@ -39,13 +39,13 @@ if (nargin < 1) || isempty (intree)
     intree   = length (trees);
 end;
 
-ver_tree (intree); % verify that input is a tree structure
+ver_tree     (intree); % verify that input is a tree structure
 
 % use only directed adjacency for this function
 if ~isstruct (intree)
-    dA = trees{intree}.dA;
+    dA       = trees{intree}.dA;
 else
-    dA = intree.dA;
+    dA       = intree.dA;
 end
 
 if (nargin < 2) || isempty (options)
@@ -53,26 +53,29 @@ if (nargin < 2) || isempty (options)
     options  = '';
 end
 
-N            = size    (dA, 1);            % number of nodes in tree
-PL           = PL_tree (intree);           % path length away from node
-sdA          = spdiags (PL, 0, N, N) * dA; % dA-ordered path length values
+N                = size    (dA, 1);            % number of nodes in tree
+PL               = PL_tree (intree);           % path length away from node
+sdA              = spdiags (PL, 0, N, N) * dA; % dA-ordered path lengths
 % calculating weighted path length:
-counter      = 1;
-resLO        = sdA;
-LO           = sum (resLO)';
+counter          = 1;
+resLO            = sdA;
+LO               = sum (resLO)';
 while sum (resLO (: ,1)) ~= 0
-    counter  = counter + 1;
+    counter      = counter + 1;
     % starting at the tips
     % use adjacency matrix to walk through tree accumulating LO:
-    resLO    = resLO * dA;
-    LO       = LO + sum (resLO)';
+    resLO        = resLO * dA;
+    LO           = LO + sum (resLO)';
 end
-LO           = LO + PL;
-LO           = full (LO);
+LO               = LO + PL;
+LO               = full (LO);
 
 if strfind       (options, '-s') % show option
-    clf; hold on; 
-    plot_tree    (intree, LO);
+    clf;
+    hold         on; 
+    HP           = plot_tree (intree, LO, [], [], [], '-b');
+    set          (HP, ...
+        'edgecolor',           'none');
     title        ('level order');
     xlabel       ('x [\mum]');
     ylabel       ('y [\mum]');

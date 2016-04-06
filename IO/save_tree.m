@@ -27,8 +27,8 @@
 % See also
 % Uses
 %
-% the TREES toolbox: edit, visualize and analyze neuronal trees
-% Copyright (C) 2009  Hermann Cuntz
+% the TREES toolbox: edit, generate, visualise and analyse neuronal trees
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 
 function [tname path]  = save_tree (intree, tname)
 
@@ -58,7 +58,7 @@ if nstart (end) > 0,
     tname(1 : nstart (end)) = '';
 end
 
-save ([path tname], 'tree');
+save ([path tname], 'tree', '-v7.3');
 
 
 

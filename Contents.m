@@ -32,6 +32,6 @@
 % along with the TREES toolbox. If not, see <http://www.gnu.org/licenses/>.
 %
 %
-% the TREES toolbox: edit, visualize and analyze neuronal trees
-% Copyright (C) 2009  Hermann Cuntz
+% the TREES toolbox: edit, generate, visualise and analyse neuronal trees
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 

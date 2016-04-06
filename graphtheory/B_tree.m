@@ -5,7 +5,7 @@
 % ----------------------------
 %
 % Returns a binary vector which is one only where there is a
-% branching element (more than one child). Branch point indices are then
+% branching point (> one child). Branch point indices are then
 % find (B).
 %
 % Input
@@ -27,7 +27,7 @@
 % Uses       ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2015  Hermann Cuntz
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 
 function B = B_tree (intree, options)
 
@@ -55,23 +55,20 @@ end
 
 % sum (dA) (but actually faster than sum (dA)) ;-)
 % branch points have more than one entry in dA:
-B            = ((ones (1, size (dA, 1)) * dA) > 1)';
+B                = ((ones (1, size (dA, 1)) * dA) > 1)';
 
-if strfind   (options, '-s') % show option
-    clf; hold on; 
-    HP       = plot_tree (intree);
-    set      (HP, ...
-        'facealpha',           0.2);
-    HP       = pointer_tree (intree, find (B), 50);
-    set      (HP, ...
-        'facealpha',           0.2);
-    title    ('branch points');
-    xlabel   ('x [\mum]');
-    ylabel   ('y [\mum]');
-    zlabel   ('z [\mum]');
-    view     (2);
-    grid     on;
-    axis     image;
+if strfind       (options, '-s') % show option
+    clf;
+    hold         on; 
+    plot_tree    (intree, [], [], [], [], '-b');
+    pointer_tree (intree, find (B), 50);
+    title        ('branch points');
+    xlabel       ('x [\mum]');
+    ylabel       ('y [\mum]');
+    zlabel       ('z [\mum]');
+    view         (2);
+    grid         on;
+    axis         image;
 end
 
 

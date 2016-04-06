@@ -28,8 +28,8 @@
 % See also load_tree and start_trees
 % Uses idpar_tree ver_tree X Y Z D
 %
-% the TREES toolbox: edit, visualize and analyze neuronal trees
-% Copyright (C) 2009  Hermann Cuntz
+% the TREES toolbox: edit, generate, visualise and analyse neuronal trees
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 
 function [tname, path] = swc_tree (intree, tname)
 

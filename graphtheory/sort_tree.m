@@ -39,7 +39,7 @@
 % Uses idpar_tree ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2015  Hermann Cuntz
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 
 function varargout = sort_tree (intree, options)
 
@@ -65,7 +65,7 @@ if (nargin < 2) || isempty (options)
     options  = '';
 end
 
-N            = size (tree.dA, 1); % number of nodes in tree
+N                = size (tree.dA, 1); % number of nodes in tree
 
 if strfind       (options, '-LO')
     % path length away from node:
@@ -77,7 +77,7 @@ if strfind       (options, '-LO')
     % change the adjacency matrix according to the new order:
     tree.dA      = tree.dA (iipre, iipre);
     % update all vectors of form Nx1:
-    S = fieldnames (tree);
+    S            = fieldnames (tree);
     for counter  = 1 : length (S)
         if ~strcmp (S{counter}, 'dA')
             vec  = tree.(S{counter});
@@ -115,41 +115,41 @@ else
 end
 
 
-idpar         = idpar_tree (tree); % index to direct parent
-dA            = tree.dA;           % directed adjacency matrix of tree
+idpar            = idpar_tree (tree); % index to direct parent
+dA               = tree.dA;           % directed adjacency matrix of tree
 
 % simple hierarchical sorting
-ii           = 1 : N;
-r2           = 1 : N;
-for counter  = 2 : N
-    elem     = r2 (counter); % sorting ii is not faster...
-    par      = r2 (idpar (counter)); % parent node
+ii               = 1 : N;
+r2               = 1 : N;
+for counter      = 2 : N
+    elem         = r2 (counter); % sorting ii is not faster...
+    par          = r2 (idpar (counter)); % parent node
     % just sort that the parent always comes directly before the daughter:
-    if par>elem
-        r    = [ ...
+    if par > elem
+        r        = [ ...
             (1 : elem - 1) ...
             (elem + 1 : par) ...
             elem ...
             (par + 1 : N)];
     else
-        r    = [ ...
+        r        = [ ...
             (1 : par) ...
             elem ...
             (par + 1 : elem - 1) ...
             (elem + 1 : N)];
     end
-    ii       = ii (r);
-    [~, r2]  = sort  (ii);
+    ii           = ii (r);
+    [~, r2]      = sort  (ii);
 end
-order        = iipre (ii);
+order            = iipre (ii);
 
 % change the trees-structure according to the new order:
-tree.dA      = sparse (dA (ii, ii));
+tree.dA          = sparse (dA (ii, ii));
 % in all vectors of form Nx1:
-S            = fieldnames (tree);
-for counter  = 1 : length (S)
-    if ~strcmp (S{counter}, 'dA')
-        vec  = tree.(S{counter});
+S                = fieldnames (tree);
+for counter      = 1 : length (S)
+    if ~strcmp   (S{counter}, 'dA')
+        vec      = tree.(S{counter});
         if ...
                 (isvector (vec)) && ...
                 (numel    (vec) == size (tree.dA, 1)) && ...
@@ -159,29 +159,31 @@ for counter  = 1 : length (S)
     end
 end
 
-if strfind   (options, '-s') % show option
-    clf; hold on;
-    HP       = plot_tree  (intree);
-    set      (HP, ...
-        'facealpha',           0.5);
-    T        = vtext_tree (intree, [], [0 1 0], [-2 3 5]);
-    set      (T, ...
+if strfind       (options, '-s') % show option
+    clf;
+    hold         on;
+    HP           = plot_tree  (intree, [], [], [], [], '-b');
+    set          (HP, ...
+        'facealpha',           0.5, ...
+        'edgecolor',           'none');
+    T            = vtext_tree (intree, [], [0 1 0], [-2 3 5]);
+    set          (T, ...
         'fontsize',           14);
-    T        = vtext_tree (tree, [], [], [0 0 5]);
-    set      (T, ...
+    T            = vtext_tree (tree,   [],      [], [0 0 5]);
+    set          (T, ...
         'fontsize',           14);
-    title   ('sort nodes BCT conform');
-    HP (1)  = plot (1, 1, 'g-');
-    HP (2)  = plot (1, 1, 'r-');
-    legend  (HP, {'before', 'after'});
-    set     (HP, ...
+    title       ('sort nodes BCT conform');
+    HP (1)      = plot (1, 1, 'g-');
+    HP (2)      = plot (1, 1, 'r-');
+    legend      (HP, {'before', 'after'});
+    set         (HP, ...
         'visible',             'off');
-    xlabel  ('x [\mum]');
-    ylabel  ('y [\mum]');
-    zlabel  ('z [\mum]');
-    view    (2);
-    grid    on;
-    axis    image;
+    xlabel      ('x [\mum]');
+    ylabel      ('y [\mum]');
+    zlabel      ('z [\mum]');
+    view        (2);
+    grid        on;
+    axis        image;
 end
 
 if (nargout > 0) || (isstruct (intree))

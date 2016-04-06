@@ -71,7 +71,7 @@ end
 if (nargin < 5) || isempty (options)
     % {DEFAULT: no option}
     options  = '';
-end;
+end
 
 for counter      = 1 : size (inodes1, 1)
     M (inodes1 (counter), inodes2 (counter)) = ...
@@ -149,15 +149,6 @@ if strfind       (options, '-s')     % show option
     xlim         ([1 (size (M, 1))]);
     ylim         ([1 (size (M, 1))]);
 end
-
-
-
-
-
-
-
-
-
 
 
 

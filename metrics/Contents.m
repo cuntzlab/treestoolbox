@@ -8,10 +8,10 @@
 %   cyl_tree     - Cylinder coordinates of all segments in a tree.
 %   dstats_tree  - Display tree statistics obtained by stats_tree.
 %   eucl_tree    - Euclidean distances of all nodes of a tree to a point.
-%   flatten_tree - flattens tree onto XY plane.
-%   flip_tree    - flips a tree around one axis.
+%   flatten_tree - Flattens tree onto XY plane.
+%   flip_tree    - Flips a tree around one axis.
 %   len_tree     - Length values of tree segments.
-%   morph_tree   - morph a tree's metrics without changing angles or topology
+%   morph_tree   - Morph a tree's metrics without changing angles or topology
 %   rot_tree     - Rotate a tree.
 %   scale_tree   - Scales a tree.
 %   surf_tree    - Surface values for tree segments.
@@ -21,7 +21,7 @@
 %   sholl_tree   - Real sholl analysis.
 %   stats_tree   - Collects tree statistics using TREES toolbox functions.
 %
-% the TREES toolbox: edit, visualize and analyze neuronal trees
-% Copyright (C) 2009  Hermann Cuntz
+% the TREES toolbox: edit, generate, visualise and analyse neuronal trees
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 
 

@@ -166,19 +166,19 @@ if sum (get (gca, 'Dataaspectratio') == [1 1 1]) ~= 3
 end
 
 if (nargout > 1)
-    if strfind (options, '-2d')
-        hull = [];
-        hull.XY = [ ...
+    if strfind   (options, '-2d')
+        hull     = [];
+        hull.XY  = [ ...
             (X (ipart) + DD (1)) ...
             (Y (ipart) + DD (2))];
     else
-        hull = [];
+        hull     = [];
         hull.XYZ = [ ...
             (X (ipart) + DD (1)) ...
             (Y (ipart) + DD (2)) ...
             (Z (ipart) + DD (3))];
     end
-    hull.ch  = ch;
+    hull.ch      = ch;
 end
 
 

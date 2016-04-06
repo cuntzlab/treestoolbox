@@ -28,7 +28,7 @@
 % Uses       PL_tree ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2015  Hermann Cuntz
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 
 function ipar = ipar_tree (intree, options)
 
@@ -55,25 +55,25 @@ if (nargin < 2) || isempty (options)
 end
 
 % number of nodes in tree:
-N            = size (dA, 1);
+N                = size (dA, 1);
 % maximum depth by maximum path length:
-maxPL        = max  (PL_tree (intree));
-V            = (1 : N)';
-ipar         = zeros (N, maxPL + 2);
-ipar(:, 1)   = V;
-for counter  = 2 : maxPL + 2
+maxPL            = max  (PL_tree (intree));
+V                = (1 : N)';
+ipar             = zeros (N, maxPL + 2);
+ipar(:, 1)       = V;
+for counter      = 2 : maxPL + 2
     % use adjacency matrix to walk through tree:
-    V        = dA * V;
+    V            = dA * V;
     ipar (:, counter) = V;
 end
 
-if strfind   (options, '-s') % show option
+if strfind       (options, '-s') % show option
     clf;
-    imagesc  (ipar);
-    ylabel   ('node #');
-    xlabel   ('parent path');
+    imagesc      (ipar);
+    ylabel       ('node #');
+    xlabel       ('parent path');
     colorbar;
-    title    ('color: parent node #');
+    title        ('color: parent node #');
 end
 
 % % stupid concatenation issue (2.5 sec.. for hss):

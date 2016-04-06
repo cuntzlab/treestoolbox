@@ -121,32 +121,32 @@ if (nargin < 9) || isempty (I)
     I        = sparse (N, 1);
 end
 
-if numel (I)     == 1
-    dI           = I;
-    I            = sparse (N, 1);
-    I (dI)       = 1;
+if numel (I) == 1
+    dI       = I;
+    I        = sparse (N, 1);
+    I (dI)   = 1;
 end
 
 if (nargin < 10) || isempty (options),
     options  = '';
 end
 
-MM           = sparse ( ...
-    sumsiz   (len + 1), ...
-    sumsiz   (len + 1));
+MM               = sparse ( ...
+    sumsiz (len + 1), ...
+    sumsiz (len + 1));
 
-for counter     = 1 : len
-    MM ( ...
+for counter      = 1 : len
+    MM           ( ...
         sumsiz (counter) + 1 : sumsiz (counter + 1),   ...
         sumsiz (counter) + 1 : sumsiz (counter + 1)) = ...
-        M_tree (intrees {counter});
+        M_tree   (intrees{counter});
 end
 
 if numel (gelsyn) == 1
-    gelsyn = ones (length (inodes1), 1) .* gelsyn;
+    gelsyn       = ones (length (inodes1), 1) .* gelsyn;
 end
 
-for counter     = 1 : length (inodes1)
+for counter      = 1 : length (inodes1)
     MM (inodes1 (counter), inodes2 (counter)) = ...
         MM (inodes1 (counter), inodes2 (counter)) - gelsyn (counter);
     MM (inodes2 (counter), inodes1 (counter)) = ...
@@ -158,82 +158,73 @@ for counter     = 1 : length (inodes1)
 end
 
 % feed into M the synaptic conductances
-MMg          = MM + ...
-    spdiags  (ge, 0, N, N) + ...
-    spdiags  (gi, 0, N, N);
+MMg              = MM + ...
+    spdiags (ge, 0, N, N) + ...
+    spdiags (gi, 0, N, N);
 % and then inject the corresponding current
-syn          = MMg \ ((ge .* Ee) + (gi .* Ei) + I);
+syn              = MMg \ ((ge .* Ee) + (gi .* Ei) + I);
 
-if strfind   (options, '-s')
-    
+if strfind       (options, '-s')
     clf; hold on;
-    X        = zeros (N, 1);
-    Y        = zeros (N, 1);
-    Z        = zeros (N, 1);
-    for counter = 1 : len
+    X            = zeros (N, 1);
+    Y            = zeros (N, 1);
+    Z            = zeros (N, 1);
+    for counter  = 1 : len
         plot_tree (intrees {counter}, ...
-            syn (sumsiz (counter) + 1 : sumsiz (counter + 1), 1));
+            syn   (sumsiz (counter) + 1 : sumsiz (counter + 1), 1));
         X (sumsiz (counter) + 1 : sumsiz (counter + 1)) = ...
-            intrees {counter}.X;
+            intrees{counter}.X;
         Y (sumsiz (counter) + 1 : sumsiz (counter + 1)) = ...
-            intrees {counter}.Y;
+            intrees{counter}.Y;
         Z (sumsiz (counter) + 1 : sumsiz (counter + 1)) = ...
-            intrees {counter}.Z;
+            intrees{counter}.Z;
     end;
-    L        = [];
-    ige      = find (ge ~= 0);
-    R        = rand ( ...
+    L            = [];
+    ige          = find (ge ~= 0);
+    R            = rand ( ...
         length (ige), 3) .* repmat ([50 50 150], ...
         length (ige), 1);
-    HP       = line ( ...
+    HP           = line ( ...
         [(X (ige)) (X (ige)) + (R (:, 1))]',...
         [(Y (ige)) (Y (ige)) + (R (:, 2))]',...
         [(Z (ige)) (Z (ige)) + (R (:, 3))]');
-    set      (HP, ...
+    set          (HP, ...
         'linestyle',         '-', ...
         'color',             [0 1 0], ...
         'linewidth',         2);
-    L (1)    = HP (1);
-    igi      = find (gi ~= 0);
-    R        = rand ( ...
+    L (1)        = HP (1);
+    igi          = find (gi ~= 0);
+    R            = rand ( ...
         length (igi), 3) .* repmat ([50 50 150], ...
         length (igi), 1);
-    HP       = line ( ...
+    HP           = line ( ...
         [(X (igi)) (X (igi)) + (R (:, 1))]',...
         [(Y (igi)) (Y (igi)) + (R (:, 2))]',...
         [(Z (igi)) (Z (igi)) + (R (:, 3))]');
-    set      (HP, ...
+    set          (HP, ...
         'linestyle',         '-', ...
         'color',             [1 0 0], ...
         'linewidth',         2);
-    L (2)    = HP (1);
-    L2       = line ( ...
+    L (2)        = HP (1);
+    L2           = line ( ...
         [(X (inodes1)) (X (inodes2))]', ...
         [(Y (inodes1)) (Y (inodes2))]',...
         [(Z (inodes1)) (Z (inodes2))]');
-    set      (L2, ...
+    set          (L2, ...
         'linestyle',         '--', ...
         'color',             [0 0 0], ...
         'linewidth',         2);
-    L (3)    = L2 (1);
-    legend   (L, {'exc', 'inh', 'elsyn'});
+    L (3)        = L2 (1);
+    legend       (L, {'exc', 'inh', 'elsyn'});
     colorbar;
-    title    ('potential distribution [mV]');
-    xlabel   ('x [\mum]');
-    ylabel   ('y [\mum]');
-    zlabel   ('z [\mum]');
-    view     (2);
-    grid     on;
-    axis     image;
-    
+    title        ('potential distribution [mV]');
+    xlabel       ('x [\mum]');
+    ylabel       ('y [\mum]');
+    zlabel       ('z [\mum]');
+    view         (2);
+    grid         on;
+    axis         image;
 end
-
-
-
-
-
-
-
 
 
 

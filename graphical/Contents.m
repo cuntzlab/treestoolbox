@@ -18,7 +18,7 @@
 %   xdend_tree      - Dendrogram X-coordinates of a tree.
 %   xplore_tree     - Tree exploration plots.
 %
-% the TREES toolbox: edit, visualize and analyze neuronal trees
-% Copyright (C) 2009  Hermann Cuntz
+% the TREES toolbox: edit, generate, visualise and analyse neuronal trees
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 
 

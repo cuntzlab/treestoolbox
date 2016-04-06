@@ -29,7 +29,7 @@
 % Uses       ipar_tree len_tree ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2015  Hermann Cuntz
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 
 function Pvec = Pvec_tree (intree, v, options)
 
@@ -54,18 +54,21 @@ if (nargin < 3) || isempty (options)
 end
 
 % parent index structure (see "ipar_tree"):
-ipar         = ipar_tree (intree);
-v0           = [0; v];
+ipar             = ipar_tree (intree);
+v0               = [0; v];
 
 if size (ipar, 1) == 1
-    Pvec     = v;
+    Pvec         = v;
 else
-    Pvec     = sum (v0 (ipar + 1), 2);
+    Pvec         = sum (v0 (ipar + 1), 2);
 end
 
 if strfind       (options, '-s')       % show option
-    clf; hold on; 
-    plot_tree    (intree, Pvec);
+    clf;
+    hold         on; 
+    HP           = plot_tree (intree, Pvec, [], [], [], '-b');
+    set          (HP, ...
+        'edgecolor',           'none');    
     colorbar;
     title        ('path accumulation');
     xlabel       ('x [\mum]');

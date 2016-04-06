@@ -9,62 +9,78 @@
 %
 % Input
 % -----
-% - intree::integer:index of tree in trees or structured tree
-% - options::string: {DEFAULT: ''}
-%     '-s' : show
+% - intree   ::integer: index of tree in trees or structured tree
+% - options  ::string:
+%     '-s'   : show
+%     {DEFAULT: ''}
 %
 % Output
 % ------
-% - rindex::Nx1 vector: region specific index for each node
+% - rindex   ::Nx1 vector: region specific index for each node
 %
 % Example
 % -------
-% rindex_tree (sample2_tree, '-s')
+% rindex_tree  (sample2_tree, '-s')
 %
 % See also load_tree start_trees
 % Uses ver_tree R
 %
-% the TREES toolbox: edit, visualize and analyze neuronal trees
-% Copyright (C) 2009  Hermann Cuntz
+% the TREES toolbox: edit, generate, visualise and analyse neuronal trees
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 
 function rindex = rindex_tree (intree, options)
 
 % trees : contains the tree structures in the trees package
-global trees
+global       trees
 
-if (nargin < 1)||isempty(intree),
-    intree = length(trees); % {DEFAULT tree: last tree in trees cell array}
+if (nargin < 1) || isempty (intree)
+    % {DEFAULT tree: last tree in trees cell array}
+    intree   = length (trees);
 end;
 
-ver_tree (intree); % verify that input is a tree structure
+ver_tree     (intree); % verify that input is a tree structure
 
 % use only region vector for this function
-if ~isstruct(intree),
-    R = trees{intree}.R;
+if ~isstruct (intree)
+    R        = trees{intree}.R;
 else
-    R = intree.R;
+    R        = intree.R;
 end
 
-if (nargin < 2)||isempty(options),
-    options = ''; % {DEFAULT: no option}
+if (nargin < 2) || isempty (options)
+    % {DEFAULT: no option}
+    options  = '';
 end
 
-uR = unique(R); % sorted regions
-luR = length(uR); % number of regions
+uR               = unique (R);  % sorted regions
+luR              = length (uR); % number of regions
 
-rindex = zeros(length(R),1);
-rindex(1) = 1;
+rindex           = zeros  (length (R), 1);
+rindex (1)       = 1;
 
-for ward = 1:luR;
-    G = R == uR(ward);
-    rindex(G) = 1:sum(G);
+for counter      = 1 : luR
+    G            = R == uR (counter);
+    rindex (G)   = 1 : sum (G);
 end
-    
-if strfind(options,'-s'), % show option
-    clf; hold on; shine; colorbar;
-    HP = plot_tree (intree, R); set(HP,'facealpha',.2);
-    T = vtext_tree (intree, rindex, [], [0 0 5]); set (T, 'fontsize',14);
-    title ('regional index (color - region)');
-    xlabel ('x [\mum]'); ylabel ('y [\mum]'); zlabel ('z [\mum]');
-    view(2); grid on; axis image;
+
+if strfind       (options, '-s') % show option
+    clf;
+    hold         on;
+    colorbar;
+    HP           = plot_tree  (intree, R, [], [], [], '-b');
+    set          (HP, ...
+        'facealpha',           0.5, ...
+        'edgecolor',           'none');
+    T            = vtext_tree (intree, rindex, [], [0 0 5]);
+    set          (T, ...
+        'fontsize',            14);
+    title        ('regional index (color - region)');
+    xlabel       ('x [\mum]');
+    ylabel       ('y [\mum]');
+    zlabel       ('z [\mum]');
+    view         (2);
+    grid         on;
+    axis         image;
 end
+
+

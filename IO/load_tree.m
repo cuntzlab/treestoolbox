@@ -10,21 +10,23 @@
 % Input
 % -----
 % - name     ::string: name of the file to be loaded, incl. the extension.
-%     {DEFAULT : open gui fileselect, replaces format entry}
+%     {DEFAULT: open gui fileselect, replaces format entry}
 %     formats are file extensions:
-%     '.mtr' : TREES toolbox internal format (this is just a matlab workspace)
+%     '.mtr' : TREES toolbox internal format
+%        (this is just a matlab workspace!)
 %        such a file can contain more than one tree, up to 2 depth for e.g.
 %        cgui_tree: {{treei1, treei2,... }, {treej1, treej2,...}, ...}
 %        or: {tree1, tree2, ...} or just tree.
 %     '.swc' : from the Neurolucida swc format ([inode R X Y Z D/2 idpar])
-%             comments prefixed with "#", otherwise only pure ASCII data
+%        comments prefixed with "#", otherwise only pure ASCII data
+%        May contain multiple trees!!     
 %     '.neu' : from NEURON transfer format .neu (see neu_tree)
-%             not every NEURON hoc-file represents a correct graph, read
-%             about restrictions in the documentation.
-%     {DEFAULT : '.mtr'}
+%        not every NEURON hoc-file represents a correct graph, read
+%        about restrictions in the documentation.
+%     {DEFAULT: '.mtr'}
 % - options  ::string:
 %     '-s'   : show
-%     '-r'   : repair tree, preparing trees for most TREES toolbox functions
+%     '-r'   : repair tree, preparing trees for most TREES functions
 %     {DEFAULT: '-r' for .swc/.neu 'none' for .mtr}
 %
 % Output
@@ -51,29 +53,29 @@ function varargout = load_tree (tname, options)
 global       trees
 
 if (nargin < 1) || isempty (tname)
-    [tname, path]  = uigetfile ( ...
-        {'*.mtr;*swc;*.neu', ...
+    [tname, path] = uigetfile ( ...
+        {'*.mtr; *swc; *.neu', ...
         'TREES formats (TREES *.mtr or *.swc or *.neu)'}, ...
         'Pick a file', ...
         'multiselect',         'off');
-    if tname       == 0
-        varargout {1} = [];
-        varargout {2} = [];
-        varargout {3} = [];
+    if tname == 0
+        varargout{1} = [];
+        varargout{2} = [];
+        varargout{3} = [];
         return
     end
 else
-    path             = '';
+    path     = '';
 end
 
 % input format from extension:
-format               = tname  (end - 3 : end);
+format       = tname  (end - 3 : end);
 % extract a sensible name from the filename string:
-nstart               = unique ([ ...
+nstart       = unique ([ ...
     0 ...
     (strfind (tname, '/')) ...
     (strfind (tname, '\'))]);
-name                 = tname  (nstart (end) + 1 : end - 4);
+name         = tname  (nstart (end) + 1 : end - 4);
 
 if (nargin < 2) || isempty (options)
     if strcmp (format, '.swc') || strcmp (format, '.neu')
@@ -154,34 +156,35 @@ switch               format
             (size (swc, 1) + 1)];
         if length (treelimits) > 2
             tree     = cell (1, 1);
-            for counter = 1 : length (treelimits) - 1
-                N    = treelimits (counter + 1) - treelimits (counter);
+            for counter1 = 1 : length (treelimits) - 1
+                N    = treelimits (counter1 + 1) - treelimits (counter1);
                 dA   = sparse (N, N);
-                for te = 2 : N
-                    dA (te, parid (te + treelimits (counter) - 1) - ...
-                        treelimits (counter) + 1) = 1;
+                for counter2 = 2 : N
+                    dA (counter2, ...
+                        parid (counter2 + treelimits (counter1) - 1) - ...
+                        treelimits (counter1) + 1) = 1;
                 end
-                tree{counter}.dA = dA;
-                tree{counter}.X  = geo ( ...
-                    treelimits (counter) : ...
-                    treelimits (counter + 1) - 1, 1);
-                tree{counter}.Y  = geo ( ...
-                    treelimits (counter) : ...
-                    treelimits (counter + 1) - 1, 2);
-                tree{counter}.Z  = geo (...
-                    treelimits (counter) : ...
-                    treelimits (counter + 1) - 1, 3);
-                tree{counter}.D  = geo (...
-                    treelimits (counter) : ...
-                    treelimits (counter + 1) - 1, 4);
-                tree{counter}.R  = R   (...
-                    treelimits (counter) : ...
-                    treelimits (counter + 1) - 1);
+                tree{counter1}.dA = dA;
+                tree{counter1}.X  = geo ( ...
+                    treelimits (counter1) : ...
+                    treelimits (counter1 + 1) - 1, 1);
+                tree{counter1}.Y  = geo ( ...
+                    treelimits (counter1) : ...
+                    treelimits (counter1 + 1) - 1, 2);
+                tree{counter1}.Z  = geo (...
+                    treelimits (counter1) : ...
+                    treelimits (counter1 + 1) - 1, 3);
+                tree{counter1}.D  = geo (...
+                    treelimits (counter1) : ...
+                    treelimits (counter1 + 1) - 1, 4);
+                tree{counter1}.R  = R   (...
+                    treelimits (counter1) : ...
+                    treelimits (counter1 + 1) - 1);
                 [i1, ~, i3]      = unique (R (...
-                    treelimits (counter) : ...
-                    treelimits (counter + 1) - 1));
-                tree{counter}.R      = i3;
-                tree{counter}.rnames = rnames (i1);
+                    treelimits (counter1) : ...
+                    treelimits (counter1 + 1) - 1));
+                tree{counter1}.R      = i3;
+                tree{counter1}.rnames = rnames (i1);
             end
         else
             N        = size (swc, 1);
@@ -201,20 +204,24 @@ switch               format
         if ~exist    ([path tname], 'file')
             error    ('no such file...');
         end
-        A            = textread ([path tname], '%s', 'delimiter', '\n');
+        swcfid       = fopen    ([path tname], '-r');
+        A            = textscan (swcfid, '%s', 'delimiter', '\n');
+        A            = A{1};
+        fclose       (swcfid);
         swc          = [];
         for counter  = 1 : length (A)
             if ~isempty (A{counter})  % allow empty lines in between
                 % allow comments: lines starting with #:
                 if ~strcmp (A{counter} (1), '#')
-                    swc  = [swc; (str2num (A{counter}))];
+                    swc0   = textscan (A{counter}, '%f')';
+                    swc    = [swc; swc0];
                 end
             end
         end
         itree        = find (swc (:, 7) == -1);
         if length    (itree) > 1
             itree    = [itree; (size (swc, 1))];
-            tree     = {};
+            tree     = cell (1, 1);
             tcounter = 1;
             for counter  = 1 : length (itree) - 1
                 iswc     = swc ( ...
@@ -291,17 +298,18 @@ end
 
 if strfind           (options, '-r')
     if iscell        (tree)
-        for counter  = 1 : length (tree)
-            if iscell (tree{counter})
-                for counter2 = 1 : length (tree{counter})
-                    tree{counter}{counter2} = repair_tree (tree{counter}{counter2});
+        for counter1  = 1 : length (tree)
+            if iscell (tree{counter1})
+                for counter2 = 1 : length (tree{counter1})
+                    tree{counter1}{counter2} = repair_tree ( ...
+                        tree{counter1}{counter2});
                 end
             else
-                tree {counter} = repair_tree (tree{counter});
+                tree {counter1} = repair_tree (tree{counter1});
             end
         end
     else
-        tree = repair_tree (tree);
+        tree         = repair_tree (tree);
     end
 end
 
@@ -309,13 +317,13 @@ if strfind           (options, '-s')
     clf; hold on;
     title            ('loaded trees');
     if iscell        (tree)
-        for counter  = 1 : length (tree)
-            if iscell (tree {counter})
-                for counter2 = 1 : length (tree {counter})
-                    plot_tree (tree{counter}{counter2});
+        for counter1  = 1 : length (tree)
+            if iscell (tree {counter1})
+                for counter2 = 1 : length (tree {counter1})
+                    plot_tree (tree{counter1}{counter2});
                 end
             else
-                plot_tree (tree{counter});
+                plot_tree (tree{counter1});
             end
         end
     else
@@ -330,10 +338,13 @@ if strfind           (options, '-s')
 end
 
 if (nargout > 0)
-    varargout {1} = tree; % if output is defined then it becomes the tree
-    varargout {2} = tname; varargout {3} = path;
+    % if output is defined then it becomes the tree:
+    varargout{1} = tree;
+    varargout{2} = tname;
+    varargout{3} = path;
 else
-    trees {length (trees) + 1} = tree; % otherwise add to end of trees cell array
+    % otherwise add to end of trees cell array:
+    trees{length (trees) + 1} = tree;
 end
 
 

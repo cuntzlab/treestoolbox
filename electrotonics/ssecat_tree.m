@@ -88,22 +88,22 @@ if (nargin < 6) || isempty (options)
     options  = '';
 end
 
-MM           = sparse ( ...
-    sumsiz   (len + 1), ...
-    sumsiz   (len + 1));
+MM               = sparse ( ...
+    sumsiz (len + 1), ...
+    sumsiz (len + 1));
 
-for counter     = 1 : len
-    MM       ( ...
+for counter      = 1 : len
+    MM           ( ...
         sumsiz (counter) + 1 : sumsiz (counter + 1), ...
         sumsiz (counter) + 1 : sumsiz (counter + 1)) = ...
-        M_tree (intrees {counter});
+        M_tree   (intrees {counter});
 end
 
 if numel (gelsyn) == 1
-    gelsyn   = ones (length (inodes1), 1) .* gelsyn;
+    gelsyn       = ones (length (inodes1), 1) .* gelsyn;
 end
 
-for counter     = 1 : length (inodes1)
+for counter      = 1 : length (inodes1)
     MM (inodes1 (counter), inodes2 (counter)) = ...
         MM (inodes1 (counter), inodes2 (counter)) - gelsyn (counter);
     MM (inodes2 (counter), inodes1 (counter)) = ...
@@ -115,14 +115,14 @@ for counter     = 1 : length (inodes1)
 end
 
 if (nargin < 5) || isempty (I)
-    sse      = inv (MM);
+    sse          = inv (MM);
 else
-    if numel (I) == 1,
-        dI   = I;
-        I    = sparse (size (MM, 1), 1);
-        I (dI) = 1;
+    if numel (I) == 1
+        dI       = I;
+        I        = sparse (size (MM, 1), 1);
+        I (dI)   = 1;
     end
-    sse      = MM \ I;
+    sse          = MM \ I;
 end
 
 if strfind       (options, '-s')

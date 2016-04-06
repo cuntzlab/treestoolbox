@@ -40,8 +40,8 @@
 %
 % Thanks to Arnd Roth for providing the neurolucida specification file.
 %
-% the TREES toolbox: edit, visualize and analyze neuronal trees
-% Copyright (C) 2009  Hermann Cuntz
+% the TREES toolbox: edit, generate, visualise and analyse neuronal trees
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 
 function varargout = neurolucida_tree (tname, options)
 

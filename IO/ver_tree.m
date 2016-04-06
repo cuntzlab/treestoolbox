@@ -25,8 +25,8 @@
 % See also start_trees
 % Uses X Y Z D R dA
 %
-% the TREES toolbox: edit, visualize and analyze neuronal trees
-% Copyright (C) 2009  Hermann Cuntz
+% the TREES toolbox: edit, generate, visualise and analyse neuronal trees
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 
 function no_error = ver_tree (intree)
 

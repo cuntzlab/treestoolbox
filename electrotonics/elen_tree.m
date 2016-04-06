@@ -25,7 +25,7 @@
 % Uses lambda_tree len_tree ver_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2015  Hermann Cuntz
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 
 function elen = elen_tree (intree, options)
 
@@ -44,7 +44,7 @@ if (nargin < 2) || isempty (options)
     options  = '';
 end
 
-elen         = len_tree (intree) ./ lambda_tree (intree) / 10000;
+elen             = len_tree (intree) ./ lambda_tree (intree) / 10000;
 % conversion here from [um] length to [cm] since electrotonic properties
 % are per cm
 

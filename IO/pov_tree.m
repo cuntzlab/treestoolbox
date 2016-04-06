@@ -55,7 +55,7 @@
 % edited by Calvin Schneider 11 June 2014 for speed improvement
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2015  Hermann Cuntz
+% Copyright (C) 2009 - 2016  Hermann Cuntz
 
 function [tname, path, rpot] = pov_tree (intree, tname, v, ipart, options)
 
