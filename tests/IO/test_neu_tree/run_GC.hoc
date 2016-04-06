@@ -1,0 +1,7 @@
+load_file ("nrngui.hoc")
+load_file ("morpho.hoc")
+
+objectvar GC
+
+load_file ("neu_tree.hoc")
+neu_tree  ("GC.neu")

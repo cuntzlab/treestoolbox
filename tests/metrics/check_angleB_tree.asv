@@ -1,0 +1,27 @@
+%% check_angleB_tree
+
+%% test 1
+
+angleB_tree      (sample_tree, '-m');
+
+%% test 2
+angleB_tree      (sample_tree, '-s');
+tprint           ('./panels/angleB_tree1', ...
+    '-jpg -HR',                [10 10]);
+
+%% test 3
+tree             = sample2_tree;
+angleB = angleB_tree(tree);
+clf; shine; set(gca,'visible','off');
+
+HP = plot_tree(tree,[1 0 0],[],[],32);
+set(HP, 'facealpha',.2);
+
+HP = patch( ...
+    [(tree.X(3)) (tree.X(10) tree.X(10)+tree.X(4)-tree.X(3) tree.X(4)],...
+    [(tree.Y(3)) (tree.Y(10) tree.Y(10)+tree.Y(4)-tree.Y(3) tree.Y(4)],...
+    [(tree.Z(3)) (tree.Z(10)( tree.Z(10)+tree.Z(4)-tree.Z(3) tree.Z(4)],[0 0 0]);
+set(HP,'facealpha',.2,'linestyle','none');
+HT = vtext_tree(sample2_tree);
+set(HT,'color',[0 0 0],'fontsize',18);
+

@@ -1,0 +1,9 @@
+load_file ("nrngui.hoc")
+load_file ("GCT.hoc")
+
+objectvar GC
+
+GC = new GC7()
+
+load_file ("neu_tree.hoc")
+neu_tree  ("GCT.neu")
