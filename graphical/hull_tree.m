@@ -57,8 +57,7 @@ global       trees
 
 if (nargin < 6) || isempty (options)
     % {DEFAULT: waitbar, show result and output full distance matrix}
-    % options  = '-w -s -F';
-    options  = '-F';
+    options  = '-w -s -F';
 end
 
 if (nargin < 1) || isempty (intree)
