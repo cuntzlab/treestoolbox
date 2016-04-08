@@ -60,7 +60,7 @@ if (nargin < 3) || isempty (dY)
 end;
 
 if (nargin < 4) || isempty (options)
-    % {DEFAULT: no option}
+    % {DEFAULT: none}
     options  = '';
 end
 
@@ -218,16 +218,16 @@ if strfind           (options, '-s')
                 for counter2 = 1 : length (intrees{counter1})
                     plot_tree ( ...
                         intrees{counter1}{counter2}, [], ...
-                        DD{counter1}{counter2}, [], [], options);
+                        DD{counter1}{counter2});
                 end
             end
         case         1
             clf;
             for counter = 1 : lent
-                plot_tree (intrees {counter}, [], DD{counter}, [], [], options);
+                plot_tree (intrees {counter}, [], DD{counter});
             end
         case     0
-            plot_tree (intrees, [], [], [], [], options);
+            plot_tree (intrees);
     end
     title            ('spread trees');
     xlabel           ('x [\mum]');
