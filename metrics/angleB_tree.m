@@ -77,7 +77,7 @@ for counter      = 1 : length (iB)      % walk through all branch points:
     % normalized vectors:
     nV1          = V1 / sqrt (sum (V1.^2));
     nV2          = V2 / sqrt (sum (V2.^2));
-    % the angle between to vectors in 3D is simply the inverse cosine of
+    % the angle between two vectors in 3D is simply the inverse cosine of
     % their dot-product.
     angleB (counter) = acos (dot (nV1, nV2));
     if strfind   (options, '-m') % show movie option

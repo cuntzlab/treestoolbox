@@ -204,7 +204,7 @@ switch               format
         if ~exist    ([path tname], 'file')
             error    ('no such file...');
         end
-        swcfid       = fopen    ([path tname], '-r');
+        swcfid       = fopen    ([path tname]);
         A            = textscan (swcfid, '%s', 'delimiter', '\n');
         A            = A{1};
         fclose       (swcfid);
@@ -214,7 +214,7 @@ switch               format
                 % allow comments: lines starting with #:
                 if ~strcmp (A{counter} (1), '#')
                     swc0   = textscan (A{counter}, '%f')';
-                    swc    = [swc; swc0];
+                    swc    = [swc; swc0{1}'];
                 end
             end
         end
