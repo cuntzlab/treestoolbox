@@ -6,6 +6,7 @@
 %
 % Changes the diameter in all locations closer than l/2 from the root to a
 % sort of circular (cosine) soma shape.
+% Note! This function was recently corrected to match maxD and l!
 %
 % Inputs
 % ------
@@ -65,8 +66,12 @@ end
 
 Plen         = Pvec_tree (tree);
 indy         = find      (Plen < l / 2);
+% % this used to be:
+% dmaxD        = max       (tree.D (indy), ...
+%     maxD / 4 * cos (pi * Plen (indy) / (l / 2)) + maxD / 4);
+
 dmaxD        = max       (tree.D (indy), ...
-    maxD / 4 * cos (pi * Plen (indy) / (l / 2)) + maxD / 4);
+    maxD * cos (pi * Plen (indy) / l) );
 
 tree.D (indy) = dmaxD;
 
