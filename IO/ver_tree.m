@@ -28,7 +28,7 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2016  Hermann Cuntz
 
-function no_error = ver_tree (intree)
+function no_error = ver_tree (intree, options)
 
 % trees : contains the tree structures in the trees package
 global trees
@@ -53,7 +53,7 @@ if isfield (tree, 'dA'),
         end
     end
 else
-    warning ('Trees:NoTree', 'missing adjacency matrix');
+    %warning ('Trees:NoTree', 'missing adjacency matrix');
     no_error = false;
 end
 
