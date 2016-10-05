@@ -14,7 +14,7 @@
 %     '-s'   : show
 %     '-e'   : message deleted nodes
 %     '-r'   : do not update regions
-%     {DEFAULT: '-e'}
+%     {DEFAULT: ''}
 %
 % Output
 % ------
@@ -48,8 +48,8 @@ end;
 ver_tree     (intree); % verify that input is a tree structure
 
 if (nargin < 2) || isempty (options)
-    % {DEFAULT: echo changes}
-    options  = '-e';
+    % {DEFAULT: nothing}
+    options  = '';
 end
 
 len          = len_tree (intree);

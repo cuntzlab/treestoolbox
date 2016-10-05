@@ -17,6 +17,12 @@
 %     1-tupel rotation is in XY plane. {DEFAULT: [0 0 90]}
 % - options  ::string:
 %     '-s'    : show before and after
+%     '-pcaX' : rotate using PCA, sorting X Y Z axes in decreasing order
+%               of geometrical extent
+%     '-pcaY' : rotate using PCA, sorting Y X Z axes in decreasing order
+%               of geometrical extent
+%     '-pcaZ' : rotate using PCA, sorting Z Y X axes in decreasing order
+%               of geometrical extent
 %     '-m3dX' : mean axis, 3-dimensional, central axis lays on x-axis
 %     '-m3dY' : mean axis, 3-dimensional, central axis lays on y-axis
 %     '-m3dZ' : mean axis, 3-dimensional, central axis lays on z-axis
@@ -122,6 +128,28 @@ if strfind       (options, '-m3d')
         acosd (dot (coeff (:, 1), e));
     tree         = rot_tree  (tree, rangle);
     tree         = tran_tree (tree, XYZ0);
+elseif strfind       (options, '-pca')
+    tree         = tran_tree (tree); % translate tree to coordinate origin
+    XYZ          = [tree.X tree.Y tree.Z];
+    [~, XYZp] = pca(XYZ);
+    if strfind (options, '-pcaX')
+        Xp = XYZp(:, 1);
+        Yp = XYZp(:, 2);
+        Zp = XYZp(:, 3);
+    elseif strfind (options, '-pcaY')
+        Xp = XYZp(:, 2);
+        Yp = XYZp(:, 1);
+        Zp = XYZp(:, 3);
+    else
+        Xp = XYZp(:, 3);
+        Yp = XYZp(:, 2);
+        Zp = XYZp(:, 1);
+    end
+
+    
+    tree.X = Xp;
+    tree.Y = Yp;
+    tree.Z = Zp;
 else
     if numel (DEG) == 1
         RM       =  [ ...        % rotation matrix 2D
@@ -173,3 +201,4 @@ else
 end
 
 
+ 

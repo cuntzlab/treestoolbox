@@ -15,7 +15,7 @@
 %     '-s'   : show
 %     '-w'   : waitbar
 %     '-m'   : demo movie
-%     {DEFAULT: '-w'}
+%     {DEFAULT: ''}
 %
 % Output
 % -------
@@ -53,7 +53,7 @@ end
 
 if (nargin < 2) || isempty (options)
     % {DEFAULT: waitbar}
-    options  = '-w'; 
+    options  = ''; 
 end
 
 % parent index structure (see "ipar_tree"):

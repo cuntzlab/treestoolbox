@@ -15,7 +15,7 @@
 % - options  ::string:
 %     '-s'   : show
 %     '-e'   : echo added nodes
-%     {DEFAULT: '-e'}
+%     {DEFAULT: ''}
 %
 % Output
 % ------
@@ -53,8 +53,8 @@ else
 end
 
 if (nargin < 2) || isempty (options)
-    % {DEFAULT: echo changes}
-    options  = '-e';
+    % {DEFAULT: nothing}
+    options  = '';
 end
 
 dA           = tree.dA;            % directed adjacency matrix of tree
