@@ -60,7 +60,7 @@ if (nargin < 3) || isempty (dY)
 end;
 
 if (nargin < 4) || isempty (options)
-    % {DEFAULT: no option}
+    % {DEFAULT: none}
     options  = '';
 end
 
@@ -219,8 +219,8 @@ if strfind           (options, '-s')
             for counter1 = 1 : length (intrees)
                 for counter2 = 1 : length (intrees{counter1})
                     plot_tree ( ...
-                        intrees{counter1}{counter2}, color, ...
-                        DD{counter1}{counter2}, [], []);
+                        intrees{counter1}{counter2}, [], ...
+                        DD{counter1}{counter2});
                 end
             end
         case         1
@@ -228,10 +228,10 @@ if strfind           (options, '-s')
                 clf;
             end
             for counter = 1 : lent
-                plot_tree (intrees {counter}, color, DD{counter}, [], []);
+                plot_tree (intrees {counter}, [], DD{counter});
             end
         case     0
-            plot_tree (intrees, color, [], [], []);
+            plot_tree (intrees);
     end
     %title            ('spread trees');
     xlabel           ('x [\mum]');

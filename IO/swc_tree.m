@@ -86,3 +86,7 @@ fwrite  (swcfile, ['#',                              char(13), char(10)], 'char'
 fwrite  (swcfile, ['# inode R X Y Z D/2 idpar',      char(13), char(10)], 'char');
 fprintf (swcfile, '%d %d %12.8f %12.8f %12.8f %12.8f %d\n', swc');
 fclose  (swcfile);
+
+
+
+
