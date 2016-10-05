@@ -45,6 +45,21 @@ end
 
 no_error = true;
 
+if isfield (tree, 'dA'),
+    if length (size (tree.dA)) ~= 2,
+        warning ('Trees:NoTree', 'adjacency matrix incorrect dimensions');
+        no_error = false;
+    else
+        if size (tree.dA, 1) ~= size (tree.dA, 2),
+            warning ('Trees:NoTree', 'adjacency matrix not square');
+            no_error = false;
+        end
+    end
+else
+    %warning ('Trees:NoTree', 'missing adjacency matrix');
+    no_error = false;
+end
+
 if (nargin < 2) || isempty (options)
     % {DEFAULT: ''}
     options  = '';

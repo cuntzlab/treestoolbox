@@ -39,7 +39,7 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2016  Hermann Cuntz
 
-function [DD, outtrees] = spread_tree (intrees, dX, dY, options)
+function [DD, outtrees] = spread_tree (intrees, dX, dY, color, options)
 
 % trees : contains the tree structures in the trees package
 global       trees
@@ -211,7 +211,9 @@ switch               level
 end
 
 if strfind           (options, '-s')
-    clf;
+    if ~strfind           (options, '-noclear')
+        clf;
+    end
     switch level
         case         2
             for counter1 = 1 : length (intrees)
@@ -222,14 +224,16 @@ if strfind           (options, '-s')
                 end
             end
         case         1
-            clf;
+            if ~strfind           (options, '-noclear')
+                clf;
+            end
             for counter = 1 : lent
                 plot_tree (intrees {counter}, [], DD{counter});
             end
         case     0
             plot_tree (intrees);
     end
-    title            ('spread trees');
+    %title            ('spread trees');
     xlabel           ('x [\mum]');
     ylabel           ('y [\mum]');
     zlabel           ('z [\mum]');
