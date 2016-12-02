@@ -39,7 +39,7 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2016  Hermann Cuntz
 
-function [DD, outtrees] = spread_tree (intrees, dX, dY, color, options)
+function [DD, outtrees] = spread_tree (intrees, dX, dY, options)
 
 % trees : contains the tree structures in the trees package
 global       trees
