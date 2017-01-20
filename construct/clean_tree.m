@@ -126,7 +126,7 @@ if strfind       (options, '-s')
 end
 
 if (nargout == 0) && ~(isstruct (intree))
-    % otherwise the orginal tree in trees is replaced
+    % otherwise the original tree in trees is replaced
     trees {intree} = tree;
 end
 

@@ -1,8 +1,8 @@
 % IPAR_TREE   Path to root: parent indices. 
 % (trees package)
 % 
-% ipar = ipar_tree (intree, options)
-% ----------------------------------
+% ipar = ipar_tree (intree, options, ipart)
+% -----------------------------------------
 %
 % Returns the matrix of indices to the parent of individual nodes following
 % the path against the direction of the adjacency matrix tocounter the root of
@@ -30,7 +30,7 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2016  Hermann Cuntz
 
-function ipar = ipar_tree (intree, options)
+function ipar = ipar_tree (intree, options, ipart)
 
 % trees : contains the tree structures in the trees package
 global       trees
@@ -54,6 +54,12 @@ if (nargin < 2) || isempty (options)
     options  = '';
 end
 
+if (nargin < 3) || isempty (ipart)
+    % {DEFAULT: all nodes}
+    ipart  = (1 : size (dA, 1))';
+end
+
+
 % number of nodes in tree:
 N                = size (dA, 1);
 % maximum depth by maximum path length:
@@ -66,6 +72,7 @@ for counter      = 2 : maxPL + 2
     V            = dA * V;
     ipar (:, counter) = V;
 end
+ipar             = ipar (ipart, :);
 
 if strfind       (options, '-s') % show option
     clf;

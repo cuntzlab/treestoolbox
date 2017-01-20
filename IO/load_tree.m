@@ -54,8 +54,8 @@ global       trees
 
 if (nargin < 1) || isempty (tname)
     [tname, path] = uigetfile ( ...
-        {'*.mtr; *swc; *.neu', ...
-        'TREES formats (TREES *.mtr or *.swc or *.neu)'}, ...
+        {'*.mtr; *swc; *.neu; *.nmf', ...
+        'TREES formats (TREES *.mtr or *.swc or *.neu *.nmf)'}, ...
         'Pick a file', ...
         'multiselect',         'off');
     if tname == 0
@@ -78,7 +78,9 @@ nstart       = unique ([ ...
 name         = tname  (nstart (end) + 1 : end - 4);
 
 if (nargin < 2) || isempty (options)
-    if strcmp (format, '.swc') || strcmp (format, '.neu')
+    if strcmp (format, '.swc') || ...
+            strcmp (format, '.neu') || ...
+            strcmp (format, '.nmf')
         options  = '-r';
     else
         options  = '';
@@ -86,6 +88,49 @@ if (nargin < 2) || isempty (options)
 end
 
 switch               format
+    case             '.nmf' % our new version of .swc
+        if ~exist    ([path tname], 'file')
+            error    ('.nmf file nonexistent...');
+        end
+        hinfo        = h5info ([path tname], '/swc');
+        tree         = [];
+        for counter  = 1 : length (hinfo.Datasets)
+            switch   hinfo.Datasets(counter).Name
+                case 'index'
+                case 'parent_index'
+                    idpar  = h5read ([path tname],...
+                        '/swc/parent_index');
+                    N      = length (idpar);
+                    dA     = sparse (N, N);
+                    for counter2 = 2 : N
+                        dA (counter2, idpar (counter2)) = 1;
+                    end
+                    tree.dA = dA;
+                case 'type'
+                    R      = h5read ([path tname], '/swc/type');
+                    [i1, ~, i3] = unique (R);
+                    tree.R      = i3;
+                    tree.rnames = cellstr (num2str (i1))';
+                case 'r'
+                    D      = h5read ([path tname], '/swc/r') * 2;
+                    tree.D = D;
+                case 'x'
+                    X      = h5read ([path tname], '/swc/x');
+                    tree.X = X;
+                case 'y'
+                    Y      = h5read ([path tname], '/swc/y');
+                    tree.Y = Y;
+                case 'z'
+                    Z      = h5read ([path tname], '/swc/z');
+                    tree.Z = Z;
+                otherwise
+                    tree   = setfield (tree, ...
+                        hinfo.Datasets(counter).Name, ...
+                        h5read ([path tname], ...
+                        ['/swc/' hinfo.Datasets(counter).Name]));
+            end
+        end
+        tree.name      = name;
     case             '.neu' % this is import from NEURON
         if ~exist    ([path tname], 'file')
             error    ('.neu file nonexistent...');
