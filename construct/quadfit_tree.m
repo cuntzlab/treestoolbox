@@ -48,41 +48,43 @@ if (nargin < 2) || isempty (options)
     options  = '';
 end
 
-if strfind   (options, '-w')   % waitbar option: initialization
-    HW       = waitbar (0.3, 'fitting quad diameter...');
-    set      (HW, ...
+if strfind       (options, '-w')   % waitbar option: initialization
+    HW           = waitbar (0.3, 'fitting quad diameter...');
+    set          (HW, ...
         'Name',                '..PLEASE..WAIT..YEAH..');
 end
 
-P0           = fminsearch (@(P) qfit (P, intree), rand (1, 2));
+P0               = fminsearch (@(P) qfit (P, intree), rand (1, 2));
 
-if strfind   (options, '-w')   % waitbar option: close
-    close    (HW);
+if strfind       (options, '-w')   % waitbar option: close
+    close        (HW);
 end
 
 if (nargout > 1) || ~isempty (strfind (options, '-s')),
-    tree     = quaddiameter_tree (intree, P0(1), P0(2), 'none');
+    tree         = quaddiameter_tree (intree, P0(1), P0(2), 'none');
 end
 
-if strfind (options, '-s') % show option
+if strfind       (options, '-s') % show option
     clf; hold on;
-    plot_tree (tree,   [1 0 0]);
-    plot_tree (intree, [0 0 0], 20);
-    HP (1)   = plot (1, 1, 'k-');
-    HP (2)   = plot (1, 1, 'r-');
-    legend   (HP, {'before', 'after'});
-    title    ('fitted quadratic diameter taper');
-    xlabel   ('x [\mum]');
-    ylabel   ('y [\mum]');
-    zlabel   ('z [\mum]');
-    view     (2);
-    grid     on;
-    axis     equal;
+    plot_tree    (tree,   [1 0 0]);
+    plot_tree    (intree, [0 0 0], 20);
+    HP (1)       = plot (1, 1, 'k-');
+    HP (2)       = plot (1, 1, 'r-');
+    legend       (HP, {'before', 'after'});
+    title        ('fitted quadratic diameter taper');
+    xlabel       ('x [\mum]');
+    ylabel       ('y [\mum]');
+    zlabel       ('z [\mum]');
+    view         (2);
+    grid         on;
+    axis         equal;
 end
 
 end
 
-function err = qfit (P, intree)
-qtree        = quaddiameter_tree (intree, P(1), P(2));
-err          = norm (intree.D - qtree.D);
+function err     = qfit (P, intree)
+qtree            = quaddiameter_tree (intree, P(1), P(2));
+err              = norm (intree.D - qtree.D);
 end
+
+

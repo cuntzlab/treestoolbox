@@ -126,9 +126,9 @@ if ~isempty      (M)
         CS       = cumsum (reshape (M, numel (M), 1));
         % apply CS on the random variable, (r1, r2) then correspond to the
         % bin for each value in R.
-        r1 = zeros (length (R), 1);
-        r2 = zeros (length (R), 1);
-        r3 = zeros (length (R), 1);
+        r1       = zeros (length (R), 1);
+        r2       = zeros (length (R), 1);
+        r3       = zeros (length (R), 1);
         for counter = 1 : length (R)
             if strfind (options, '-w')
                 if mod (counter, 5000) == 1
@@ -166,33 +166,36 @@ else % if no density matrix was defined do a fully homogeneous picking
     Z            = zeros (N, 1);
 end
 
-if ~isempty  (c)
-    IN       = find (in_c (X, Y, c));
-    [PX, PY] = cpoints (c);
-    M        = eucdist (X (IN), PX, Y (IN), PY);
-    IN2      = min     (M, [], 2) > thr;
-    XR       = X;
-    YR       = Y;
-    X        = XR (IN (IN2));
-    Y        = YR (IN (IN2));
-    Z        = zeros (length (Y), 1);
+if ~isempty      (c)
+    IN           = find (in_c (X, Y, c));
+    [PX, PY]     = cpoints (c);
+    M            = eucdist (X (IN), PX, Y (IN), PY);
+    IN2          = min     (M, [], 2) > thr;
+    XR           = X;
+    YR           = Y;
+    X            = XR (IN (IN2));
+    Y            = YR (IN (IN2));
+    Z            = zeros (length (Y), 1);
 end
 
-if strfind (options, '-s') % show option
+if strfind       (options, '-s') % show option
     clf; hold on;
     if ~isempty  (c)
         cplotter (c);
     end
-    HP       = plot3 (X, Y, Z, 'ko');
-    set      (HP, ...
+    HP           = plot3 (X, Y, Z, 'ko');
+    set          (HP, ...
         'markersize',          3, ...
         'markerfacecolor',     [0 0 0]);
-    legend   (HP, 'random points');
-    title    ('distribute random points');
-    xlabel   ('x [\mum]');
-    ylabel   ('y [\mum]');
-    zlabel   ('z [\mum]');
-    view     (2);
-    grid     on;
-    axis     image;
+    legend       (HP, 'random points');
+    title        ('distribute random points');
+    xlabel       ('x [\mum]');
+    ylabel       ('y [\mum]');
+    zlabel       ('z [\mum]');
+    view         (2);
+    grid         on;
+    axis         image;
 end
+
+
+

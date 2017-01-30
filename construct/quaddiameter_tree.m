@@ -112,38 +112,39 @@ if strfind   (options, '-w')      % waitbar option: initialization
 end
 
 Ds               = zeros (size (ipariT));
-for ward         = 1 : size (ipariT, 1);
+for counter      = 1    : size (ipariT, 1);
     if strfind   (options, '-w')    % waitbar option: update
-        if mod   (ward, 500) == 0
-            waitbar (ward / size (ipariT, 1), HW);
+        if mod   (counter, 500) == 0
+            waitbar (counter / size (ipariT, 1), HW);
         end
     end
-    iipariT      = ipariT (ward, ipariT (ward, :) ~= 0);
+    iipariT      = ipariT (counter, ipariT (counter, :) ~= 0);
     iipariT      = fliplr (iipariT);
     pathh        = Plen   (iipariT);
     % find which ldend is closest to path length:
     [~, i2]      = min    ((pathh (end) - ldend).^2);
     quadpathh    = polyval (P (i2, :), pathh) .* scale;
     % apply the diameters:
-    Ds (ward, 1 : length (quadpathh)) = fliplr (quadpathh);
+    Ds (counter, 1 : length (quadpathh)) = fliplr (quadpathh);
 end
 
-if strfind   (options, '-w')      % waitbar option: close
-    close    (HW);
+if strfind       (options, '-w')      % waitbar option: close
+    close        (HW);
 end
 
 % average the diameters for overloaded nodes (there might be a better way
 % to do this than averaging):
-for ward     = 1 : N
-    iR       = find (ipariT == ward);
-    tree.D (ward)    = mean (Ds (iR));
+for counter      = 1 : N
+    iR           = find (ipariT == counter);
+    tree.D (counter)   = mean (Ds (iR));
 end
 
-tree.D       = tree.D + offset; % add offset diameter
+tree.D           = tree.D + offset; % add offset diameter
 
 if strfind       (options, '-s') % show option
     clf; hold on;
-    plot_tree    (tree, [0 0 0]);
+    plot_tree    (intree, [0 0 0]);
+    plot_tree    (tree,   [1 0 0]);
     title        ('quadratic diameter tapering');
     xlabel       ('x [\mum]');
     ylabel       ('y [\mum]');
@@ -153,7 +154,7 @@ if strfind       (options, '-s') % show option
     axis         equal;
 end
 
-if (nargout == 1) || (isstruct(intree))
+if (nargout == 1) || (isstruct (intree))
     varargout{1}  = tree; % if output is defined then it becomes the tree
 else
     trees{intree} = tree; % otherwise the orginal tree in trees is replaced
