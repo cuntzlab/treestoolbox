@@ -36,7 +36,7 @@ proc neu_tree() {
     o = o + 1
   }
   f1.printf("// file created by neu_tree from the TREES package\n")
-  f1.printf("// Hermann Cuntz 2009 - 2016 \n")
+  f1.printf("// Hermann Cuntz 2009-2016 \n")
   f1.printf("\n")
   f1.printf("# section lines: %d\n", nsec)
   f1.printf("\n")
