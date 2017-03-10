@@ -39,10 +39,10 @@ if (nargin < 1) || isempty (intree)
 end;
 
 if ~isstruct (intree)
-    if numel (intree) > 1
+    if numel (intree) >= 1
         BCT  = intree;
     else
-    BCT      = sum (trees (intree).dA);
+        BCT  = sum (trees (intree).dA);
     end
 else
     BCT      = sum (intree.dA);
