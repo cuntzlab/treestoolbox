@@ -308,7 +308,11 @@ switch               format
             N        = size (swc, 1);
             % check index in first column:
             if sum   (swc (:, 1) ~= (1 : N)')
-                error  ('index needs to be 1 .. n');
+                for counter = 2 : N
+                    swc (counter, 7) = ...
+                        find (swc (counter, 7) == swc (:, 1));
+                end
+                warning  ('index needs to be 1 .. n, correcting...');
             end
             % index to direct parent:
             idpar    = swc (:, 7);
