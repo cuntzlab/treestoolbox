@@ -1,13 +1,7 @@
 %% check_load_stack
 
 %% test 1
-
-
-
-
-%% test 2
-
-
-
-tprint           ('./panels/_tree1', ...
+stack            = load_stack ('sample.stk', '-s');
+tprint           ('./panels/load_stack1', ...
     '-jpg -HR',                [10 10]);
+
