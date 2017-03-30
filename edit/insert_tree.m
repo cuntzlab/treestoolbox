@@ -98,6 +98,9 @@ if ~isempty  (swc)
     if isfield   (tree, 'D')
         tree.D   = [tree.D; (swc (:, 6))];
     end
+    if isfield   (tree, 'jpoints') 
+        tree.jpoints = [tree.jpoints; (zeros (N2, 1))];
+    end
     if isfield       (tree, 'R')
         % eliminate obsolete regions (only if everything is correct)
         if ~isempty (strfind (options, '-d'))
