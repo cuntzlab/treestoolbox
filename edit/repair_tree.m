@@ -16,12 +16,14 @@
 % - intree   ::integer:  index of tree in trees or structured tree
 % - options  ::string:
 %     '-s'   : show
+%     '-0' : do not eliminate trifurcation at root
 %     {DEFAULT: ''}
 %
 % Output
 % ------
 % if no output is declared the tree is changed in trees
 % - tree     :: structured output tree
+% - ntrif    :: number of trifurcations that were eliminated
 %
 % Example
 % -------
@@ -32,7 +34,7 @@
 % Uses ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2017  Hermann Cuntz
 
 function varargout = repair_tree (intree, options)
 
@@ -58,10 +60,28 @@ if (nargin < 2) || isempty (options)
     options  = '';
 end
 
-% eliminate trifurcations by adding short segments:
-tree         = elimt_tree (tree);        
+if islogical     (tree.dA)
+    tree.dA      = double (tree.dA);
+end
+
+if strfind (options, '-0')
+    % eliminate trifurcations by adding short segments (except root):
+    [tree, errtri] = elimt_tree (tree,'-0 -e');
+else
+    % eliminate trifurcations by adding short segments:
+    [tree, errtri] = elimt_tree (tree);
+end
+
+tree             = elimt_tree (tree);
+
 % eliminate 0-length compartments:
-tree         = elim0_tree (tree);        
+tree             = elim0_tree (tree);
+
+if any (find (T_tree (tree)) == 1) && numel (tree.X) > 1
+    tree.dA (2, 1) = 1;
+    fprintf      ('Missed root association repaired.\n')
+end
+
  % sort tree to be BCT conform, heavy parts left:
 tree         = sort_tree  (tree, '-LO');
 
@@ -89,3 +109,8 @@ if (nargout == 1) || (isstruct (intree))
 else
     trees{intree}  = tree; % otherwise original tree in trees is replaced
 end
+if (nargout >= 2)
+    varargout{2}   = errtri;
+end
+
+
