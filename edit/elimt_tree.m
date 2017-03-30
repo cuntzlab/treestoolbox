@@ -1,7 +1,7 @@
 % ELIMT_TREE   Replace multifurcations by multiple bifurcations in a tree.
 % (trees package)
 %
-% [tree, itrif] = elimt_tree (intree, options)
+% [tree, ntrif] = elimt_tree (intree, options)
 % --------------------------------------------
 %
 % Eliminates the trifurcations/multifurcations present in the tree's
@@ -21,7 +21,7 @@
 % ------
 % if no output is declared the tree is changed in trees
 % - tree     :: structured output tree
-% - itrif    :: indices of trifurcations
+% - ntrif    :: number of trifurcations
 %
 % Example
 % -------
