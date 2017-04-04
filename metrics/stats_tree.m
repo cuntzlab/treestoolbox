@@ -40,7 +40,7 @@
 % Uses
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2017  Hermann Cuntz
 
 function [stats, tname, tpath] = stats_tree (intrees, s, tname, options)
 
@@ -50,7 +50,7 @@ global       trees
 if (nargin < 1) || isempty (intrees)
     % {DEFAULT trees: full trees cell array}
     intrees  = trees;
-end;
+end
 
 % make intrees cell array convoluted to 2 depth:
 if ~iscell   (intrees)
@@ -233,13 +233,14 @@ for counter1                     = 1 : lens % walk through tree groups
             % calculate convex hull area and put in "ahull"
             if strfind (options, '-2d')
                 [~, ahull]                     = convhull  (  ...
-                    intrees{counter1}{counter2}.X, ...
-                    intrees{counter1}{counter2}.Y);
+                    double (intrees{counter1}{counter2}.X), ...
+                    double (intrees{counter1}{counter2}.Y));
             else
-                [~, ahull]                     = convhulln ([ ...
+                [~, ahull]                     = convhulln ( ...
+                    double ([ ...
                     intrees{counter1}{counter2}.X, ...
                     intrees{counter1}{counter2}.Y, ...
-                    intrees{counter1}{counter2}.Z]);
+                    intrees{counter1}{counter2}.Z]));
             end
             % convex hull area (volume):
             gstats (counter1).hull (counter2)  = ahull;
