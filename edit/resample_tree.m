@@ -15,6 +15,7 @@
 %     {DEFAULT: 10 um}
 % - options  ::string:
 %     '-s'   : show
+%     '-r'   : do not trim away obsolete regions
 %     '-e'   : echo modified nodes
 %     '-w'   : waitbar
 %     '-d'   : interpolates diameters (changes total surface & volume)
@@ -22,10 +23,12 @@
 %     imprecise resampling. Resampling automatically reduces length and
 %     that reduces the sr-length pieces sligthly. However, this can be
 %     altered by:
-%     '-l' : length conservation - reduced pieces are lenghtened to
+%     '-l'   : length conservation - reduced pieces are lenghtened to
 %        reflect the original path lengths in the tree. But the total
 %        tree size expands in the process (no good for automated
 %        reconstruction procedure for example)
+%     '-b'   : do not collapse branches to multifurcations (caution, might
+%        give a mess with high sr). DOES NOT PRESERVE LENGTH
 %     {DEFAULT: ''}
 %
 % Output
@@ -42,7 +45,7 @@
 % delete_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2017  Hermann Cuntz
 
 function varargout = resample_tree (intree, sr, options)
 
@@ -52,7 +55,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 ver_tree     (intree); % verify that input is a tree structure
 
@@ -73,6 +76,12 @@ if (nargin < 3) || isempty (options)
     options  = ''; 
 end
 
+if ~isempty (strfind (options, '-r'))
+    doptions = '-r';
+else
+    doptions = '';
+end
+
 if strfind   (options, '-s')
     clf;     hold on;
 end
@@ -82,7 +91,7 @@ end
 iT           = find (T_tree (tree)); % termination point indices
 len          = len_tree (tree);      % length values of tree segments [um]
 lenT         = len;
-lenT (iT)    = len(iT) + 0.5 * sr;   % new length values, ready to morph
+lenT (iT)    = len (iT) + 0.5 * sr;   % new length values, ready to morph
 % (conserve options from resample_tree  but not show -> waitbar)
 % - options2 is used again further below -
 i1           = strfind (options, '-s');
@@ -90,6 +99,11 @@ options2     = options;
 options2 (i1 : i1 + 1) = '';
 if isempty   (options2)
     options2 = 'none';
+end
+if ~isempty  (strfind (options, '-b'))
+    idpar    = idpar_tree (tree); % indices to direct parents
+    Bs       = B_tree     (tree);
+    lenT (lenT < sr & Bs & Bs (idpar)) = sr;
 end
 % see "morph_tree", changes length values but preserves topology and
 % angles:
@@ -170,6 +184,9 @@ ntree.dA         = ndA;
 ntree.X          = nX;
 ntree.Y          = nY;
 ntree.Z          = nZ;
+if isfield       (tree, 'name')
+    ntree.name   = tree.name;
+end
 if strfind       (options, '-d')
     ntree.D      = nD;
 end
@@ -181,21 +198,26 @@ for counterS     = 1 : length (S)
             ~strcmp (S{counterS}, 'dA') && ...
             ~strcmp (S{counterS}, 'X')  && ...
             ~strcmp (S{counterS}, 'Y')  && ...
-            ~strcmp (S{counterS}, 'Z'))
+            ~strcmp (S{counterS}, 'Z')  && ...
+            ~strcmp (S{counterS}, 'name'))
         if  ...
                 (~isempty (strfind (options, '-d')) && ...
                 strcmp (S{counterS}, 'D'))
-        else
-            vec  = tree.(S{counterS});
-            if isvector (vec) && (numel (vec) == N) && ~(ischar (vec))
-                ntree.(S{counterS})  = vec  (nindy);
+            continue
+        end
+        vec  = tree.(S{counterS});
+        if isvector (vec) && ~(ischar (vec))
+            if numel (vec) == N
+                ntree.(S{counterS}) = vec (nindy);
             else
-                ntree.(S{counterS})  = vec;
+                ntree.(S{counterS}) = vec;
             end
+        else
+            ntree.(S{counterS})  = vec;
         end
     end
 end
-tree             = delete_tree (ntree, 2 : N); % resampled tree
+tree             = delete_tree (ntree, 2 : N, doptions); % resampled tree
 
 if isempty       (strfind (options, '-v'))
     % a bit complicated for collapsing multifurcations:
@@ -256,7 +278,7 @@ if isempty       (strfind (options, '-v'))
         tree     = delete_tree (tree, ...
             itodel (sub2ind (size (itodel), ...
             icollapse, ...
-            1 : length (icollapse))));
+            1 : length (icollapse))), doptions);
     end
 end
 
