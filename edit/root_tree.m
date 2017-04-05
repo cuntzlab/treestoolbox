@@ -37,7 +37,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees); 
-end;
+end
 
 ver_tree     (intree); % verify that input is a tree structure
 
@@ -69,7 +69,6 @@ for counter      = 1 : length (S)
                 ~(iscell (vec) && isstruct (vec{1})) && ...
                 isvector (vec) && ...
                 (numel   (vec) == N)
-%             isvector (vec) && (numel (vec) == N) && ~(ischar (vec))
             tree.(S{counter})   = [ ...
                 tree.(S{counter})(1); ...
                 tree.(S{counter})];

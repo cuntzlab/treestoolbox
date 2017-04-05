@@ -101,8 +101,9 @@ if (nargin < 2) || isempty (color)
 end
 
 if (size (color, 1) == N) && (size (ipart, 1) ~= N)
-    color    = color (ipart);
+    color    = color  (ipart);
 end
+color        = double (color);
 
 if (nargin < 3) || isempty (DD)
     % {DEFAULT 3-tupel: no spatial displacement from the root}
@@ -471,7 +472,12 @@ if strfind       (options, '-p')
         1, res * 4);
     shift_vec    = reshape (shift_vec', 4, res * N)';
     poly_array   = poly_array + shift_vec;
-    if (size (color, 1) > 1) && (size (color, 2) == 1)
+    if  (...
+            (size (color, 1) == numel(tree.X)) && (size (color, 2) == 1)) ||  ...
+            (size (color, 2) == numel(tree.X)) && (size (color, 1) == 1)
+        if (size (color, 2) > 1) && (size (color, 1) == 1)
+           color = color'; 
+        end        
         C        = repmat  (color, 1, res * 2);
         C        = reshape (C', numel (C), 1);
         HP       = patch   ( ...
