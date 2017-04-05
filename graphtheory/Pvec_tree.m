@@ -6,7 +6,7 @@
 %
 % Cumulative vector, calculates the total path to the root cumulating
 % elements of v (addition) of each node. This is a META-FUNCTION and can
-% lead to various applications.
+% lead to various applications. NaN values now are ignored.
 %
 % Input
 % -----
@@ -29,7 +29,7 @@
 % Uses       ipar_tree len_tree ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2017  Hermann Cuntz
 
 function Pvec = Pvec_tree (intree, v, options)
 
@@ -39,7 +39,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 ver_tree     (intree);                 % verify that input is a tree
 
@@ -56,6 +56,7 @@ end
 % parent index structure (see "ipar_tree"):
 ipar             = ipar_tree (intree);
 v0               = [0; v];
+v0 (isnan (v0))  = 0;
 
 if size (ipar, 1) == 1
     Pvec         = v;
