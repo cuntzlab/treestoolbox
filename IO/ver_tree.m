@@ -37,27 +37,33 @@ function no_error = ver_tree (intree, options)
 global trees
 
 % use full tree for this function
-if ~isstruct (intree) && isscalar(intree) && isinteger(intree) && numel(trees) <= intree
-    tree = trees {intree};
+if ...
+        (~isstruct (intree)) && ...
+        (isscalar  (intree)) && ...
+        (isinteger (intree)) && ...
+        (numel (trees) <= intree)
+    tree     = trees{intree};
 else
-    tree = intree;
+    tree     = intree;
 end
+no_error     = true;
 
-no_error = true;
-
-if isfield (tree, 'dA'),
-    if length (size (tree.dA)) ~= 2,
-        warning ('Trees:NoTree', 'adjacency matrix incorrect dimensions');
+if isfield       (tree, 'dA')
+    if length    (size (tree.dA)) ~= 2
+        warning  ( ...
+            'Trees:NoTree', ...
+            'adjacency matrix incorrect dimensions');
         no_error = false;
     else
-        if size (tree.dA, 1) ~= size (tree.dA, 2),
-            warning ('Trees:NoTree', 'adjacency matrix not square');
+        if size (tree.dA, 1) ~= size (tree.dA, 2)
+            warning ( ...
+                'Trees:NoTree', ...
+                'adjacency matrix not square');
             no_error = false;
         end
     end
 else
-    %warning ('Trees:NoTree', 'missing adjacency matrix');
-    no_error = false;
+    no_error     = false;
 end
 
 if (nargin < 2) || isempty (options)
@@ -65,85 +71,117 @@ if (nargin < 2) || isempty (options)
     options  = '';
 end
 
-if strfind(options, '-q')
-    warning ('OFF', 'Trees:NoTree');
+if strfind       (options, '-q')
+    warning      ('OFF', 'Trees:NoTree');
 end
 
-if ~isstruct(tree)
-   warning ('Trees:NoTree', 'tree is no struct');
-   no_error = false;
+if ~isstruct     (tree)
+   warning       ( ...
+       'Trees:NoTree', ...
+       'tree is no struct');
+   no_error      = false;
 else
-    if isfield (tree, 'dA'),
-        if length (size (tree.dA)) ~= 2,
-            warning ('Trees:NoTree', 'adjacency matrix incorrect dimensions');
+    if isfield   (tree, 'dA')
+        if length (size (tree.dA)) ~= 2
+            warning ( ...
+                'Trees:NoTree', ...
+                'adjacency matrix incorrect dimensions');
             no_error = false;
         else
-            if size (tree.dA, 1) ~= size (tree.dA, 2),
-                warning ('Trees:NoTree', 'adjacency matrix not square');
+            if size (tree.dA, 1) ~= size (tree.dA, 2)
+                warning ( ...
+                    'Trees:NoTree', ...
+                    'adjacency matrix not square');
                 no_error = false;
             end
         end
     else
-        warning ('Trees:NoTree', 'missing adjacency matrix');
+        warning  ( ...
+            'Trees:NoTree', ...
+            'missing adjacency matrix');
         no_error = false;
     end
 
-    if isfield (tree, 'X'),
-        if (size (tree.X, 2) ~= 1) || (length (size (tree.X)) ~= 2),
-            warning ('Trees:NoTree', 'X not vertical vector');
+    if isfield   (tree, 'X')
+        if (size (tree.X, 2) ~= 1) || (length (size (tree.X)) ~= 2)
+            warning  ( ...
+                'Trees:NoTree', ...
+                'X not vertical vector');
             no_error = false;
         end
-        if size (tree.X, 1) ~= size (tree.dA, 1),
-            warning ('Trees:NoTree', 'X size not compatible with adjacency matrix');
-            no_error = false;
-        end
-    end
-
-    if isfield (tree, 'Y'),
-        if (size (tree.Y, 2) ~= 1) || (length (size (tree.Y)) ~= 2),
-            warning ('Trees:NoTree', 'Y not vertical vector');
-            no_error = false;
-        end
-        if size (tree.Y, 1) ~= size (tree.dA, 1),
-            warning ('Trees:NoTree', 'Y size not compatible with adjacency matrix');
+        if size (tree.X, 1) ~= size (tree.dA, 1)
+            warning  ( ...
+                'Trees:NoTree', ...
+                'X size not compatible with adjacency matrix');
             no_error = false;
         end
     end
 
-    if isfield (tree, 'Z'),
-        if (size (tree.Z, 2) ~= 1) || (length (size (tree.Z)) ~= 2),
-            warning ('Trees:NoTree', 'Z not vertical vector');
+    if isfield   (tree, 'Y')
+        if (size (tree.Y, 2) ~= 1) || (length (size (tree.Y)) ~= 2)
+            warning  ( ...
+                'Trees:NoTree', ...
+                'Y not vertical vector');
             no_error = false;
         end
-        if size (tree.Z, 1) ~= size (tree.dA, 1),
-            warning ('Trees:NoTree', 'Z size not compatible with adjacency matrix');
-            no_error = false;
-        end
-    end
-
-    if isfield (tree, 'D'),
-        if (size (tree.D, 2) ~= 1) || (length (size (tree.D)) ~= 2),
-            warning ('Trees:NoTree', 'D not vertical vector');
-            no_error = false;
-        end
-        if size (tree.D, 1) ~= size (tree.dA, 1),
-            warning ('Trees:NoTree', 'D size not compatible with adjacency matrix');
+        if size  (tree.Y, 1) ~= size (tree.dA, 1)
+            warning  ( ...
+                'Trees:NoTree', ...
+                'Y size not compatible with adjacency matrix');
             no_error = false;
         end
     end
 
-    if isfield (tree, 'R'),
-        if (size (tree.R, 2) ~= 1) || (length (size (tree.R)) ~= 2),
-            warning ('Trees:NoTree', 'R not vertical vector');
+    if isfield   (tree, 'Z')
+        if (size (tree.Z, 2) ~= 1) || (length (size (tree.Z)) ~= 2)
+            warning  ( ...
+                'Trees:NoTree', ...
+                'Z not vertical vector');
             no_error = false;
         end
-        if size (tree.R, 1) ~= size (tree.dA, 1),
-            warning ('Trees:NoTree', 'R size not compatible with adjacency matrix');
+        if size (tree.Z, 1) ~= size (tree.dA, 1)
+            warning  ( ...
+                'Trees:NoTree', ...
+                'Z size not compatible with adjacency matrix');
+            no_error = false;
+        end
+    end
+
+    if isfield   (tree, 'D')
+        if (size (tree.D, 2) ~= 1) || (length (size (tree.D)) ~= 2)
+            warning  ( ...
+                'Trees:NoTree', ...
+                'D not vertical vector');
+            no_error = false;
+        end
+        if size (tree.D, 1) ~= size (tree.dA, 1)
+            warning  ( ...
+                'Trees:NoTree', ...
+                'D size not compatible with adjacency matrix');
+            no_error = false;
+        end
+    end
+
+    if isfield   (tree, 'R')
+        if (size (tree.R, 2) ~= 1) || (length (size (tree.R)) ~= 2)
+            warning  ( ...
+                'Trees:NoTree', ...
+                'R not vertical vector');
+            no_error = false;
+        end
+        if size (tree.R, 1) ~= size (tree.dA, 1)
+            warning  ( ...
+                'Trees:NoTree', ...
+                'R size not compatible with adjacency matrix');
             no_error = false;
         end
     end
 end
 
-if strfind(options, '-q')
-    warning ('ON', 'Trees:NoTree');
+if strfind       (options, '-q')
+    warning      ('ON', 'Trees:NoTree');
 end
+
+
+
+
