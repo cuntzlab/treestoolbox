@@ -109,7 +109,8 @@ for counter      = 2 : length (tree.X)
         dZ       = tree.Z (counter) - tree.Z (ipar (counter, 2));
         XYZ      = sqrt ((dX.^2) + (dY.^2) + (dZ.^2)); % 3D segment length
         % find sub-tree indices:
-        [sub, ~] = ind2sub (size (ipar), find (ipar == counter));
+%         [sub, ~] = ind2sub (size (ipar), find (ipar == counter));
+        sub      = sub_tree (tree, counter);
         % correct for change loss of length, move sub-tree
         if XYZ   == 0 
             % if original length is zero no direction is given -> random:
