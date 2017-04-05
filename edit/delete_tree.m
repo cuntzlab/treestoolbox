@@ -62,6 +62,11 @@ if (nargin < 2) || isempty (inodes)
     % {DEFAULT: nothing!! (this used to be: last node)}
     inodes   = [];
 end
+
+if islogical (inodes) && numel (inodes) == N
+    inodes   = find (inodes);
+end
+
 if size (inodes, 1) == N
     % all nodes are deleted, return empty vector:
     if  (nargout == 1) || (isstruct (intree))
