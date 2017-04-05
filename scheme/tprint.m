@@ -14,7 +14,7 @@
 % - options  ::string:
 %     '-SHR' 1200 dpi
 %     '-HR'  600  dpi
-%     '-R'   300  dpi 
+%     '-R'   300  dpi
 %     '-LR'  150  dpi
 %     '-jpg' as jpg
 %     '-tif' as tif
@@ -45,16 +45,16 @@
 % Uses shine
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2017  Hermann Cuntz
 
 function [tname, tpath] = tprint (tname, options, fsize, shineoptions)
 
 if (nargin < 1) || isempty (tname)
-     [tname, tpath] = uiputfile ('.*', 'print figure content', 'fig');
-     if tname    == 0,
+    [tname, tpath] = uiputfile ('.*', 'print figure content', 'fig');
+    if tname    == 0
         tname    = [];
         return
-     end
+    end
 else
     tpath        = '';
 end
@@ -99,19 +99,55 @@ if ~strcmp       (shineoptions, 'none')
     shine        (shineoptions);
 end
 
+if strfind       (options, '-png')
+    if ~isempty  (strfind (tname, '.png'))
+        print    ('-dpng',   ...
+            ['-r' (num2str (res))], [tpath tname]);
+    else
+        print    ('-dpng',   ...
+            ['-r' (num2str (res))], [tpath tname '.png']);
+    end
+end
 if strfind       (options, '-jpg')
-    print        ('-djpeg',  ['-r' (num2str (res))], [tpath tname '.jpg']);
+    print        ('-djpeg',  ...
+        ['-r' (num2str (res))], [tpath tname '.jpg']);
 end
 if strfind       (options, '-tif')
-    print        ('-dtiff',  ['-r' (num2str (res))], [tpath tname '.tif']);
+    if ~isempty  (strfind (tname, '.tif'))
+        print    ('-dtiff', ...
+            ['-r' (num2str (res))], [tpath tname]);
+    else
+        print    ('-dtiff', ...
+            ['-r' (num2str (res))], [tpath tname '.tif']);
+    end    
 end
 if strfind       (options, '-eps')
-    print        ('-depsc2', [tpath tname '.eps']);
+    %     print        ('-depsc2', [tpath tname '.eps']);
+    print        ('-painters', '-depsc2', ...
+        [tpath tname '.eps']);
 end
 if strfind       (options, '-pdf')
-    print        ('-dpdf',   [tpath tname '.pdf']);
+    if ~isempty  (strfind (tname, '.pdf'))
+        print    ('-painters', '-dpdf', ...
+            ['-r' (num2str (res))], '-loose', [tpath tname]);
+    else
+        print    ('-painters', '-dpdf', ...
+            ['-r' (num2str (res))], [tpath tname '.pdf']);
+    end
 end
-
+if strfind       (options, '-svg')
+    axes         ( ...
+        'Position',            [0.005 0.005 0.99 0.99], ...
+        'xtick',               [], ...
+        'ytick',               [], ...
+        'box',                 'on');
+    set          (gcf, 'children', flipud (get (gcf, 'children')));
+    if exist     ('plot2svg')
+        plot2svg ([tpath tname '.svg']);
+    else
+        warning  ('plot2svg not installed');
+    end
+end
 
 
 
