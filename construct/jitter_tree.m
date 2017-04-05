@@ -1,8 +1,8 @@
 % JITTER_TREE   Jitters coordinates of a tree.
 % (trees package)
 %
-% tree = jitter_tree (intree, stde, lambda, options, inodes)
-% ----------------------------------------------------------
+% tree = jitter_tree (intree, stde, lambda, options, ipart)
+% ---------------------------------------------------------
 %
 % adds spatial noise to the coordinates of the nodes of a tree.
 %
@@ -18,7 +18,7 @@
 %     '-s'   : show
 %     '-w'   : waitbar
 %     {DEFAULT: '-w'}
-% - inodes   ::index: nodes of the tree affected by jitter
+% - ipart    ::index: nodes of the tree affected by jitter
 %
 % Output
 % ------
@@ -33,19 +33,19 @@
 % Uses ipar_tree
 %
 % speed up suggested  by Calvin Schneider 2014
-% added inodes option by Marcel Beining   2015
+% added ipart option by Marcel Beining   2015
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2017  Hermann Cuntz
 
-function  varargout = jitter_tree (intree, stde, lambda, options, inodes)
+function  varargout = jitter_tree (intree, stde, lambda, options, ipart)
 
 % trees : contains the tree structures in the trees package
 global trees
 
 if (nargin < 1) || isempty (intree)
     intree   = length (trees);
-end;
+end
 
 ver_tree     (intree);
 
@@ -69,11 +69,11 @@ end
 
 N            = size (tree.X, 1);
 
-if (nargin < 5) || isempty (inodes)
-    inodes   = 1 : N;
+if (nargin < 5) || isempty (ipart)
+    ipart    = 1 : N;
 end
-if islogical (inodes) && numel (inodes) == N  % transform logical indexing
-    inodes   = find (inodes);
+if islogical (ipart) && numel (ipart) == N  % transform logical indexing
+    ipart    = find (ipart);
 end
 
 % all paths:
@@ -88,14 +88,14 @@ end
 
 for counter      = 1 : lambda
     if strfind   (options, '-w')   % waitbar option: update
-        if mod (counter, 5) == 0
+        if mod   (counter, 5) == 0
             waitbar (counter / lambda, HW);
         end
     end
     As{counter}  = A ^ counter;
 end
 R                = zeros (N, 3);
-R (inodes, :)    = randn (numel (inodes), 3) * stde * lambda;
+R (ipart, :)     = randn (numel (ipart), 3) * stde * lambda;
 R1               = zeros (N, 3);
 
 if strfind       (options, '-w')     % waitbar option: reinitialization
@@ -105,7 +105,7 @@ end
 
 for counter      = 1 : N
     if strfind   (options, '-w')   % waitbar option: update
-        if mod (counter, 50) == 0,
+        if mod   (counter, 50) == 0
             waitbar (counter / N, HW);
         end
     end
