@@ -79,7 +79,12 @@ for counter      = 1 : length (iB)      % walk through all branch points:
     nV2          = V2 / sqrt (sum (V2.^2));
     % the angle between two vectors in 3D is simply the inverse cosine of
     % their dot-product.
-    angleB (counter) = acos (dot (nV1, nV2));
+    if all       (nV1 == nV2)
+        % otherwise strange imaginary parts might occur
+        angleB (counter) = 0;
+    else
+        angleB (counter) = acos (dot (nV1, nV2));
+    end    
     if strfind   (options, '-m') % show movie option
         clf; hold on;
         HP       = plot_tree (intree, [], [], [], [], '-b');
