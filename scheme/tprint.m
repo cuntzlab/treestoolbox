@@ -67,8 +67,18 @@ if nstart (end)  > 0
     tname (1 : nstart (end)) = '';
 end
 
+ % percent symbol makes problems with ghostscript:
+tname (strfind (tname, '%')) = 'p';
+
+
 if (nargin < 2) || isempty (options)
-    options      = '-R -jpg';
+    options      = '-R';
+    switch       tname (end - 2 : end)
+        case     {'pdf', 'eps', 'png', 'tif', 'svg'}
+            options = strcat (options, ' -', tname (end - 2 : end));
+        otherwise
+            options = strcat (options, ' -jpg');
+    end
 end
 
 if (nargin < 3) || isempty (fsize)
