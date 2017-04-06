@@ -38,7 +38,7 @@
 % Uses ver X Y Z
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2017  Hermann Cuntz
 
 function HP = pointer_tree (intree, inodes, llen, color, DD, options)
 
@@ -48,7 +48,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 % use only node position for this function
 if ~isstruct (intree)
@@ -70,6 +70,9 @@ end
 if (nargin < 2) || isempty (inodes)
     % {DEFAULT: nothing!! (this used to be: last node)}
     inodes   = [];
+end
+if (islogical (inodes)) && (length (inodes) == length (X))
+    inodes   = find (inodes);
 end
 
 if (nargin < 3) || isempty (llen)
@@ -135,11 +138,11 @@ switch           options
     case         '-s'
         HP       = zeros (length (inodes), 1);
         [XS, YS, ZS] = sphere (16);
-        for counter = 1 : length (inodes),
+        for counter = 1 : length (inodes)
             HP (counter) = surface ( ...
-                X (inodes (counter)) + 2.5 * XS + DD (1),...
-                Y (inodes (counter)) + 2.5 * YS + DD (2),...
-                Z (inodes (counter)) + 2.5 * ZS + DD (3));
+                X (inodes (counter)) + (llen / 150) * 2.5 * XS + DD (1), ...
+                Y (inodes (counter)) + (llen / 150) * 2.5 * YS + DD (2), ...
+                Z (inodes (counter)) + (llen / 150) * 2.5 * ZS + DD (3));
         end
         set      (HP, ...
             'edgecolor',       'none', ...
