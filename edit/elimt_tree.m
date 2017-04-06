@@ -42,7 +42,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 ver_tree     (intree); % verify that input is a tree structure
 
@@ -63,7 +63,7 @@ num              = size (dA, 1);       % number of nodes in tree
 sumdA            = ones (1, num) * dA; % actually faster than sum (dA)!
 idpar            = idpar_tree (tree);
 itrif            = find (sumdA > 2);   % find trifurcations
-if strfind (options, '-0')             % do not eliminate root trifurcation
+if strfind       (options, '-0')       % do not eliminate root trifurcation
     itrif        = setdiff (itrif, find ((dA * ones (num, 1)) == 0));
 end
 
@@ -83,9 +83,9 @@ for counter      = 1 : length (itrif)
         tree.Z (itrif (counter)) - ...
         tree.Z (idpar (itrif (counter)));
     if all       ([dX, dY, dZ] == 0)
-        dX        = mean (tree.X) - tree.X (1);
-        dY        = mean (tree.Y) - tree.Y (1);
-        dZ        = mean (tree.Z) - tree.Z (1);
+        dX       = mean (tree.X) - tree.X (1);
+        dY       = mean (tree.Y) - tree.Y (1);
+        dZ       = mean (tree.Z) - tree.Z (1);
     end
     normvec      = norm ([dX, dY, dZ]);
     dX           = dX / normvec;

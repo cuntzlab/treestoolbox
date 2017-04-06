@@ -15,6 +15,8 @@
 % - options  ::string:
 %     '-s'   : show
 %     {DEFAULT: ''}
+% - ipart    ::index:        index to the subpart to be plotted
+%     {DEFAULT: all nodes}
 %
 % Output
 % ------

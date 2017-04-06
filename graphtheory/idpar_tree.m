@@ -27,7 +27,7 @@
 % Uses         ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2017  Hermann Cuntz
 
 function idpar = idpar_tree (intree, options)
 
@@ -37,7 +37,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 ver_tree     (intree);                 % verify that input is a tree
 
@@ -75,10 +75,6 @@ if strfind       (options,'-s')            % show option
     T            = vtext_tree (intree, idpar,      [],  [0 0 5]);
     set          (T, ...
         'fontsize',            14);
-%     
-%     T            = vtext_tree (intree, idpar, []);
-%     set          (T, ...
-%         'fontsize',            14);
     title        ('direct parend ID');
     xlabel       ('x [\mum]');
     ylabel       ('y [\mum]');
