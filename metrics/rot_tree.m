@@ -76,18 +76,15 @@ if strfind       (options, '-m3d')
     if     strfind (options, '-m3dX')
         e        = [0 1 0];
         raxis    = 1;
-        d = [2 3];
-        %         sigcos   = 3;
+        d        = [2 3];
     elseif strfind (options, '-m3dY')
         e        = [1 0 0];
         raxis    = 2;
-        d = [3 1];
-        %         sigcos   = 2;
+        d        = [3 1];
     else
         e        = [1 0 0];
         raxis    = 3;
-        d = [1 2];
-        %         sigcos   = 2;
+        d        = [1 2];
     end
     XYZ0         = [ ...
         (tree.X (1)) ...

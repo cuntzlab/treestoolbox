@@ -11,7 +11,7 @@
 % -----
 % - intree   ::integer:      index of tree in trees or structured tree
 % - options  ::string:
-%     '-0'   : the root node is 0 instead of 1 
+%     '-0'   : the root node is 0 instead of itself, careful this is NEW!!
 %     '-s'   : show
 %     {DEFAULT: ''}
 %
@@ -58,8 +58,8 @@ end
 idpar            = dA * (1 : size (dA, 1))';
 
 if isempty       (strfind (options, '-0'))
-    % null-compartment (root) becomes one
-    idpar (idpar == 0) = 1;
+    % null-compartment (root) becomes index to itsself
+    idpar (idpar == 0) = find ((idpar == 0));
 end
 
 if strfind       (options,'-s')            % show option

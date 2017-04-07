@@ -73,8 +73,9 @@ for counter      = 2 : maxPL + 2
     V            = dA * V;
     ipar (:, counter) = V;
 end
-ipar             = ipar (ipart, :);
-
+if ~isempty      (ipart)
+    ipar         = ipar (ipart, any (ipar (ipart, :) ~= 0, 1));
+end
 if strfind       (options, '-s') % show option
     clf;
     imagesc      (ipar);
