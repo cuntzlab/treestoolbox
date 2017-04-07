@@ -4,9 +4,10 @@
 % tree = scale_tree (intree, fac, options)
 % ----------------------------------------
 %
-% Scales the entire tree by factor fac where it is (NEW!). If fac 3-tupel
-% scaling factor can be different for X, Y and Z. By default, diameter is
-% also scaled.
+% Scales the entire tree by factor fac at the location where it is (NEW!).
+% If fac 3-tupel scaling factor can be different for X, Y and Z. By
+% default, diameter is also scaled (as average between X and Y scaling,
+% NEW!).
 %
 % Input
 % -----
@@ -77,6 +78,9 @@ if numel (fac) > 1
     tree.X       = tree.X * fac (1);
     tree.Y       = tree.Y * fac (2);
     tree.Z       = tree.Z * fac (3);
+    if isempty   (strfind (options, '-d'))
+        tree.D   = tree.D * mean (fac (1 : 2));
+    end    
 else
     tree.X       = tree.X * fac;
     tree.Y       = tree.Y * fac;
