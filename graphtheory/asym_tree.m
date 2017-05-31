@@ -48,7 +48,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: : last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 ver_tree     (intree); % verify that input is a tree structure
 
