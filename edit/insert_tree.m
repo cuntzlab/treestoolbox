@@ -1,10 +1,10 @@
 % INSERT_TREE   Insert a number of points into a tree.
 % (trees package)
-% 
-% tree = insert_tree (intree, swc,  options)
-% ------------------------------------------
 %
-% Inserts a set of points defined by a matrix swc in SWC order 
+% [tree, ind] = insert_tree (intree, swc,  options)
+% -------------------------------------------------
+%
+% Inserts a set of points defined by a matrix swc in SWC order
 % ([inode R X Y Z D idpar] BUT NOTE that diameter values are given and NOT
 % radius!) into a tree intree. This function alters the original
 % morphology! Trifurcations can occur but are not identified to keep speed
@@ -21,12 +21,14 @@
 % - options  ::string:
 %     '-s'   : show
 %     '-e'   : echo added nodes
+%     '-d'   : delete obsolete regions (NOTE! BUG, see code)
 %     {DEFAULT: '-e'}
 %
 % Output
 % ------
 % if no output is declared the tree is changed in trees
 % - tree     :: structured output tree
+% - ind      :: indices of added nodes
 %
 % Example
 % -------
@@ -37,8 +39,10 @@
 % See also insertp_tree
 % Uses ver_tree dA
 %
+% Added node index output by Marcel Beining 2017
+%
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2017  Hermann Cuntz
 
 function varargout = insert_tree (intree, swc, options)
 
@@ -48,7 +52,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 ver_tree     (intree); % verify that input is a tree structure
 
@@ -77,9 +81,10 @@ if ~isempty  (swc)
     tree.dA      = [[tree.dA, ...
         (sparse  (N,  N2))]; ...
         (sparse  (N2, N + N2))];
+    ind          = (N + 1 : N + N2)';
     tree.dA (sub2ind ( ...
         [(N + N2), (N + N2)], ...
-        (N + 1 : N + N2)',   swc (:, 7))) = 1;
+        ind,   swc (:, 7))) = 1;
     
     if isfield   (tree, 'X')
         tree.X   = [tree.X; (swc (:, 3))];
@@ -93,23 +98,31 @@ if ~isempty  (swc)
     if isfield   (tree, 'D')
         tree.D   = [tree.D; (swc (:, 6))];
     end
-    
-    % eliminate obsolete regions (only if everything is correct)
+    if isfield   (tree, 'jpoints') 
+        tree.jpoints = [tree.jpoints; (zeros (N2, 1))];
+    end
     if isfield       (tree, 'R')
-        if isfield   (tree, 'rnames')
-            % my god! Handling regions is not easy!!!!!!
-            [i1, ~, i3]  = unique    ([tree.R; (swc (:, 2))]);
-            [~, i5, i6]  = intersect (unique (tree.R), i1);
-            rnames       = cell (1, 1);
-            for counter  = 1 : length (i1)
-                rnames {counter} = num2str (i1 (counter));
+        % eliminate obsolete regions (only if everything is correct)
+        if ~isempty (strfind (options, '-d'))
+            if isfield   (tree, 'rnames')
+                % my god! Handling regions is not easy!!!!!!
+                % AND IS WRONG!!!!! IF FIRST REGION DOES NOT EXIST, THERE IS A
+                % SHIFT OF REGION NAMES THAT ARE DELETED..!!!!
+                [i1, ~, i3]  = unique    ([tree.R; (swc (:, 2))]);
+                [~, i5, i6]  = intersect (unique (tree.R), i1);
+                rnames       = cell (1, 1);
+                for counter  = 1 : length (i1)
+                    rnames {counter} = num2str (i1 (counter));
+                end
+                rnames (i6)  = tree.rnames (i5);
+                tree.rnames  = rnames;
+                tree.R       = i3;
+            else
+                [~, ~, i3]   = unique ([tree.R; (swc (:, 2))]);
+                tree.R       = i3;
             end
-            rnames (i6)  = tree.rnames (i5);
-            tree.rnames  = rnames;
-            tree.R       = i3;
         else
-            [~, ~, i3]   = unique ([tree.R; (swc (:, 2))]);
-            tree.R       = i3;
+            tree.R           = [tree.R; (swc (:, 2))];
         end
     end
 end
@@ -138,8 +151,13 @@ if strfind       (options, '-e')   % echo changes
 end
 
 if (nargout == 1) || (isstruct (intree))
-    varargout{1}   = tree; % if output is defined then it becomes the tree
+    varargout{1}   = tree;  % if output is defined: tree
+    if nargout >= 2
+        varargout{2} = ind; % second output: index of the inserted node
+    end    
 else
-    trees{intree}  = tree; % otherwise original tree in trees is replaced
+    trees{intree}  = tree;  % otherwise original tree in trees is replaced
 end
+
+
 

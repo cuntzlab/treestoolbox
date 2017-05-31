@@ -15,6 +15,8 @@
 % - options  ::string:
 %     '-s'   : show
 %     {DEFAULT: ''}
+% - ipart    ::index:        index to the subpart to be plotted
+%     {DEFAULT: all nodes}
 %
 % Output
 % ------
@@ -28,7 +30,7 @@
 % Uses       PL_tree ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2017  Hermann Cuntz
 
 function ipar = ipar_tree (intree, options, ipart)
 
@@ -38,7 +40,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 ver_tree     (intree);                 % verify that input is a tree
 
@@ -59,7 +61,6 @@ if (nargin < 3) || isempty (ipart)
     ipart  = (1 : size (dA, 1))';
 end
 
-
 % number of nodes in tree:
 N                = size (dA, 1);
 % maximum depth by maximum path length:
@@ -72,8 +73,9 @@ for counter      = 2 : maxPL + 2
     V            = dA * V;
     ipar (:, counter) = V;
 end
-ipar             = ipar (ipart, :);
-
+if ~isempty      (ipart)
+    ipar         = ipar (ipart, any (ipar (ipart, :) ~= 0, 1));
+end
 if strfind       (options, '-s') % show option
     clf;
     imagesc      (ipar);

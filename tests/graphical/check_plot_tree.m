@@ -1,5 +1,4 @@
 %% check_plot_tree
-
 tree             = sample_tree;
 
 %% test 1
@@ -47,6 +46,18 @@ set              (hp, ...
     'marker',                  '.', ...
     'markersize',              12);
 tprint           ('./panels/plot_tree4', ...
+    '-jpg -HR',                [10 10]);
+
+%% test 5
+clf;
+axis off
+strahler         = strahler_tree (tree);
+BO               = BO_tree       (tree);
+plot_tree        (tree, [ ...
+    (strahler ./ (max (strahler))) ...
+    (BO ./ (max (BO))) ...
+    (BO * 0)]);
+tprint           ('./panels/plot_tree5', ...
     '-jpg -HR',                [10 10]);
 
 

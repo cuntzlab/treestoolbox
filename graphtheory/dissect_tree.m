@@ -16,6 +16,7 @@
 % - intree   ::integer:      index of tree in trees or structured tree
 % - options  ::string:
 %     '-s'   : show branches
+%     '-r'   : do not section by region
 %     {DEFAULT: ''}
 %
 % Output
@@ -34,7 +35,7 @@
 % Uses       root_tree ipar_tree idpar_tree T_tree B_tree Pvec_tree ver_tree R
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2017  Hermann Cuntz
 
 function [sect, vec] = dissect_tree (intree, options)
 
@@ -44,7 +45,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 ver_tree     (intree); % verify that input is a tree structure
 
@@ -61,7 +62,10 @@ ipar             = ipar + 1;
 
 % iBT: positions at which to cut the tree (branch and terminal nodes):
 iBT              = T_tree (tree) | B_tree (tree);
-if isfield       (tree, 'R')
+if ...
+        (isempty (strfind (options, '-r'))) && ...
+        (isfield (tree,'R')) && ...
+        (numel   (tree.R) == numel (tree.X))
     idpar        = idpar_tree (tree);      % indices to direct parents
     % detect region changes:
     iR           = idpar (tree.R ~= tree.R (idpar));

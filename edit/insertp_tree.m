@@ -1,8 +1,8 @@
 % INSERTP_TREE   Insert nodes along a path in a tree.
 % (trees package)
 %
-% [tree indx] = insertp_tree (intree, inode, plens, options)
-% ----------------------------------------------------------
+% [tree, indx] = insertp_tree (intree, inode, plens, options)
+% -----------------------------------------------------------
 %
 % Inserts nodes at path-lengths plens on the path from the root to point
 % inode. All Nx1 vectors are interpolated linearly but regions are taken
@@ -38,7 +38,7 @@
 % Uses ipar_tree Pvec_tree ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2017  Hermann Cuntz
 
 function varargout = insertp_tree (intree, inode, plens,  options)
 
@@ -136,6 +136,8 @@ for counter      = 1 : N2
                     ~(ischar (vec))
                 if strcmp (S{counterS}, 'R')
                     tree.R (N + counter) = tree.R (ipos);
+                elseif  strcmp (S{counterS}, 'jpoints')
+                    tree.jpoints (N + counter, 1) = 0;
                 else
                     tree.(S{counterS})(N + counter)  = ...
                         tree.(S{counterS})(idpar)  + ( ...
@@ -182,7 +184,8 @@ if (nargout > 0) || (isstruct (intree))
 else
     trees{intree}  = tree;
 end
-
 if nargout         == 2
     varargout{2}   = indx;
 end
+
+

@@ -45,7 +45,7 @@
 % Uses Pvec_tree ipar_tree T_tree ver_tree dA D
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2017  Hermann Cuntz
 
 function  varargout = quaddiameter_tree (intree, scale, offset, options, ...
     P, ldend)
@@ -56,7 +56,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 ver_tree     (intree); % verify that input is a tree structure
 
@@ -112,7 +112,7 @@ if strfind   (options, '-w')      % waitbar option: initialization
 end
 
 Ds               = zeros (size (ipariT));
-for counter      = 1    : size (ipariT, 1);
+for counter      = 1    : size (ipariT, 1)
     if strfind   (options, '-w')    % waitbar option: update
         if mod   (counter, 500) == 0
             waitbar (counter / size (ipariT, 1), HW);

@@ -41,7 +41,7 @@
 % Uses redirect_tree sort_tree ver_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2017  Hermann Cuntz
 
 function varargout = cat_tree (intree1, intree2, inode1, inode2, options)
 
@@ -85,16 +85,16 @@ if (nargin < 5) || isempty (options)
 end
 
 % if inode2 is not root on tree2 set it to root:
-tree2        = redirect_tree (tree2, inode2);
-dA1          = tree1.dA;        % directed adjacency matrix of tree 1
-dA2          = tree2.dA;        % directed adjacency matrix of tree 2
-N1           = size   (dA1, 1); % number of nodes in tree 1
-N2           = size   (dA2, 1); % number of nodes in tree 2
-ndA          = sparse ( ...
+tree2            = redirect_tree (tree2, inode2);
+dA1              = tree1.dA;        % directed adjacency matrix of tree 1
+dA2              = tree2.dA;        % directed adjacency matrix of tree 2
+N1               = size   (dA1, 1); % number of nodes in tree 1
+N2               = size   (dA2, 1); % number of nodes in tree 2
+ndA              = sparse ( ...
     [[dA1; (sparse (N2, N1))], ...
     [(sparse (N1, N2)); dA2]]);
 ndA (1 + N1, inode1) = 1;
-tree.dA      = ndA;
+tree.dA          = ndA;
 
 % expand all fields, take only tree1 fields:
 S                = fieldnames (tree1);
@@ -147,9 +147,9 @@ if isempty (strfind (options, '-r'))
     end
 end
 
-tree         = sort_tree (tree, '-LO');
+tree             = sort_tree (tree, '-LO');
 
-if strfind   (options, '-s')
+if strfind       (options, '-s')
     clf; hold on;
     plot_tree    (intree1);
     plot_tree    (intree2, [1 0 0]);

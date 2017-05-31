@@ -27,7 +27,7 @@
 % Uses ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2017  Hermann Cuntz
 
 function varargout = root_tree (intree, options)
 
@@ -37,7 +37,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees); 
-end;
+end
 
 ver_tree     (intree); % verify that input is a tree structure
 
@@ -53,20 +53,25 @@ if (nargin < 2) || isempty (options)
     options  = '';
 end
 
-N            = size (tree.dA, 1); % number of nodes in tree
+N                = size (tree.dA, 1); % number of nodes in tree
 % expand directed adjacency matrix:
-tree.dA      = [ ...
+tree.dA          = [ ...
     (zeros (1, N + 1)); [ ...
     (zeros (N, 1)) tree.dA]];
-tree.dA (2, 1) = 1; % connect new root to old root
-S            = fieldnames (tree); % update all fields:
-for ward     = 1 : length (S)
-    if ~strcmp (S{ward}, 'dA')
-        vec  = tree.(S{ward});
-        if isvector (vec) && (numel (vec) == N) && ~(ischar (vec))
-            tree.(S{ward})   = [ ...
-                tree.(S{ward})(1); ...
-                tree.(S{ward})];
+tree.dA (2, 1)   = 1; % connect new root to old root
+S                = fieldnames (tree); % update all fields:
+for counter      = 1 : length (S)
+    if ~strcmp (S{counter}, 'dA') && ~strcmp (S{counter}, 'rnames')
+        vec      = tree.(S{counter});
+        if ...
+                ~ischar  (vec) && ...
+                ~(iscell (vec) && ischar   (vec{1})) && ...
+                ~(iscell (vec) && isstruct (vec{1})) && ...
+                isvector (vec) && ...
+                (numel   (vec) == N)
+            tree.(S{counter})   = [ ...
+                tree.(S{counter})(1); ...
+                tree.(S{counter})];
         end
     end
 end

@@ -62,7 +62,7 @@
 % Friedrich Forstner
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2017  Hermann Cuntz
 
 function HP  = plot_tree (intree, color, DD, ipart, res, options)
 
@@ -72,7 +72,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 ver_tree     (intree); % verify that input is a tree structure
 
@@ -98,10 +98,12 @@ end
 if (nargin < 2) || isempty (color)
     % {DEFAULT color: black}
     color    = [0 0 0];
-end;
-if (size (color, 1) == N) && (size (ipart, 1) ~= N)
-    color    = color (ipart);
 end
+
+if (size (color, 1) == N) && (size (ipart, 1) ~= N)
+    color    = color  (ipart);
+end
+color        = double (color);
 
 if (nargin < 3) || isempty (DD)
     % {DEFAULT 3-tupel: no spatial displacement from the root}
@@ -278,7 +280,7 @@ if ~isempty      ([ ...
         (strfind (options, '-3'))])
     % if color values are mapped:
     if size (color, 1) > 1
-        if size (color, 2) ~= 3,
+        if size (color, 2) ~= 3
             if islogical (color)
                 color  = double (color);
             end
@@ -390,7 +392,7 @@ if strfind       (options, '-p')
         % orthogonal bases setup
         b1 (counter, :) = v (:, 2);
         b2 (counter, :) = v (:, 1);
-    end;
+    end
     % replicate vectors and reshape
     b1           = repmat  (b1,  1, 2 * res);
     b1           = reshape (b1', 3, 2 * res * size (b1, 1))';
@@ -470,7 +472,12 @@ if strfind       (options, '-p')
         1, res * 4);
     shift_vec    = reshape (shift_vec', 4, res * N)';
     poly_array   = poly_array + shift_vec;
-    if (size (color, 1) > 1) && (size (color, 2) == 1)
+    if  (...
+            (size (color, 1) == numel(tree.X)) && (size (color, 2) == 1)) ||  ...
+            (size (color, 2) == numel(tree.X)) && (size (color, 1) == 1)
+        if (size (color, 2) > 1) && (size (color, 1) == 1)
+           color = color'; 
+        end        
         C        = repmat  (color, 1, res * 2);
         C        = reshape (C', numel (C), 1);
         HP       = patch   ( ...
@@ -480,7 +487,13 @@ if strfind       (options, '-p')
             'facecolor',       'interp', ...
             'linestyle',       'none');
     else
-        C        = repmat (color, size (vertex_array, 1), 1);
+        if (size (color, 1) > 1)
+            C    = repmat  (color, 1, res * 2);
+            C    = reshape (C',   numel (C), 1);
+            C    = reshape (C, 3, numel (C) / 3)';
+        else
+            C    = repmat  (color, size (vertex_array, 1), 1);
+        end
         HP       = patch (...
             'Faces',           poly_array, ...
             'Vertices',        vertex_array, ...

@@ -1,39 +1,46 @@
 % NEURON_TEMPLATE_TREE   Export tree as NEURON file.
 % (trees package)
 %
-% [name path] = neuron_template_tree (intree, name, options)
-% ------------------------------------------------------
+% [name, path, minterf] = neuron_template_tree (intree, name, options)
+% --------------------------------------------------------------------
 %
-% saves a complete tree in the section based neuron '.hoc' format.
+% Saves a complete tree in the section based neuron '.hoc' format.
 % This function saves the resulting neuron as a template (compare with
 % neuron_tree)
 %
 % Inputs
 % ------
-% - intree::integer:index of tree in trees or structured tree
-% - name::string: name of file including the extension ".hoc"
-%     {DEFAULT : open gui fileselect} spaces and other weird symbols not
-%     allowed!
-% - options::string: {DEFAULT : ''}
+% - intree   ::integer: index of tree in trees or structured tree
+% - name     ::string:  name of file including the extension ".hoc"
+%     spaces and other weird symbols not allowed!
+%     {DEFAULT : open gui fileselect}
+% - options  ::string: {DEFAULT : ''}
 %     '-s'   : write procedures to collect
 %     '-w'   : waitbar
 %     '-e'   : include passive electrotonic parameters
 %     '->'   : send directly to windows (necessitates -s option)
+%     '-m'   : writes T2N interface matrix in minterf.dat (in the same
+%              folder)
 %
 % See also neuron_tree load_tree swc_tree start_trees (neu_tree.hoc)
 % Uses root_tree cyl_tree dissect_tree ver_tree D
 %
 % Output
 % ------
-% - name::string: name of output file; [] no file was selected -> no output
-% - path::sting: path of the file, complete string is therefore: [path name]
+% - name     ::string:  name of output file;
+%     [] no file was selected -> no output
+% - path     ::sting:   path of the file
+%     complete string is therefore: [path name]
+% - minterf  ::matrix:  interface matrix with node positions in sections
 %
 % Example
 % -------
-% neuron_tree (sample_tree);
+% neuron_template_tree (sample_tree);
+%
+% Heavily modified by Marcel Beining for use with T2N, 2014
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2017  Hermann Cuntz
 
 function [tname, path] = neuron_template_tree (intree, tname, options)
 
@@ -43,19 +50,11 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
-
-ver_tree     (intree); % verify that input is a tree structure
-
-% use full tree for this function
-if ~isstruct (intree),
-    tree     = trees {intree};
-else
-    tree     = intree;
 end
 
 if (nargin < 3) || isempty (options)
-    options  = ''; % {DEFAULT: no option}
+    % {DEFAULT: no option}
+    options  = '';
 end
 
 % defining a name for the neuron-tree
@@ -64,7 +63,7 @@ if (nargin < 2) || isempty (tname)
         {'.hoc', 'export to hoc'}, ...
         'Save as', ...
         'tree.hoc');
-    if tname     == 0,
+    if tname     == 0
         tname    = [];
         return
     end
@@ -83,238 +82,293 @@ if nstart (end) > 0
 end
 name2        = [path 'run_' name '.hoc']; % show file, with '-s' option
 
-% add a starting node in root to avoid all starting branch point:
-tree         = root_tree (tree);
-
-ipar         = ipar_tree (tree); % parent index structure (see "ipar_tree")
-% idpar        = ipar (:, 2);      % vector containing index to direct parent
-D            = tree.D;           % local diameter values of nodes on tree
-N            = size (D, 1);      % number of nodes in tree
-if isfield  (tree, 'R')
-    R        = tree.R;           % region values on nodes in the tree
+if isfield(intree,'artificial')
+    artflag      = true;
+    tree         = intree;
+    minterf      = [1 0 0];
 else
-    R        = ones (N, 1);      % add a homogeneous regions field of all ones
-end
-sect         = dissect_tree (tree);  % find separate branches
-Rsect        = R (sect (:, 2));  % region attribute to sections
-uR           = unique (R);       % sorted regions
-luR          = length (uR);      % number of regions
-
-if isfield   (tree, 'rnames')
-    rnames   = tree.rnames (uR);
-    for ward = 1 : length (uR)
-        rnames {ward} = rnames{ward};
-    end
-else
-    if luR   == 1
-        rnames   = {name};
+    artflag      = false;
+    ver_tree     (intree); % verify that input is a tree structure
+    
+    % use full tree for this function
+    if ~isstruct (intree)
+        tree     = trees {intree};
     else
-        rnames   = cell (1, luR);
-        for ward = 1 : luR
-            rnames {ward} = num2str(uR (ward));
+        tree     = intree;
+    end
+    if isfield (tree, 'frustum') && (tree.frustum == 1)
+        isfrustum  = 1;
+    else
+        isfrustum  = 0;
+    end
+    % add a starting node in root to avoid all starting branch point:
+    tree         = root_tree (tree);
+    ipar         = ipar_tree (tree); % parent index structure
+    D            = tree.D;           % local diameter values of nodes
+    N            = size (D, 1);      % number of nodes in tree
+    if isfield  (tree, 'R')
+        R        = tree.R;           % region values on nodes in the tree
+    else
+        R        = ones (N, 1);      % add a homogeneous regions field
+    end
+    sect         = dissect_tree (tree);  % find separate branches
+    len = len_tree (tree);
+    Rsect        = R (sect (:, 2));  % region attribute to sections
+    % initializing minterf:
+    minterf      = NaN (numel (tree.X) + size (sect, 1) - 1, 3);
+    uR           = unique (R);       % sorted regions
+    luR          = length (uR);      % number of regions
+    if isfield   (tree, 'rnames')
+        rnames   = tree.rnames (uR);
+        for counter = 1 : length (uR)
+            rnames{counter} = ...
+                regexprep (rnames{counter}, '[^a-zA-Z0-9]','');
+        end
+    else
+        if luR   == 1
+            rnames   = {name};
+        else
+            rnames   = cell (1, luR);
+            for counter = 1 : luR
+                rnames{counter} = num2str (uR (counter));
+            end
         end
     end
 end
 
-switch format
-    case '.hoc' % save file in the NEURON .hoc format
-        H1       = histc (Rsect, uR); % distribution of section regions in H1
-        % file-pointer to the neuron-file
-        neuron   = fopen ([path tname], 'w');
-        % HEADER of the file
-        fwrite   (neuron, ['/*', ...
-            char(13), char(10)], 'char');
-        fwrite   (neuron, [ ...
-            'This is a CellBuilder-like file', ...
-            'written for the simulator NEURON', ...
-            char(13), char(10)], 'char');
-        fwrite   (neuron, [ ...
-            'by an automatic procedure "neuron_tree" ', ...
-            'part of the TREES package', ...
-            char(13), char(10)], 'char');
-        fwrite   (neuron, ['in MATLAB', ...
-            char(13), char(10)], 'char');
-        fwrite   (neuron, ['copyright 2009 Hermann Cuntz', ...
-            char(13), char(10)], 'char');
-        fwrite   (neuron, ['*/', ...
-            char(13), char(10)], 'char');
-        fwrite   (neuron, ['', ...
-            char(13), char(10)], 'char');
-        fwrite   (neuron, ['begintemplate ', name, ...
-            char(13), char(10)], 'char');        
-        fwrite   (neuron, ['', ...
-            char(13), char(10)], 'char');           
-        fwrite   (neuron, ['proc celldef() {', ...
-            char(13), char(10)], 'char');
-        fwrite   (neuron, ['  topol()', ...
-            char(13), char(10)], 'char');
-        fwrite   (neuron, ['  subsets()', ...
-            char(13), char(10)], 'char');
-        fwrite   (neuron, ['  geom()', ...
-            char(13), char(10)], 'char');
-        fwrite   (neuron, ['  biophys()', ...
-            char(13), char(10)], 'char');
-        fwrite   (neuron, ['  geom_nseg()', ...
-            char(13), char(10)], 'char');
-        fwrite   (neuron, ['}', ...
-            char(13), char(10)], 'char');
-        fwrite   (neuron, ['', ...
-            char(13), char(10)], 'char');           
-            
-        % making regions public
-        for te       = 1 : luR
-            fwrite   (neuron, ['public ' rnames{te}, ...
-                char(13), char(10)], 'char');
-        end
-        fwrite   (neuron, ['', ...
-            char(13), char(10)], 'char');  
-        
-        % making sections public
-        fwrite   (neuron, ['public allreg', ...
-            char(13), char(10)], 'char');
-        fwrite   (neuron, ['public alladendreg', ...
-            char(13), char(10)], 'char');
-        for ward     = 1 : luR,
-            fwrite   (neuron, ['public reg', rnames{ward}, ...
-                char(13), char(10)], 'char');
-        end
-        fwrite   (neuron, ['', char(13), char(10)], 'char'); 
-        
-        % declaring the regions
-        for te = 1 : luR
-            fwrite (neuron, ['create ' rnames{te} '[' num2str(H1(te)) ']', ...
-                char(13), char(10)], 'char');
-        end
-        fwrite (neuron, ['', char(13), char(10)], 'char');
-        % topology procedure
-        fwrite (neuron, ['proc topol_1() {', char(13), char(10)], 'char');
-        countero = 1;
-        counteri = 1;
-        for ward = 1 : size (sect, 1)
-            s      = sect (ward, 1); % start compartment of section
-            e      = sect (ward, 2); % end compartment of section
-            ipsect = find (s == sect (:, 2)); % parent section
-            ip     = sect (ipsect, 2); % parent index of section
-            if ~isempty(ip),
-                ie  = find (ward   == find (Rsect == R (e)));
-                ipe = find (ipsect == find (Rsect == R (ip)));
-                fwrite (neuron, ['  connect ', ...
-                    rnames{find(uR == R (e))}  '[' num2str(ie  - 1) '](0),' ...
-                    rnames{find(uR == R (ip))} '[' num2str(ipe - 1) '](1)', ...
-                    char(13), char(10)], 'char');
-                countero = countero + 1;
-                if countero  == 250,
-                    countero = 1;
-                    counteri = counteri + 1;
-                    fwrite (neuron, ['}', char(13), char(10)], 'char');
-                    fwrite (neuron, ['proc topol_' num2str(counteri) '() {', ...
-                        char(13), char(10)], 'char');
-                end
-            end
-        end
-        fwrite (neuron, ['}',                               char(13), char(10)], 'char');
-        fwrite (neuron, ['proc topol() {',                  char(13), char(10)], 'char');
-        for ward = 1 : counteri
-            fwrite (neuron, ['  topol_' num2str(ward) '()', char(13), char(10)], 'char');
-        end
-        fwrite (neuron, ['  basic_shape()',                 char(13), char(10)], 'char');
-        fwrite (neuron, ['}',                               char(13), char(10)], 'char');
-        fwrite (neuron, ['',                                char(13), char(10)], 'char');
-        fwrite (neuron, ['proc shape3d_1() {',              char(13), char(10)], 'char');
-        countero = 1;
-        counteri = 1;
-        for ward = 1 : size (sect, 1),
-            s = sect (ward, 1); % start compartment of section
-            e = sect (ward, 2); % end compartment of section
-            ie = find (ward == find (Rsect == R (e)));
-            fwrite (neuron, ['  ' rnames{find(uR == R(e))} ...
-                '[' num2str(ie - 1) '] {pt3dclear()', char(13), char(10)], 'char');
-            indy = fliplr (ipar (e, 1 : find (ipar (e, :) == s)));
-            for te = 1 : length (indy),
-                fwrite (neuron, ['    pt3dadd(', ...
-                    num2str(tree.X (indy (te))),', ', ...
-                    num2str(tree.Y (indy (te))),', ', ...
-                    num2str(tree.Z (indy (te))),', ', ...
-                    num2str(tree.D (indy (te))),')',  char(13), char(10)], 'char');
-                countero = countero + 1;
-                if countero  == 250,
-                    countero = 1;
-                    counteri = counteri + 1;
-                    fwrite (neuron, ['  }',           char(13), char(10)], 'char');
-                    fwrite (neuron, ['}',             char(13), char(10)], 'char');
-                    fwrite (neuron, ['proc shape3d_' num2str(counteri) '() {', ...
-                        char(13), char(10)], 'char');
-                    fwrite (neuron, ['  ' rnames{find(uR == R(e))} ...
-                        '[' num2str(ie - 1) '] {', char(13), char(10)], 'char');
-                end
-            end
-            fwrite (neuron, ['  }',              char(13), char(10)], 'char');
-        end
-        fwrite (neuron, ['}',                    char(13), char(10)], 'char');
-        fwrite (neuron, ['proc basic_shape() {', char(13), char(10)], 'char');
-        for ward = 1 : counteri,
-            fwrite (neuron, ['  shape3d_' num2str(ward) '()', ...
-                char(13), char(10)], 'char');
-        end
-        fwrite (neuron, ['}',                    char(13), char(10)], 'char');
-        fwrite (neuron, ['',                     char(13), char(10)], 'char');
-        fwrite (neuron, ['objref allreg', ...
-            char(13), char(10)], 'char');
-        fwrite (neuron, ['objref alladendreg', ...
-            char(13), char(10)], 'char');        
-        for ward = 1 : luR,
-            fwrite (neuron, ['objref reg' rnames{ward}, ...
-                char(13), char(10)], 'char');
-        end
-        fwrite (neuron, ['proc subsets() { local ward', ...
-            char(13), char(10)], 'char');
-        fwrite (neuron, ['  allreg = new SectionList()', ...
-            char(13), char(10)], 'char');
-        fwrite (neuron, ['  alladendreg = new SectionList()', ...
-            char(13), char(10)], 'char');        
-        for ward = 1 : luR,
-            fwrite (neuron, ['  reg' rnames{ward} ' = new SectionList()', ...
-                char(13), char(10)], 'char');
-            fwrite (neuron, ['  for ward = 0, ' num2str(H1 (ward) - 1) ' ' ...
-                rnames{ward} '[ward] {', char(13), char(10)], 'char');
-            fwrite (neuron, ['    reg' rnames{ward} '.append()', char(13), char(10)], 'char');
-            fwrite (neuron, ['    allreg.append()',   char(13), char(10)], 'char');
-            if  strfind (rnames{ward}, 'adend')
-                fwrite (neuron, ['    alladendreg.append()',   char(13), char(10)], 'char');
-            end
-            fwrite (neuron, ['  }',                               char(13), char(10)], 'char');
-        end
-        fwrite (neuron, ['}',                   char(13), char(10)], 'char');
-        fwrite (neuron, ['proc geom() {',       char(13), char(10)], 'char');
-        fwrite (neuron, ['}',                   char(13), char(10)], 'char');
-        fwrite (neuron, ['proc geom_nseg() {',  char(13), char(10)], 'char');
-        fwrite (neuron, ['}',                   char(13), char(10)], 'char');
-        fwrite (neuron, ['proc biophys() {',    char(13), char(10)], 'char');
-        fwrite (neuron, ['}',                   char(13), char(10)], 'char');
-        fwrite (neuron, ['access ' rnames{1} ,  char(13), char(10)], 'char');
-        fwrite (neuron, ['proc init() {',       char(13), char(10)], 'char');
-        fwrite (neuron, ['  celldef()',         char(13), char(10)], 'char');
-        fwrite (neuron, ['}',                   char(13), char(10)], 'char');
-        fwrite (neuron, ['',                    char(13), char(10)], 'char');
-        fwrite (neuron, ['endtemplate ', name, char(13), char(10)], 'char');        
-        fwrite (neuron, ['', char(13), char(10)], 'char');           
-        fclose (neuron);
-    otherwise
-        warning ('TREES:IO', 'format unknown');
-        return
+nextline         = [(char (13)), (char (10))];
+
+if ~strcmp       (format, '.hoc')
+    warning      ('TREES:IO',  'format unknown');
+    return
 end
 
-if strfind   (options, '-s')
+%%% save file in the NEURON .hoc format
+
+% file-pointer to the neuron-file
+neuron           = fopen ([path tname], 'w');
+% HEADER of the file
+fwrite           (neuron, ['/*'                         nextline], 'char');
+fwrite           (neuron, ['This is a CellBuilder-like file ', ...
+    'written for the simulator NEURON',                 nextline], 'char');
+fwrite           (neuron, ['by an automatic procedure ', ...
+    '"neuron_template_tree" part of the TREES package', nextline], 'char');
+fwrite           (neuron, ['in MATLAB',                 nextline], 'char');
+fwrite           (neuron, ['copyright 2009-2017 ', ...
+    'Hermann Cuntz',                                    nextline], 'char');
+fwrite           (neuron, ['heavy modifications ', ...
+    'by Marcel Beining, 2014',                          nextline], 'char');
+fwrite           (neuron, ['*/',                        nextline], 'char');
+fwrite           (neuron, ['',                          nextline], 'char');
+fwrite           (neuron, ['begintemplate ', name,      nextline], 'char');
+fwrite           (neuron, ['',                          nextline], 'char');
+if artflag
+    fwrite       (neuron, ['public cell',               nextline], 'char');
+    fwrite       (neuron, ['public is_artificial',      nextline], 'char');
+    fwrite       (neuron, ['objref cell'                nextline], 'char');
+    fwrite       (neuron, ['proc celldef() {',          nextline], 'char');
+    fwrite       (neuron, ['cell = new ', ...
+        tree.artificial,  '()',                         nextline], 'char');
+    fwrite       (neuron, ['is_artificial = 1}',        nextline], 'char');
+else
+    fwrite       (neuron, ['proc celldef() {',          nextline], 'char');
+    fwrite       (neuron, ['  topol()',                 nextline], 'char');
+    fwrite       (neuron, ['  subsets()',               nextline], 'char');
+    fwrite       (neuron, ['  geom()',                  nextline], 'char');
+    fwrite       (neuron, ['  biophys()',               nextline], 'char');
+    fwrite       (neuron, ['  geom_nseg()',             nextline], 'char');
+    fwrite       (neuron, ['  is_artificial = 0',       nextline], 'char');
+    fwrite       (neuron, ['}',                         nextline], 'char');
+    fwrite       (neuron, ['',                          nextline], 'char');
+    % distribution of section regions:
+    H1           = histc (Rsect, uR); 
+    % making regions public
+    for counterR = 1 : luR
+        fwrite   (neuron, ['public ' rnames{counterR},  nextline], 'char');
+    end
+    fwrite       (neuron, ['',                          nextline], 'char');
+    % making sections public
+    fwrite       (neuron, ['public allregobj',          nextline], 'char');    
+    fwrite       (neuron, ['public allreg',             nextline], 'char');
+    fwrite       (neuron, ['public alladendreg',        nextline], 'char');
+    fwrite       (neuron, ['public allaxonreg',         nextline], 'char');    
+    for counter     = 1 : luR
+        fwrite   (neuron, ['public reg', ...
+            rnames{counter},                            nextline], 'char');
+    end
+    fwrite       (neuron, ['public is_artificial',      nextline], 'char');
+    fwrite       (neuron, ['',                          nextline], 'char');
+    % declaring the regions
+    for counterR = 1 : luR
+        fwrite   (neuron, ['create ', rnames{counterR}, ...
+            '[' (num2str (H1 (counterR))) ']',          nextline], 'char');
+    end
+    fwrite       (neuron, ['',                          nextline], 'char');
+    % topology procedure
+    fwrite       (neuron, ['proc topol_1() {', nextline], 'char');
+    countero     = 1;
+    counteri     = 1;
+    for counter  = 1 : size (sect, 1)
+        s        = sect (counter, 1);       % start compartment of section
+        e        = sect (counter, 2);       % end compartment of section
+        ipsect   = find (s == sect (:, 2)); % parent section
+        ip       = sect (ipsect, 2);        % parent index of section
+        if ~isempty(ip)
+            ie  = find (counter   == find (Rsect == R (e)));
+            ipe = find (ipsect    == find (Rsect == R (ip)));
+            fwrite (neuron, ['  connect ', ...
+                rnames{(uR == R (e))}, ...
+                '[' (num2str (ie  - 1)) '](0),' ...
+                rnames{(uR == R (ip))}, ...
+                '[' (num2str (ipe - 1)) '](1)',         nextline], 'char');
+            countero     = countero + 1;
+            if countero  == 250
+                countero = 1;
+                counteri = counteri + 1;
+                fwrite (neuron, ['}',                   nextline], 'char');
+                fwrite (neuron, ['proc topol_', ...
+                    (num2str (counteri)) '() {',        nextline], 'char');
+            end
+        end
+    end
+    fwrite (neuron, ['}',                               nextline], 'char');
+    fwrite (neuron, ['proc topol() {',                  nextline], 'char');
+    for counter = 1 : counteri
+        fwrite (neuron, ['  topol_', ...
+            (num2str (counter)), '()',                  nextline], 'char');
+    end
+    fwrite (neuron, ['  basic_shape()',                 nextline], 'char');
+    fwrite (neuron, ['}',                               nextline], 'char');
+    fwrite (neuron, ['',                                nextline], 'char');
+    fwrite (neuron, ['proc shape3d_1() {',              nextline], 'char');
+    countero     = 1;
+    counteri     = 1;
+    for counter  = 1 : size (sect, 1)
+        s        = sect (counter, 1); % start compartment of section
+        e        = sect (counter, 2); % end compartment of section
+        % the how manyth section with this region is it?
+        ie       = find (counter == find (Rsect == R (e)));
+        fwrite   (neuron, ['  ', rnames{(uR == R(e))}, ...
+            '[', (num2str (ie - 1)), ...
+            '] {pt3dclear()',                           nextline], 'char');
+        indy     = fliplr (ipar (e, 1 : find (ipar (e, :) == s)));
+        seclen   = sum (len (indy (2 : end)));
+        D        = tree.D (indy);
+        if ~isfrustum || ...
+                (~isempty (strfind (rnames {(uR == R (e))}, 'spine')))
+            % a (spine) starting segment needs to have the neck
+            % diameter, otherwise wrong surface:
+            D (1) = D (2);
+        end
+        for counterP = 1 : length (indy)
+            fwrite (neuron, ['    pt3dadd(', ...
+                (num2str (tree.X (indy (counterP)), 15)), ', ', ...
+                (num2str (tree.Y (indy (counterP)), 15)), ', ', ...
+                (num2str (tree.Z (indy (counterP)), 15)), ', ', ...
+                (num2str (D (counterP), 15)), ...
+                ')',                                    nextline], 'char');
+            % sectionref can be assessed with allregobj.o(minterf(x,2) %!%!
+            minterf ((counteri - 1) * 249 + countero, :) = [ ...
+                (indy (counterP) - 1), ...
+                (sum (H1 (1 : find (uR == R (e)) - 1)) + ie-1), ...
+                (round (1e+5 * (sum (len (indy (1 : counterP))) - ...
+                len (indy (1))) / seclen) * 1e-5)];   
+            countero = countero + 1;
+            if countero  == 250
+                countero = 1;
+                counteri = counteri + 1;
+                fwrite (neuron, ['  }',                 nextline], 'char');
+                fwrite (neuron, ['}',                   nextline], 'char');
+                fwrite (neuron, ['proc shape3d_' ...
+                    (num2str (counteri)) '() {',        nextline], 'char');
+                fwrite (neuron, ['  ' rnames{(uR == R(e))} ...
+                    '[' (num2str (ie - 1)) '] {',       nextline], 'char');
+            end
+        end
+        fwrite   (neuron, ['  }',                       nextline], 'char');
+    end
+    fwrite       (neuron, ['}',                         nextline], 'char');
+    fwrite       (neuron, ['proc basic_shape() {',      nextline], 'char');
+    for counter = 1 : counteri
+        fwrite   (neuron, ['  shape3d_' ...
+            (num2str (counter)) '()',                   nextline], 'char');
+    end
+    fwrite       (neuron, ['}',                         nextline], 'char');
+    fwrite       (neuron, ['',                          nextline], 'char');
+    fwrite       (neuron, ['objref allreg, allregobj, alladendreg, ', ...
+        'allaxonreg, sec',                              nextline], 'char');
+    for counter = 1 : luR
+        fwrite   (neuron, ['objref reg', ...
+            rnames{counter},                            nextline], 'char');
+    end
+    fwrite       (neuron, ['proc subsets() { ', ...
+        'local counter',                                nextline], 'char');
+    fwrite       (neuron, ['  allregobj   = ', ...
+        'new List()',                                   nextline], 'char');
+    fwrite       (neuron, ['  allreg      = ', ...
+        'new SectionList()',                            nextline], 'char');
+    fwrite       (neuron, ['  alladendreg = ', ...
+        'new SectionList()',                            nextline], 'char');
+    fwrite       (neuron, ['  allaxonreg  = ', ...
+        'new SectionList()',                            nextline], 'char');
+    for counter  = 1 : luR
+        fwrite   (neuron, ['  reg', rnames{counter}, ...
+            ' = new SectionList()',                     nextline], 'char');
+        fwrite   (neuron, ['  for counter = 0, ', ...
+            (num2str (H1 (counter) - 1)), ' ', ...
+            rnames{counter}, '[counter] {',             nextline], 'char');
+        fwrite   (neuron, ['    reg', rnames{counter}, ...
+            '.append()',                                nextline], 'char');
+        fwrite   (neuron, ['    allreg.append()',       nextline], 'char');
+        if  strfind (rnames{counter}, 'adend')
+            fwrite (neuron, ['    ', ....
+                'alladendreg.append()',                 nextline], 'char');
+        end
+        if  strfind (rnames{ward}, 'axon')
+            fwrite (neuron, ['    allaxonreg.append()', nextline], 'char');
+        end
+        fwrite   (neuron, ['  }',                       nextline], 'char');
+    end
+    fwrite       (neuron, ['}',                         nextline], 'char');
+    fwrite       (neuron, ['proc geom() {',             nextline], 'char');
+    fwrite       (neuron, ['}',                         nextline], 'char');
+    fwrite       (neuron, ['proc geom_nseg() {',        nextline], 'char');
+    fwrite       (neuron, ['}',                         nextline], 'char');
+    fwrite       (neuron, ['proc biophys() {',          nextline], 'char');
+    fwrite       (neuron, ['}',                         nextline], 'char');
+    fwrite       (neuron, ['access ', rnames{1},        nextline], 'char');
+end
+fwrite           (neuron, ['proc init() {',             nextline], 'char');
+fwrite           (neuron, ['  celldef()',               nextline], 'char');
+fwrite           (neuron, ['}',                         nextline], 'char');
+fwrite           (neuron, ['',                          nextline], 'char');
+fwrite           (neuron, ['endtemplate ', name,        nextline], 'char');
+fwrite           (neuron, ['',                          nextline], 'char');
+fclose           (neuron);
+
+if strfind       (options, '-s')
     % file-pointer to the run-file
-    neuron   = fopen (name2, 'w');
-    fwrite   (neuron, ['load_file ("nrngui.hoc")', ...
-        char(13), char(10)], 'char');
-    fwrite   (neuron, ['xopen ("' name1 '")', ...
-        char(13), char(10)], 'char');
-    fclose   (neuron);
-    if strfind (options, '->')
-        if ispc % this even calls the file directly (only windows)
+    neuron       = fopen (name2, 'w');
+    fwrite       (neuron, ['load_file ("nrngui.hoc")',  nextline], 'char');
+    fwrite       (neuron, ['xopen ("', name1, '")',     nextline], 'char');
+    fclose       (neuron);
+    if strfind   (options, '->')
+        if ispc  % this even calls the file directly (only windows)
             winopen (name2);
         end
     end
 end
+
+if strfind       (options, '-m')
+    neuron       = fopen ( ...
+        fullfile (path, sprintf ('%s_minterf.dat', name)), 'w');
+    for m        = 1 : size (minterf, 1)
+        fwrite   (neuron, [(num2str (minterf (m, :))),  nextline], 'char');
+    end
+    fclose       (neuron);
+    save         (fullfile (path, sprintf ('%s_minterf.mat', name)), ...
+        'minterf')
+end
+
+
+

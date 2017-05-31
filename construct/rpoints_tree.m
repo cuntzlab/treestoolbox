@@ -52,7 +52,7 @@
 % Uses
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2017  Hermann Cuntz
 
 function [X, Y, Z, HP] = rpoints_tree (M, N, c, x, y, z, thr, options)
 

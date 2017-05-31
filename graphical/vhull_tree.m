@@ -40,7 +40,7 @@
 % Uses       ver_tree X Y (Z)
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2017  Hermann Cuntz
 
 function [HP, VO, KK, vol] = vhull_tree (intree, ...
     v, points, ipart, DD, options)
@@ -120,7 +120,7 @@ HP           = zeros (length (ipart), 1);
 if strfind       (options, '-2d')
     % voronoi doesn't like duplicate points
     warning      ('off', 'MATLAB:voronoin:DuplicateDataPoints');
-    [V, C]       = voronoin ([X, Y]);
+    [V, C]       = voronoin (double ([X, Y]));
     warning      ('on',  'MATLAB:voronoin:DuplicateDataPoints');
     VI           = V;
     if numel     (points) > 0
@@ -162,7 +162,7 @@ else
     Z            = [(Z (ipart)); (points (:, 3))] + DD (3);
     % voronoin doesn't like duplicate points
     warning      ('off', 'MATLAB:voronoin:DuplicateDataPoints');
-    [V, C]       = voronoin ([X, Y, Z]);
+    [V, C]       = voronoin (double ([X, Y, Z]));
     warning      ('on',  'MATLAB:voronoin:DuplicateDataPoints');
     VO           = cell  (length (ipart), 1);
     KK           = cell  (length (ipart), 1);

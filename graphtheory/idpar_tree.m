@@ -11,7 +11,7 @@
 % -----
 % - intree   ::integer:      index of tree in trees or structured tree
 % - options  ::string:
-%     '-0'   : the root node is 0 instead of 1 
+%     '-0'   : the root node is 0 instead of itself, careful this is NEW!!
 %     '-s'   : show
 %     {DEFAULT: ''}
 %
@@ -27,7 +27,7 @@
 % Uses         ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2017  Hermann Cuntz
 
 function idpar = idpar_tree (intree, options)
 
@@ -37,7 +37,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 ver_tree     (intree);                 % verify that input is a tree
 
@@ -58,8 +58,8 @@ end
 idpar            = dA * (1 : size (dA, 1))';
 
 if isempty       (strfind (options, '-0'))
-    % null-compartment (root) becomes one
-    idpar (idpar == 0) = 1;
+    % null-compartment (root) becomes index to itsself
+    idpar (idpar == 0) = find ((idpar == 0));
 end
 
 if strfind       (options,'-s')            % show option
@@ -75,10 +75,6 @@ if strfind       (options,'-s')            % show option
     T            = vtext_tree (intree, idpar,      [],  [0 0 5]);
     set          (T, ...
         'fontsize',            14);
-%     
-%     T            = vtext_tree (intree, idpar, []);
-%     set          (T, ...
-%         'fontsize',            14);
     title        ('direct parend ID');
     xlabel       ('x [\mum]');
     ylabel       ('y [\mum]');
