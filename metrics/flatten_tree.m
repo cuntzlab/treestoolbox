@@ -61,6 +61,18 @@ ipar             = ipar_tree (tree);
 % set root Z to 0:
 tree             = tran_tree (tree, [0 0 (-tree.Z (1))]);
 
+eps = 1e-3;
+if all(tree.Z < eps)
+    tree.Z(:) = 0;
+    warning('tree already flat, nothing to do');
+    if (nargout > 0) || (isstruct (intree))
+        varargout{1}   = tree;
+    else
+        trees{intree}  = tree;
+    end
+    return;
+end
+
 if strfind       (options, '-m') % show movie option
     clf;
     HP           = plot_tree (tree);
@@ -80,8 +92,11 @@ if strfind       (options, '-w') % waitbar option: initialization
     end
 end
 
+domovie = strfind   (options, '-m');
+dowaitbar = strfind   (options, '-w');
+
 for counter      = 2 : length (tree.X) % walk through tree
-    if strfind   (options, '-w') % waitbar option: update
+    if dowaitbar % waitbar option: update
         if  (mod (counter, 1000) == 999)
             waitbar  (counter ./ length (tree.X), HW);
         end
@@ -111,7 +126,7 @@ for counter      = 2 : length (tree.X) % walk through tree
         tree.Z (sub) = tree.Z (sub) - dZ;
         tree.Z (counter) = 0;
     end
-    if strfind   (options, '-m') % show movie option: update
+    if domovie % show movie option: update
         set      (HP, ...
             'visible',         'off');
         HP       = plot_tree (tree);
