@@ -95,6 +95,7 @@ if (nargin<1) || isempty (action), % initialization
     cgui.cat.itree      =  0;   % index to deep layer
     cgui.cat.i2tree     =  0;   % index to top layer
     cgui.cat.untrees    = {};   % undo trees, remembers all actions on an active tree
+    cgui.cat.tautosave = timer('ExecutionMode','fixedRate','Period',60,'StartDelay',60,'StartFcn',@startasv,'TimerFcn',@autosave,'StopFcn',@deleteasv,'UserData',{userpath,'autosave.mtr',0});
     
     % plt_        plot panel, separate graphical elements and their handles
     cgui.plt.HPs        = {};   % cell array of handles for hulls and plots, etc...
@@ -187,6 +188,7 @@ if (nargin<1) || isempty (action), % initialization
     cgui.modes.panel =     1;   % 1: stk_, 2: thr_, 3: skl_, 4: mtr_, 5: ged_
     cgui.modes.select =    0;   % 0: off,  1: on
     cgui.modes.edit =      0;   % 0: off,  1: on
+    cgui.modes.hold =      0;   % 0: off,  1: on
     
     % this can be changed by a different layout as long as the same
     % components exist:
@@ -217,6 +219,9 @@ switch action,      % respond to actions arranged by ui panels:
         switch selection,
             case 'Yes',
                 delete (cgui.ui.F);
+                if strcmp(get(cgui.cat.tautosave,'Running'),'on')
+                    stop(cgui.cat.tautosave)
+                end
         end
     case 'ui_save'              % save the entire TREES workspace (.tw1)
         % (.tw1 is the currently used format for cgui_tree)
@@ -920,6 +925,7 @@ switch action,      % respond to actions arranged by ui panels:
         set (cgui.vis.ui.txt1, 'string', {'switched to', 'summer-colormap'});
     case 'vis_cmap_t5'          % switch to transparent colormap
         cgui.stk.alpha = 0.5;
+%         set(cgui.ui.F,'renderer','opengl')
         cgui_tree ('vis_cbar'); cgui_tree ('vis_cbar'); cgui_tree ('stk_image');
         childs = get (cgui.ui.mu5, 'children'); % update menu
         set (childs (1), 'checked', 'off'); set (childs (2), 'checked', 'on');
@@ -927,6 +933,7 @@ switch action,      % respond to actions arranged by ui panels:
         set (cgui.vis.ui.txt1, 'string', {'switched to', 'transparent colormap'});
     case 'vis_cmap_t0'          % switch to opaque colormap
         cgui.stk.alpha = 1;
+%         set(cgui.ui.F,'renderer','painters')
         cgui_tree ('vis_cbar'); cgui_tree ('vis_cbar'); cgui_tree ('stk_image');
         childs = get (cgui.ui.mu5, 'children'); % update menu
         set (childs (1), 'checked', 'on'); set (childs (2), 'checked', 'off');
@@ -1317,7 +1324,11 @@ switch action,      % respond to actions arranged by ui panels:
             set (cgui.slt.ui.pop2, 'string', cgui.slt.sind);
         end
         cgui.mtr.selected = []; % release mtr_panel edit selected nodes
-        cgui.mtr.lastnode =  1; % reset last active node to tree root
+        if ~isfield(cgui.modes,'hold') || cgui.modes.hold == 0
+            cgui.mtr.lastnode =  1; % reset last active node to tree root
+        elseif cgui.mtr.lastnode > numel(cgui.mtr.tree.X)   % change lastnode
+            cgui.mtr.lastnode = numel(cgui.mtr.tree.X);
+        end
         cgui.slt.vec      = []; % release Nx1 vectors from slt_ panel
         if ~isempty (cgui.slt.cvec),
             % release slt_ panel computed Nx1 vectors and reset popup
@@ -1542,7 +1553,7 @@ switch action,      % respond to actions arranged by ui panels:
             if ~isempty (indy),
                 cgui.cat.untrees {end+1} = cgui.mtr.tree; % keep track of old tree for undo
                 % this is it (see "delete_tree"):
-                cgui.mtr.tree = delete_tree (cgui.mtr.tree, indy);
+                cgui.mtr.tree = delete_tree (cgui.mtr.tree, indy,'-r');
                 cgui_tree ('slt_relsel'); % after tree alteration selected nodes are discarded
                 cgui_tree ('slt_regupdate'); % check if tree alteration affected region index
                 if isempty (cgui.mtr.tree), % clear tree if tree became empty...
@@ -1719,7 +1730,13 @@ switch action,      % respond to actions arranged by ui panels:
         end
         
     case 'cat_clear_all'        % clear all trees including currently active tree
-        if ~isempty (cgui.mtr.tree),
+        if ~isempty (cgui.mtr.tree)
+            answer = questdlg('Do you really want to clear all trees? This cannot be undone!','Warning');
+            if ~strcmp(answer,'Yes')
+                return
+            end
+            setasvtimer('ask',1)
+            stop(cgui.cat.tautosave)
             cgui.mtr.tree  = {}; cgui.cat.trees  = {}; % delete all trees
             cgui.cat.itree =  0; cgui.cat.i2tree =  0; % set pointer to groups to 0
             % update cat_ panel UI elements:
@@ -1736,18 +1753,20 @@ switch action,      % respond to actions arranged by ui panels:
             set (cgui.vis.ui.txt1, 'string', {'cleared all trees'});
             cgui_tree ('mtr_showpanels'); % check if mtr_ ui panels should be active
         end
+        setactivepanel_tree (4); % activate mtr_ panel for edit
     case 'cat_cleartree'        % clear just active tree
         if ~isempty (cgui.cat.trees)
             % deal with the fact that cgui.cat.trees can be an array of arrays
             % of trees, and delete the right tree:
             if length (cgui.cat.trees {cgui.cat.i2tree}) > 1,
-                if length (cgui.cat.trees {cgui.cat.i2tree}) == 2,
-                    cgui.cat.trees {cgui.cat.i2tree} = cgui.cat.trees{cgui.cat.i2tree}{1};
-                    cgui.cat.itree = 1;
-                else
+%                 if length (cgui.cat.trees {cgui.cat.i2tree}) == 2,
+%                 %???? CRAP?
+%                     cgui.cat.trees {cgui.cat.i2tree} = cgui.cat.trees{cgui.cat.i2tree}{1};
+%                     cgui.cat.itree = 1;
+%                 else
                     cgui.cat.trees {cgui.cat.i2tree} (cgui.cat.itree) = [];
                     cgui.cat.itree = 1;
-                end
+%                 end
             else
                 cgui.cat.trees (cgui.cat.i2tree) = [];
                 cgui.cat.i2tree = 1; cgui.cat.itree = 1;
@@ -1768,8 +1787,13 @@ switch action,      % respond to actions arranged by ui panels:
                     end
                     cgui.mtr.tree = cgui.cat.trees{cgui.cat.i2tree}{cgui.cat.itree};
                 else
-                    str = cgui.cat.trees {cgui.cat.i2tree}.name;
-                    cgui.mtr.tree = cgui.cat.trees {cgui.cat.i2tree};
+                    if iscell(cgui.cat.trees {cgui.cat.i2tree})
+                        str = cgui.cat.trees {cgui.cat.i2tree}{1}.name;  %
+                        cgui.mtr.tree = cgui.cat.trees {cgui.cat.i2tree}{1};  %
+                    else
+                        str = cgui.cat.trees {cgui.cat.i2tree}.name;  %{1}
+                        cgui.mtr.tree = cgui.cat.trees {cgui.cat.i2tree};  %{1}
+                    end
                 end
                 % and update the ui panels:
                 set (cgui.cat.ui.f1, 'value', cgui.cat.itree,  'string', str);
@@ -1790,13 +1814,25 @@ switch action,      % respond to actions arranged by ui panels:
             % echo on text frame of vis_ panel:
             set (cgui.vis.ui.txt1, 'string', {'cleared last active tree'});
         end
+        setactivepanel_tree (4); % activate mtr_ panel for edit
     case 'cat_load'             % load TREES toolbox trees
-        tree = load_tree;   % see "load_tree", well yes...
+        stop(cgui.cat.tautosave)
+        [tree,name,path] = load_tree;   % see "load_tree", well yes...
+        setasvtimer({'path','name'},{path,name})
         if ~isempty (tree),
             incorporateloaded_tree (tree, 'tree'); % this deals with new trees
             % echo on text frame of vis_ panel:
             set (cgui.vis.ui.txt1, 'string', {'loaded TREES trees'});
+%             if isstruct(tree{1}) && numel(unique(cellfun(@(x) x.x_scale,tree))) == 1
+%                 % edit field entries call this function
+%                 set(cgui.stk.ui.ed_vox1, 'string', tree{1}.x_scale)
+%                 set(cgui.stk.ui.ed_vox2, 'string', tree{1}.y_scale)
+%                 set(cgui.stk.ui.ed_vox3, 'string', tree{1}.z_scale);
+%                 cgui_tree ('stk_setvoxel' )
+%             end
         end
+        setactivepanel_tree (4); % activate mtr_ panel for edit
+        start(cgui.cat.tautosave)
     case 'cat_nlucida'          % load neurolucida tree (see "neurolucida_tree")
         [tree mcoords] = neurolucida_tree ('', '-r -c -w');
         incorporateloaded_tree (tree, 'nlucida'); % this deals with new trees
@@ -1810,6 +1846,7 @@ switch action,      % respond to actions arranged by ui panels:
             % echo on text frame of vis_ panel:
             set (cgui.vis.ui.txt1, 'string', {'neurolucida tree'});
         end
+        setactivepanel_tree (4); % activate mtr_ panel for edit
     case 'cat_nlucida_onesoma'  % load neurolucida tree (see "neurolucida_tree")
         % this version incorporates all trees in one
         [tree mcoords] = neurolucida_tree ('', '-r -c -o -w');   % -o option
@@ -1825,30 +1862,49 @@ switch action,      % respond to actions arranged by ui panels:
             % echo on text frame of vis_ panel:
             set (cgui.vis.ui.txt1, 'string', {'neurolucida tree', 'forced one tree load'});
         end
+        setactivepanel_tree (4); % activate mtr_ panel for edit
     case 'cat_save'             % save active tree
         if ~isempty (cgui.mtr.tree)
-            name = save_tree (cgui.mtr.tree);   % see "save_tree", well yes...
+            [tname, path] = uiputfile ('.mtr', 'save trees',fullfile(getasvtimer('path'),getasvtimer('name')));
+            name = save_tree (cgui.mtr.tree,fullfile(path,tname));   % see "save_tree", well yes...
             % echo on text frame of vis_ panel:
             if ~isempty (name),
                 set (cgui.vis.ui.txt1, 'string', {'active tree saved:', name});
             end
         end
+        setactivepanel_tree (4); % activate mtr_ panel for edit
     case 'cat_gsave'            % save active group of trees
         if ~isempty (cgui.cat.trees)
-            name = save_tree ({cgui.cat.trees{cgui.cat.i2tree}});
+            %before saving, be sure to store changes of active tree
+            cgui_tree ('cat_update');
+            [tname, path] = uiputfile ('.mtr', 'save trees',fullfile(getasvtimer('path'),getasvtimer('name')));
+            [name, path] = save_tree ({cgui.cat.trees{cgui.cat.i2tree}},fullfile(path,tname));
             % echo on text frame of vis_ panel:
             if ~isempty (name),
                 set (cgui.vis.ui.txt1, 'string', {'active tree group saved', name});
+                if strcmp(get(cgui.cat.tautosave,'Running'),'off')
+                   start(cgui.cat.tautosave); 
+                end
+                setasvtimer({'path','name'},{path,name})
             end
         end
+        setactivepanel_tree (4); % activate mtr_ panel for edit
     case 'cat_allsave'          % save all trees
         if ~isempty (cgui.cat.trees)
-            name = save_tree (cgui.cat.trees);
+%             before saving, be sure to store changes of active tree
+            cgui_tree ('cat_update');
+            [tname, path] = uiputfile ('.mtr', 'save trees',fullfile(getasvtimer('path'),getasvtimer('name')));
+            [name, path] = save_tree (cgui.cat.trees,fullfile(path,tname));
             % echo on text frame of vis_ panel:
             if ~isempty (name),
                 set (cgui.vis.ui.txt1, 'string', {'all trees saved', name});
+                if strcmp(get(cgui.cat.tautosave,'Running'),'off')
+                    start(cgui.cat.tautosave);
+                end
+                setasvtimer({'path','name'},{path,name})
             end
         end
+        setactivepanel_tree (4); % activate mtr_ panel for edit
     case 'cat_duplicate'        % duplicate the currently active tree
         if ~isempty (cgui.mtr.tree)
             % this deals with multiple trees etc..
@@ -1856,6 +1912,7 @@ switch action,      % respond to actions arranged by ui panels:
             % echo on text frame of vis_ panel:
             set (cgui.vis.ui.txt1, 'string', {'loaded TREES trees'});
         end
+        setactivepanel_tree (4); % activate mtr_ panel for edit
     case 'cat_swc'              % export active tree to .swc format
         if ~isempty (cgui.cat.trees)
             name = swc_tree (cgui.mtr.tree);
@@ -1864,6 +1921,7 @@ switch action,      % respond to actions arranged by ui panels:
                 set (cgui.vis.ui.txt1, 'string', {'exported to .swc', name});
             end
         end
+        setactivepanel_tree (4); % activate mtr_ panel for edit
     case 'cat_neuron'           % export active tree to NEURON format
         if ~isempty (cgui.cat.trees)
             name = neuron_tree (cgui.mtr.tree);
@@ -1872,6 +1930,7 @@ switch action,      % respond to actions arranged by ui panels:
                 set (cgui.vis.ui.txt1, 'string', {'exported to .hoc/.nrn', name});
             end
         end
+        setactivepanel_tree (4); % activate mtr_ panel for edit
     case 'cat_nml_v1_l1'        % export active tree to nml_v1_l1 format
         if ~isempty (cgui.cat.trees)
             name = neuroml_tree (cgui.mtr.tree, [], '-v1l1 -w');
@@ -1880,6 +1939,7 @@ switch action,      % respond to actions arranged by ui panels:
                 set (cgui.vis.ui.txt1, 'string', {'exported to NeuroML Level 1', name});
             end
         end
+        setactivepanel_tree (4); % activate mtr_ panel for edit
     case 'cat_nml_v2a'          % export active tree to nml_v2a format
         if ~isempty (cgui.cat.trees)
             name = neuroml_tree (cgui.mtr.tree, [], '-v2a -w');
@@ -1888,7 +1948,7 @@ switch action,      % respond to actions arranged by ui panels:
                 set (cgui.vis.ui.txt1, 'string', {'exported to NeuroML v2alpha', name});
             end
         end
-        
+        setactivepanel_tree (4); % activate mtr_ panel for edit
     case 'cat_update'           % before switching tree update changes made to active tree
         if ~isempty (cgui.cat.trees)
             cgui.cat.untrees = {};  % undo is deactivated!!
@@ -1910,11 +1970,16 @@ switch action,      % respond to actions arranged by ui panels:
             end
             cgui.mtr.tree.name = name;
             % update frame window containing tree names in active group:
-            str = get (cgui.cat.ui.f1, 'string'); str {cgui.cat.itree} = name;
+            str = get (cgui.cat.ui.f1, 'string');
+            if ~iscell(str)
+                str = {str};
+            end
+            str {cgui.cat.itree} = name;
             set (cgui.cat.ui.f1, 'string', str);
             % echo on text frame of vis_ panel:
             set (cgui.vis.ui.txt1, 'string', {'changed tree name:', name});
         end
+        setactivepanel_tree (4); % activate mtr_ panel for edit
     case 'cat_selecttree'       % select a tree in a group
         if ~isempty (cgui.cat.trees)
             cgui_tree ('cat_update'); % update changes made to active tree
@@ -1924,6 +1989,9 @@ switch action,      % respond to actions arranged by ui panels:
                 cgui.mtr.tree = cgui.cat.trees{cgui.cat.i2tree}{cgui.cat.itree};
             else
                 cgui.mtr.tree = cgui.cat.trees{cgui.cat.i2tree};
+            end
+            if isfield(cgui.modes,'hold') && cgui.modes.hold == 1
+                cgui.mtr.lastnode = 1;
             end
             % update edit field for tree name:
             set (cgui.cat.ui.ed_name1, 'string', cgui.mtr.tree.name);
@@ -1935,6 +2003,7 @@ switch action,      % respond to actions arranged by ui panels:
             % echo on text frame of vis_ panel:
             set (cgui.vis.ui.txt1, 'string', {'selected different tree'});
         end
+        setactivepanel_tree (4); % activate mtr_ panel for edit
     case 'cat_selectgroup'      % select a group of trees
         if ~isempty (cgui.cat.trees)
             cgui_tree ('cat_update'); % update changes made to active tree
@@ -1962,6 +2031,7 @@ switch action,      % respond to actions arranged by ui panels:
             % echo on text frame of vis_ panel:
             set (cgui.vis.ui.txt1, 'string', {'selected different tree group'});
         end
+        setactivepanel_tree (4); % activate mtr_ panel for edit
     case 'cat_uptree'           % move tree up (very complicated)
         if ~isempty (cgui.cat.trees)
             % deal with the fact that cat_ trees can be cell array of cell
@@ -2020,6 +2090,7 @@ switch action,      % respond to actions arranged by ui panels:
             % echo on text frame of vis_ panel:
             set (cgui.vis.ui.txt1, 'string', {'moved tree in selector'});
         end
+        setactivepanel_tree (4); % activate mtr_ panel for edit
     case 'cat_downtree'         % move tree down (complicated as well)
         if ~isempty (cgui.cat.trees)
             % deal with the fact that cat_ trees can be cell array of cell
@@ -2079,6 +2150,7 @@ switch action,      % respond to actions arranged by ui panels:
             % echo on text frame of vis_ panel:
             set (cgui.vis.ui.txt1, 'string', {'moved tree in selector'});
         end
+        setactivepanel_tree (4); % activate mtr_ panel for edit
     case 'cat_undo'             % undo tree action
         if ~isempty (cgui.cat.untrees)
             cgui.mtr.tree = cgui.cat.untrees {end}; % active tree becomes last undo
@@ -2091,7 +2163,7 @@ switch action,      % respond to actions arranged by ui panels:
             % echo on text frame of vis_ panel:
             set (cgui.vis.ui.txt1, 'string', {'UNDO','reverted tree to previous status'});
         end
-        
+        setactivepanel_tree (4); % activate mtr_ panel for edit
     case 'stk_showpanels'       % enable/disable stk_ and thr_ ui elements
         if ~isempty (cgui.stk.M), % enable ui elements if there are some stacks
             % enable ui elements of stk_ and thr_ panels:
@@ -2537,6 +2609,18 @@ switch action,      % respond to actions arranged by ui panels:
         cgui.stk.mM2  = cell (1, length (cgui.stk.M));
         cgui.stk.mM3  = cell (1, length (cgui.stk.M));
         for ward = 1 : length (cgui.stk.M),
+% %             [cgui.stk.mM1{ward} cgui.stk.imM1{ward}] = max (cgui.stk.M{ward}, [], 3);
+%             [cgui.stk.mM1{ward} ] = max(cgui.stk.M{ward}, [], 3);
+%             [cgui.stk.mM2{ward} ] = max (cgui.stk.M{ward}, [], 2); %cgui.stk.imM2{ward}
+%             cgui.stk.mM2  {ward} = squeeze (cgui.stk.mM2  {ward})';
+% %             cgui.stk.imM2 {ward} = squeeze (cgui.stk.imM2 {ward})';
+%             [cgui.stk.mM3{ward} ] = max (cgui.stk.M{ward}, [], 1); %cgui.stk.imM3{ward}
+%             cgui.stk.mM3  {ward} = squeeze (cgui.stk.mM3  {ward})';
+% %             cgui.stk.imM3 {ward} = squeeze (cgui.stk.imM3 {ward})';
+
+
+
+
             [cgui.stk.mM1{ward} cgui.stk.imM1{ward}] = max (cgui.stk.M{ward}, [], 3);
             [cgui.stk.mM2{ward} cgui.stk.imM2{ward}] = max (cgui.stk.M{ward}, [], 2);
             cgui.stk.mM2  {ward} = squeeze (cgui.stk.mM2  {ward})';
@@ -2544,6 +2628,25 @@ switch action,      % respond to actions arranged by ui panels:
             [cgui.stk.mM3{ward} cgui.stk.imM3{ward}] = max (cgui.stk.M{ward}, [], 1);
             cgui.stk.mM3  {ward} = squeeze (cgui.stk.mM3  {ward})';
             cgui.stk.imM3 {ward} = squeeze (cgui.stk.imM3 {ward})';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         end
     case 'stk_trim'             % trim stacks after part deletion
         if ~isempty (cgui.stk.M),
@@ -2564,12 +2667,18 @@ switch action,      % respond to actions arranged by ui panels:
             cgui_tree ('thr_image');  % redraw thr_ graphical output: thresholded stacks
         end
     case 'stk_image'            % update graphical output for image stacks
+        
         figure (cgui.ui.F); % recover figure control
         if ~isempty (cgui.stk.HP), % redraw all handles, so first delete them
             for ward =  1: length (cgui.stk.HP),
                 delete (cgui.stk.HP {ward});
             end
             cgui.stk.HP = {};
+        end
+        if isempty(cgui.stk.HP)
+            for ward = 1 : length (cgui.stk.M)
+                cgui.stk.HP{ward} = surface;
+            end
         end
         % if 3 stacks on same coordinates stack is considered RGB (but many
         % restrictions there!!
@@ -2784,15 +2893,21 @@ switch action,      % respond to actions arranged by ui panels:
                             cM = ceil ((cgui.vis.iM - cgui.stk.coord (ward, 3)) / ...
                                 cgui.stk.voxel (3)) + 1;
                             if (cM >= 1) && (cM <= size (cgui.stk.M {ward}, 3)),
-                                cgui.stk.HP{end+1} = surface ( ...
-                                    cgui.stk.coord (ward, 1) + cgui.stk.voxel (1) * ...
-                                    [0 size(cgui.stk.M{ward}, 2)-1; ...
-                                    0 size(cgui.stk.M{ward}, 2)-1], ...
-                                    cgui.stk.coord (ward, 2) + cgui.stk.voxel (2) * ...
-                                    [0 0; size(cgui.stk.M{ward}, 1)-1 ...
-                                    size(cgui.stk.M{ward}, 1)-1], ...
-                                    cgui.vis.iM + zeros (2, 2));
-                                set (cgui.stk.HP {end}, 'CData', ...
+%                                 cgui.stk.HP{end+1} = surface ( ...
+%                                     cgui.stk.coord (ward, 1) + cgui.stk.voxel (1) * ...
+%                                     [0 size(cgui.stk.M{ward}, 2)-1; ...
+%                                     0 size(cgui.stk.M{ward}, 2)-1], ...
+%                                     cgui.stk.coord (ward, 2) + cgui.stk.voxel (2) * ...
+%                                     [0 0; size(cgui.stk.M{ward}, 1)-1 ...
+%                                     size(cgui.stk.M{ward}, 1)-1], ...
+%                                     cgui.vis.iM + zeros (2, 2));
+                                set (cgui.stk.HP{ward}, 'XData',cgui.stk.coord (ward, 1) + cgui.stk.voxel (1) * [0 size(cgui.stk.M{ward}, 2)-1; 0 size(cgui.stk.M{ward}, 2)-1] , 'YData',cgui.stk.coord (ward, 2) + cgui.stk.voxel (2) * [0 0; size(cgui.stk.M{ward}, 1)-1 size(cgui.stk.M{ward}, 1)-1] ,'ZData', cgui.vis.iM + zeros (2, 2))
+%                                 [m sys] =memory;
+%                                 if m.MaxPossibleArrayBytes < sys.SystemMemory /4  % if memory gets low, flush opengl cache
+%                                     set(gcf,'Renderer','zbuffer')
+%                                     set(gcf,'Renderer','opengl')
+%                                 end
+                                set (cgui.stk.HP {ward}, 'CData', ...
                                     double (cgui.stk.M {ward} (:, :, cM)), ...
                                     'FaceColor', 'texturemap', 'Edgecolor', 'none',...
                                     'facealpha', cgui.stk.alpha);
@@ -3710,7 +3825,7 @@ switch action,      % respond to actions arranged by ui panels:
                 % approximately the same distance pieces, given is the
                 % resolution in um
                 cgui.mtr.tree  = resample_tree (cgui.mtr.tree, ...
-                    str2double (get (cgui.mtr.ui.ed_resample1, 'string')));
+                    str2double (get (cgui.mtr.ui.ed_resample1, 'string')),'-r');
                 % echo on text frame of vis_ panel:
                 set (cgui.vis.ui.txt1, 'string', {'resampled tree:',...
                     [get(cgui.mtr.ui.ed_resample1, 'string') ' um']});
@@ -3729,7 +3844,7 @@ switch action,      % respond to actions arranged by ui panels:
                 % approximately the same distance pieces, given is the
                 % resolution in um
                 cgui.mtr.tree  = resample_tree (cgui.mtr.tree, ...
-                    str2double (get(cgui.mtr.ui.ed_resample1, 'string')), '-l -w');
+                    str2double (get(cgui.mtr.ui.ed_resample1, 'string')), '-l -w -r');
                 % echo on text frame of vis_ panel:
                 set (cgui.vis.ui.txt1, 'string', {'resampled stretched tree:', ...
                     [get(cgui.mtr.ui.ed_resample1, 'string') ' um']});
@@ -3822,7 +3937,7 @@ switch action,      % respond to actions arranged by ui panels:
             % find subtree to last clicked node:
             [isub subtree] = sub_tree (cgui.mtr.tree, cgui.mtr.lastnode);
             % delete that subtree on current tree:
-            cgui.mtr.tree = delete_tree (cgui.mtr.tree, find (isub));
+            cgui.mtr.tree = delete_tree (cgui.mtr.tree, find (isub),'-r');
             % and incorporate that tree in tree sorter and make it active:
             incorporateloaded_tree (subtree, 'sub'); % incorporate subtrees in tree sorter
             % echo on text frame of vis_ panel:
@@ -4070,8 +4185,13 @@ switch action,      % respond to actions arranged by ui panels:
                 cgui.mtr.pHP {1} = plot3 (cgui.mtr.tree.X (1), cgui.mtr.tree.Y (1), ...
                     cgui.mtr.tree.Z (1), 'ro'); % root
                 set(cgui.mtr.pHP {1}, 'markersize', 18);
+                 if isfield (cgui.mtr.tree,'jpoints') %?%?%?
+                     cgui.mtr.pHP {2} = plot3 (cgui.mtr.tree.X(cgui.mtr.tree.jpoints==0), cgui.mtr.tree.Y(cgui.mtr.tree.jpoints==0), ...
+                    cgui.mtr.tree.Z(cgui.mtr.tree.jpoints==0), 'r.');  % nodes in empty according to the..
+                 else
                 cgui.mtr.pHP {2} = plot3 (cgui.mtr.tree.X, cgui.mtr.tree.Y, ...
                     cgui.mtr.tree.Z, 'r.');  % nodes in empty according to the..
+                 end
                 set(cgui.mtr.pHP {2}, 'markersize', 24);
                 if ~isempty (cgui.mtr.selected),
                     cgui.mtr.pHP {3} = plot3 (cgui.mtr.tree.X (cgui.mtr.selected), ...
@@ -4084,6 +4204,12 @@ switch action,      % respond to actions arranged by ui panels:
                         cgui.mtr.tree.Y (cgui.mtr.lastnode), ...
                         cgui.mtr.tree.Z (cgui.mtr.lastnode), 'go'); % selected nodes
                     set(cgui.mtr.pHP {4}, 'markersize', 24);
+                end
+                if isfield (cgui.mtr.tree,'jpoints') %!%!%!
+                    cgui.mtr.pHP {5} = plot3 (cgui.mtr.tree.X (cgui.mtr.tree.jpoints>0), ...
+                        cgui.mtr.tree.Y (cgui.mtr.tree.jpoints>0), ...
+                        cgui.mtr.tree.Z (cgui.mtr.tree.jpoints>0), 'b.'); % jump nodes
+                    set (cgui.mtr.pHP {5}, 'markersize', 25);
                 end
             end
         end
@@ -4260,7 +4386,7 @@ switch action,      % respond to actions arranged by ui panels:
         % see "gedapply", applies simple tree global metric edits on either
         % one tree or all trees in a group:
         if ~isempty (cgui.mtr.tree),
-            gedapply ('tree = rot_tree (tree, [], ''-m3dX'');');            
+            gedapply ('tree = rot_tree (tree, [], ''-m3dY'');');            
 %             gedapply (['tree = rot_tree (tree, [rad2deg(atan(mean(tree.Z)./mean(tree.Y))), ' ...
 %                 'rad2deg(atan(mean(tree.Z)./mean(tree.X))), ' ...
 %                 'rad2deg(atan(mean(tree.Y)./mean(tree.X)))]);']);
@@ -4698,6 +4824,49 @@ switch action,      % respond to actions arranged by ui panels:
         lastkey = get (cgui.ui.F, 'CurrentCharacter');
         set (cgui.ui.F, 'currentcharacter', char(0));
         switch lastkey % keyboard shortcuts
+            case 't'
+                if exist('TreeAdmin.m','file')
+                    answer = questdlg('Do you want to save your trees before continuing?','Save Trees?','Save all trees','Dont save','Cancel','Cancel');
+                    if strcmp(answer,'Save all trees')
+                        cgui_tree('cat_allsave')
+                    elseif isempty(answer) || strcmp(answer,'Cancel')
+                        return
+                    end
+                    answer = questdlg('What to load into TreeAdmin?','TreeAdmin','Active tree group','Only active tree','Cancel','Cancel');
+                    if strcmp(answer,'Active tree group')
+                        cgui.cat.trees{cgui.cat.i2tree}{cgui.cat.itree} = cgui.mtr.tree;
+                        tree = TreeAdmin(cgui.cat.trees{cgui.cat.i2tree});
+                        cgui.cat.trees{cgui.cat.i2tree} = tree{1};
+                        cgui.mtr.tree = cgui.cat.trees{cgui.cat.i2tree}{cgui.cat.itree};
+                    elseif strcmp(answer,'Only active tree')
+                        tree = TreeAdmin(cgui.mtr.tree);
+                        cgui.mtr.tree = tree{1}{1};
+                    end
+                    
+                    cgui_tree ('cat_update');   %update trees
+                    name = cgui.mtr.tree.name;
+                    set (cgui.cat.ui.ed_name1, 'string',name);
+ 
+                    % update active tree and cat_ cell array name fields
+                    if length (cgui.cat.trees {cgui.cat.i2tree}) > 1,
+                        cgui.cat.trees{cgui.cat.i2tree}{cgui.cat.itree}.name = name;
+                        str = cellfun(@(x) x.name,cgui.cat.trees{cgui.cat.i2tree},'UniformOutput',false);
+                    else
+                        cgui.cat.trees{cgui.cat.i2tree}.name = name;
+                        str = {name};
+                    end
+                    % update frame window containing tree names in active group:
+                    set (cgui.cat.ui.f1, 'string', str);
+                    % echo on text frame of vis_ panel:
+                    set (cgui.vis.ui.txt1, 'string', {'Used Tree Admin for:', name});
+                    cgui_tree ('mtr_image');    %update figure
+                end
+            case 'h'
+                if isfield(cgui.modes,'hold')
+                    cgui.modes.hold = rem(cgui.modes.hold+1,2);
+                else
+                    cgui.modes.hold = 1;
+                end
             case cgui.keys.ui   {1}        % select editor panel 1 up
                 cgui_tree ('ui_editorpanelup');
             case cgui.keys.ui   {2}        % select editor panel 1 down
@@ -4916,7 +5085,7 @@ switch action,      % respond to actions arranged by ui panels:
                                         % keep track of old tree for undo:
                                         cgui.cat.untrees {end+1} = cgui.mtr.tree;
                                         cgui.mtr.tree = delete_tree (cgui.mtr.tree, ...
-                                            cgui.mtr.selected);
+                                            cgui.mtr.selected,'-r');
                                         cgui.mtr.selected = [];  cgui.mtr.lastnode = 1;
                                         % after tree alteration selected nodes
                                         % are discarded:
@@ -4955,8 +5124,15 @@ switch action,      % respond to actions arranged by ui panels:
                                 if ~isempty (cgui.mtr.tree)
                                     % keep track of old tree for undo:
                                     cgui.cat.untrees{end+1} = cgui.mtr.tree;
+                                    if isfield(cgui.modes,'hold') && cgui.modes.hold == 1
+                                        lastnode = find(cgui.mtr.tree.dA(cgui.mtr.lastnode,:));
+                                        cgui.mtr.tree = delete_tree (cgui.mtr.tree, ...
+                                            cgui.mtr.lastnode,'-r');
+                                        cgui.mtr.lastnode = lastnode;
+                                    else
                                     cgui.mtr.tree = delete_tree (cgui.mtr.tree, ...
-                                        cgui.mtr.active);
+                                        cgui.mtr.active,'-r');
+                                    end
                                     % after tree alteration selected nodes
                                     % are discarded:
                                     cgui_tree ('slt_relsel');
@@ -5097,7 +5273,7 @@ switch action,      % respond to actions arranged by ui panels:
                                     % keep track of old tree for undo:
                                     cgui.cat.untrees {end+1} = cgui.mtr.tree;
                                     cgui.mtr.tree = delete_tree (cgui.mtr.tree, ...
-                                        find (sub_tree (cgui.mtr.tree, cgui.mtr.active)));
+                                        find (sub_tree (cgui.mtr.tree, cgui.mtr.active)),'-r');
                                     % after tree alteration selected nodes
                                     % are discarded:
                                     cgui_tree ('slt_relsel');
@@ -5157,7 +5333,7 @@ switch action,      % respond to actions arranged by ui panels:
                                     isub = find (sub_tree (cgui.mtr.tree, cgui.mtr.active));
                                     X = cgui.mtr.tree.X (isub); Y = cgui.mtr.tree.Y (isub);
                                     Z = cgui.mtr.tree.Z (isub); D = cgui.mtr.tree.D (isub);
-                                    tree = delete_tree (cgui.mtr.tree, isub);
+                                    tree = delete_tree (cgui.mtr.tree, isub,'-r');
                                     [tree indx] = MST_tree({tree}, X, Y, Z, ...
                                         str2double (get (cgui.mtr.ui.ed_mst1, 'string')), ...
                                         str2double (get (cgui.mtr.ui.ed_mst2, 'string')), ...
@@ -5189,7 +5365,7 @@ switch action,      % respond to actions arranged by ui panels:
                                     isub = find (sub_tree (cgui.mtr.tree, cgui.mtr.active));
                                     X = cgui.mtr.tree.X (isub); Y = cgui.mtr.tree.Y (isub);
                                     Z = cgui.mtr.tree.Z (isub); D = cgui.mtr.tree.D (isub);
-                                    cgui.mtr.tree = delete_tree (cgui.mtr.tree, isub);
+                                    cgui.mtr.tree = delete_tree (cgui.mtr.tree, isub,'-r');
                                     [cgui.mtr.tree indx] = MST_tree ({cgui.mtr.tree}, X, Y, Z, ...
                                         str2double (get (cgui.mtr.ui.ed_mst1, 'string')), ...
                                         str2double (get (cgui.mtr.ui.ed_mst2, 'string')), ...
@@ -5368,7 +5544,36 @@ switch action,      % respond to actions arranged by ui panels:
                         end
                     end
                 end
-                
+            case cgui.keys.over {9}        % set branchpoint %!%!%!
+                if isfield(cgui.mtr.tree,'jpoints')
+                    if numel(cgui.mtr.tree.jpoints) < numel(cgui.mtr.tree.X)
+                        cgui.mtr.tree.jpoints(numel(cgui.mtr.tree.X),1) = 0;
+                    end
+                    cgui.mtr.tree.jpoints(cgui.mtr.lastnode,1) = sum(cgui.mtr.tree.jpoints>0)+1;
+                else
+                    cgui.mtr.tree.jpoints = zeros(numel(cgui.mtr.tree.X),1);
+                    cgui.mtr.tree.jpoints(cgui.mtr.lastnode,1) = 1;
+                end
+                % redraw mtr_ graphical output: active tree:
+                cgui_tree ('mtr_image');
+                % text output on tree length and number of nodes:
+                cgui_tree ('mtr_inform');
+            case cgui.keys.over {10}        % jump to last branchpoint %!%!%!
+                if isfield(cgui.mtr.tree,'jpoints') && sum(cgui.mtr.tree.jpoints)
+                    cgui.mtr.lastnode = find(cgui.mtr.tree.jpoints==max(cgui.mtr.tree.jpoints),1,'last');%find(cgui.mtr.tree.jpoints,1,'last');
+                    cgui.mtr.tree.jpoints(cgui.mtr.lastnode) = 0;
+                    % remember initial mouse coordinates and camera:
+                    set (cgui.ui.g1, 'cameratarget', double([cgui.mtr.tree.X(cgui.mtr.lastnode), cgui.mtr.tree.Y(cgui.mtr.lastnode), cgui.mtr.tree.Z(cgui.mtr.lastnode)]));
+                    cgui.ui.camtarget = get (cgui.ui.g1, 'cameratarget');
+                    set (cgui.ui.g1, 'cameraposition',cgui.ui.camtarget+[0 0 4000]);
+                    cgui.ui.campos    = get (cgui.ui.g1, 'cameraposition');
+                    % redraw mtr_ graphical output: active tree:
+                    cgui_tree ('mtr_image');
+                    % text output on tree length and number of nodes:
+                    cgui_tree ('mtr_inform');
+                    set (cgui.vis.ui.ed_setz, 'string',cgui.mtr.tree.Z(cgui.mtr.lastnode));
+                     cgui_tree ('vis_setz');
+                end
         end
 end
 end
@@ -5485,7 +5690,7 @@ switch action, % respond to mouse in dependence of edit/select/viewing mode
                                 end
                             case 4 % mtr_ edit: move or add points
                                 if ~isempty (cgui.mtr.tree)
-                                    if cgui.mtr.distance < (mean (cgui.stk.voxel (1 : 2)) * 3)
+                                    if (isfield(cgui.modes,'hold') && cgui.modes.hold == 0 && cgui.mtr.distance < (mean (cgui.stk.voxel (1 : 2)) * 3)) || ~isfield(cgui.modes,'hold') && cgui.mtr.distance < (mean (cgui.stk.voxel (1 : 2)) * 3)
                                         % rid editor and selector graphic
                                         % handles:
                                         cgui_tree ('ui_clean');
@@ -5605,7 +5810,7 @@ switch action, % respond to mouse in dependence of edit/select/viewing mode
                                 end
                             case 4 % mtr_ edit: add point 1um before active node
                                 if ~isempty (cgui.mtr.tree)
-                                    if cgui.mtr.distance < 3
+                                    if cgui.mtr.distance < 3 && (~isfield(cgui.modes,'hold') || cgui.modes.hold == 0)
                                         Plen = Pvec_tree (cgui.mtr.tree);
                                         Plen (cgui.mtr.active);
                                         if Plen (cgui.mtr.active) > 3,
@@ -6104,9 +6309,16 @@ switch action, % respond to mouse in dependence of edit/select/viewing mode
                     cgui.skl.I (cgui.skl.active, 3),   cgui.mtr.tree.X (cgui.mtr.active), ...
                     cgui.mtr.tree.Y (cgui.mtr.active), cgui.mtr.tree.Z (cgui.mtr.active));
             else
-                [x y z cgui.mtr.distance cgui.mtr.active] = ...
-                    close2cursortree (cgui.mtr.tree.X, cgui.mtr.tree.Y, ...
-                    cgui.mtr.tree.Z, cgui.vis.iM);
+                if isfield(cgui.modes,'hold') && cgui.modes.hold == 1
+                    [x y z cgui.mtr.distance cgui.mtr.active] = ...
+                        close2cursor (cgui.mtr.tree.X(cgui.mtr.lastnode), cgui.mtr.tree.Y(cgui.mtr.lastnode), ...
+                        cgui.mtr.tree.Z(cgui.mtr.lastnode), cgui.vis.iM);
+                    cgui.mtr.active = cgui.mtr.lastnode;
+                else
+                    [x y z cgui.mtr.distance cgui.mtr.active] = ...
+                        close2cursor (cgui.mtr.tree.X, cgui.mtr.tree.Y, ...
+                        cgui.mtr.tree.Z, cgui.vis.iM);
+                end
                 drawcursorline (x, y, z, cgui.mtr.tree.X (cgui.mtr.active), ...
                     cgui.mtr.tree.Y (cgui.mtr.active), cgui.mtr.tree.Z (cgui.mtr.active));
             end
@@ -6186,11 +6398,32 @@ switch action, % respond to mouse in dependence of edit/select/viewing mode
         % third dimension value from slicer
         if ~isempty (cgui.mtr.tree),
             cgui.cat.untrees {end+1} = cgui.mtr.tree;    % keep track of old tree for undo
-            [x y z cgui.mtr.distance cgui.mtr.active] = ...
-                close2cursortree (cgui.mtr.tree.X, cgui.mtr.tree.Y, cgui.mtr.tree.Z, ...
-                cgui.vis.iM); % value from slicer
+%             MotionFcn = get(cgui.ui.F,'WindowButtonMotionFcn');
+            if ~isempty (get (src, 'SelectionType'))    %if button is down, use only last point to measure distance
+                [x y z cgui.mtr.distance cgui.mtr.active] = ...
+                    close2cursor (cgui.mtr.tree.X(cgui.mtr.lastnode), cgui.mtr.tree.Y(cgui.mtr.lastnode), cgui.mtr.tree.Z(cgui.mtr.lastnode), ...
+                    cgui.vis.iM); % value from slicer
+                cgui.mtr.active = cgui.mtr.lastnode(cgui.mtr.active);
+            else
+                if isfield(cgui.modes,'hold') && cgui.modes.hold == 1
+%                     cgui.mtr.active = cgui.mtr.lastnode;
+%                     cp = get (cgui.ui.g1, 'CurrentPoint');
+%                     x = cp(1,1);
+%                     y = cp(1,2);
+%                     z = cgui.vis.iM;
+%                     cgui.mtr.distance = x-cgui.mtr.tree.X(cgui.mtr
+                                    [x y z cgui.mtr.distance cgui.mtr.active] = ...
+                    close2cursor (cgui.mtr.tree.X(cgui.mtr.lastnode), cgui.mtr.tree.Y(cgui.mtr.lastnode), cgui.mtr.tree.Z(cgui.mtr.lastnode), ...
+                    cgui.vis.iM); % value from slicer
+                cgui.mtr.active = cgui.mtr.lastnode(cgui.mtr.active);
+                else
+                    [x y z cgui.mtr.distance cgui.mtr.active] = ...
+                        close2cursor (cgui.mtr.tree.X, cgui.mtr.tree.Y, cgui.mtr.tree.Z, ...
+                        cgui.vis.iM); % value from slicer
+                end
+            end
             if cgui.mtr.distance > (mean (cgui.stk.voxel (1 : 2)) * 3)
-                if ~isempty (get (src, 'SelectionType'))
+                if ~isempty (get (src, 'SelectionType'))    
                 cgui.mtr.tree = insert_tree (cgui.mtr.tree, ...
                     [1 get(cgui.slt.ui.pop3, 'value') x y z ...
                     cgui.mtr.tree.D(cgui.mtr.lastnode) cgui.mtr.lastnode], 'none');
@@ -6208,8 +6441,17 @@ switch action, % respond to mouse in dependence of edit/select/viewing mode
         % same third dimension value as the parent point in the tree
         if ~isempty (cgui.mtr.tree),
             cgui.cat.untrees {end+1} = cgui.mtr.tree;    % keep track of old tree for undo
-            [x y z cgui.mtr.distance cgui.mtr.active] = ...
-                close2cursor (cgui.mtr.tree.X, cgui.mtr.tree.Y, cgui.mtr.tree.Z);
+            if ~isempty (get (src, 'SelectionType'))  %if button is down, use only last point to measure distance
+                [x y z cgui.mtr.distance cgui.mtr.active] = ...
+                    close2cursor (cgui.mtr.tree.X(cgui.mtr.lastnode), cgui.mtr.tree.Y(cgui.mtr.lastnode), cgui.mtr.tree.Z(cgui.mtr.lastnode), ...
+                    cgui.vis.iM); % value from slicer
+                cgui.mtr.active = cgui.mtr.lastnode(cgui.mtr.active);
+            else
+                [x y z cgui.mtr.distance cgui.mtr.active] = ...
+                    close2cursor (cgui.mtr.tree.X, cgui.mtr.tree.Y, cgui.mtr.tree.Z);
+            end
+             
+             
             if cgui.mtr.distance > (mean (cgui.stk.voxel (1 : 2)) * 3)
                 cgui.mtr.tree = insert_tree (cgui.mtr.tree, ...
                     [1 get(cgui.slt.ui.pop3, 'value') x y z ...
@@ -6434,8 +6676,14 @@ if ~isempty (tree),
             tree.Cm = str2double (get (cgui.ele.ui.ed_elec3, 'string'));
         end
     else
+        if size(tree,1) > size(tree,2)  % make trees horizontal
+            tree = tree';
+        end
         for ward = 1 : length (tree), % if tree is a cell array walk through array
             if iscell (tree {ward}), % each cell can still be an array of trees
+                if size(tree{ward},1) > size(tree{ward},2)    % make trees horizontal
+                    tree{ward} = tree{ward}';
+                end
                 for te = 1 : length (tree {ward}), % then walk through cell array
                     if ~isfield (tree{ward}{te}, 'name'), % create a name if non-existent
                         counts = counts + 1; tree{ward}{te}.name = [name num2str(counts)];
@@ -6470,7 +6718,7 @@ if ~isempty (tree),
     if ~iscell (tree), % set one of the new trees to be active
         cgui.mtr.tree = tree;
     else
-        if length (tree {1}) > 1,
+        if length (tree {1}) > 1 || iscell(tree{1})
             cgui.mtr.tree = tree{1}{1};
         else
             cgui.mtr.tree = tree {1};
@@ -6482,8 +6730,8 @@ if ~isempty (tree),
     cgui.cat.itree = 1; % in new group activate first tree
     % deal with the fact that cat_trees can be array of arrays:
     % update group selector:
-    set (cgui.cat.ui.f2, 'value', cgui.cat.i2tree, 'string', ...
-        num2str ((1 : length (cgui.cat.trees))'));
+    set (cgui.cat.ui.f2, 'string', num2str ((1 : length (cgui.cat.trees))'));
+    set (cgui.cat.ui.f2, 'value', cgui.cat.i2tree)  % needs to be two lines otherwise value not selected since string has not been refreshed
     % update tree selector:
     if length (cgui.cat.trees {cgui.cat.i2tree}) > 1,
         str = cell (1,length (cgui.cat.trees {cgui.cat.i2tree}));
@@ -6497,13 +6745,14 @@ if ~isempty (tree),
             cgui.cat.trees {cgui.cat.i2tree}.name);
     end
     cgui_tree ('slt_relsel'); % after tree alteration selected nodes are discarded
+    cgui.mtr.lastnode =  1; % active single node is reset to root
     cgui_tree ('mtr_image'); cgui_tree ('ged_image'); % redraw trees
     % update edit field for tree name:
     set (cgui.cat.ui.ed_name1, 'string', cgui.mtr.tree.name);
     % update root location, electrotonics and regions edit fields
     cgui_tree ('ged_settran'); cgui_tree ('ele_setelec'); cgui_tree ('slt_setreg');
     cgui.cat.untrees  = {}; % reset undo
-    cgui.mtr.lastnode =  1; % active single node is reset to root
+
     cgui_tree ('mtr_showpanels'); % check if tree control panels need to be active
     cgui_tree ('mtr_inform'); % text output on tree length and number of nodes
 end
@@ -6657,36 +6906,6 @@ switch cgui.modes.view % this depends on the view:
     otherwise % xy and 3D view
         dist = sqrt (sum ((repmat (cp (1, 1 : 2), length (X), 1) - ...
             [X Y]).^2, 2));
-        % distance and index of closest point are kept in memory:
-        [dist indy] = min (dist);
-        x = cp (1, 1); y = cp (1, 2);
-        if nargin > 4, z = constz; elseif nargin > 3, z = constx; else z = Z (indy); end
-end
-end
-
-function [x y z dist indy] = close2cursortree (X, Y, Z, constx, consty, constz)
-global cgui
-% get mouse cursor position and check which point defined by X Y Z is
-% closest.
-cp = get (cgui.ui.g1, 'CurrentPoint');
-switch cgui.modes.view % this depends on the view:
-    case 2 % xz view
-        dist = sqrt (sum ((repmat ([cp(1, 1) constx cp(1, 3)], length (X), 1) - ...
-            [X Y Z]).^2, 2));
-        % distance and index of closest point are kept in memory:
-        [dist indy] = min (dist);
-        x = cp (1, 1); z = cp (1, 3);
-        if nargin > 4, y = consty; elseif nargin == 4, y = constx; else y = Y (indy); end
-    case 3 % yz view
-        dist = sqrt (sum ((repmat ([constx cp(1, [2 3])], length (X), 1) - ...
-            [X Y Z]).^2, 2));
-        % distance and index of closest point are kept in memory:
-        [dist indy] = min (dist);
-        y = cp (1, 2); z = cp (1, 3);
-        if nargin > 3, x = constx; else x = X (indy); end
-    otherwise % xy and 3D view
-        dist = sqrt (sum ((repmat ([cp(1, 1 : 2) constx], length (X), 1) - ...
-            [X Y Z]).^2, 2));
         % distance and index of closest point are kept in memory:
         [dist indy] = min (dist);
         x = cp (1, 1); y = cp (1, 2);
@@ -6889,5 +7108,90 @@ switch dim,
         camposition (3) = camposition (3) - perc * diff (zl);
         set (cgui.ui.g1, 'cameratarget', camtarget, ...
             'cameraposition', camposition);
+end
+end
+
+% time function of autosave timer
+function autosave(hObject,eventdata)
+
+global cgui
+cl = get(hObject,'UserData');
+name = cl{2};
+path = cl{1};
+if length (cgui.cat.trees {cgui.cat.i2tree}) > 1,
+    cgui.cat.trees{cgui.cat.i2tree}{cgui.cat.itree} = cgui.mtr.tree;
+else
+    cgui.cat.trees{cgui.cat.i2tree} = cgui.mtr.tree;
+end
+name = save_tree (cgui.cat.trees,fullfile(path,sprintf('%s.asv',name)));
+% echo on text frame of vis_ panel:
+if ~isempty (name),
+    set (cgui.vis.ui.txt1, 'string', {'all trees autosaved', name});
+end
+
+end
+
+% start function of autosave timer
+function startasv(hObject,eventdata)
+setasvtimer('ask',0)
+end
+
+% stop function of autosave timer
+function deleteasv(hObject,eventdata)
+global cgui
+cl = get(hObject,'UserData');
+name = cl{2};
+path = cl{1};
+if exist(fullfile(path,sprintf('%s.asv',name)),'file') && (~ishandle(cgui.ui.F) || cl{3}) %if Toolbox has closed
+    answer = questdlg('Delete autosave file?','Delete Backup','Yes','No','No');
+    if strcmp(answer,'Yes')
+        delete(fullfile(path,sprintf('%s.asv',name)))
+    end
+end
+end
+
+% sets user data of autosave timer (e.g. save path)
+function setasvtimer(field,value)
+global cgui
+cl = get(cgui.cat.tautosave,'UserData');
+if ~iscell(field)
+    field = {field};
+end
+if ~iscell(value)
+    value = {value};
+end
+for f = 1:numel(field)
+    switch field{f}
+        case 'path'
+            cl{1} = value{f};
+        case 'name'
+            cl{2} = value{f};
+        case 'ask'
+            cl{3} = value{f};
+    end
+end
+set(cgui.cat.tautosave,'UserData',cl)
+end
+
+% returns user data of autosave timer (eg for saving)
+function out = getasvtimer(field)
+global cgui
+cl = get(cgui.cat.tautosave,'UserData');
+if ~iscell(field)
+    field = {field};
+end
+out = cell(1,numel(field));
+for f = 1:numel(field)
+    switch field{f}
+        case 'path'
+            out{f} = cl{1};
+        case 'name'
+            out{f} = cl{2};
+        case 'ask'
+            out{f} = cl{3};
+    end
+end
+if numel(out) == 1
+    out = out{1};
 end
 end

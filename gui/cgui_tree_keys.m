@@ -64,11 +64,13 @@ cgui.keys.stk      = {};
 
 % overloaded keys:
 cgui.keys.over     = {};
-cgui.keys.over {1} = 'c';           % general cut functions
-cgui.keys.over {2} = 'C';           % 2nd general cut functions
-cgui.keys.over {3} = 'v';           % preview rebuild (rebuild for skel. points)
-cgui.keys.over {4} = 'V';           % rebuild (e.g. rebuild tree from subpoints)
-cgui.keys.over {5} = 'f';           % decrease diameter
-cgui.keys.over {6} = 'F';           % decrease diameter lots
-cgui.keys.over {7} = 'r';           % increase diameter
-cgui.keys.over {8} = 'R';           % increase diameter lots
+cgui.keys.over {1}  = 'c';           % general cut functions
+cgui.keys.over {2}  = 'C';           % 2nd general cut functions
+cgui.keys.over {3}  = 'v';           % preview rebuild (rebuild for skel. points)
+cgui.keys.over {4}  = 'V';           % rebuild (e.g. rebuild tree from subpoints)
+cgui.keys.over {5}  = 'f';           % decrease diameter
+cgui.keys.over {6}  = 'F';           % decrease diameter lots
+cgui.keys.over {7}  = 'r';           % increase diameter
+cgui.keys.over {8}  = 'R';           % increase diameter lots
+cgui.keys.over {9}  = 'b';           % set branch point
+cgui.keys.over {10} = 'j';           % jump to last branch point

@@ -4,10 +4,10 @@
 % D = fitD_stack (intree, stack, maxR, options)
 % ---------------------------------------------
 %
-% Tries to derive diameter values for tree intree based on the underlying
-% image stack stack. maxR determines a threshold maximum radius for a
-% segment in the tree (should be much larger than the maximum radius, but
-% of course not too large...).
+% Attempts to derive diameter values for tree intree based on the
+% underlying image stack stack. maxR determines a threshold maximum radius
+% for a segment in the tree (should be much larger than the maximum radius,
+% but not too large...).
 %
 % the stack structure as in "save_stack":
 % stack has to be in the following form:
@@ -20,7 +20,6 @@
 %
 % Input
 % -----
-%
 % - intree    ::integer: index of tree in trees or structured tree
 % - stack     ::struct:  image stacks in structure form (see above)
 % - maxR      ::value:   threshold radius
@@ -44,7 +43,7 @@
 % adpated for TREES toolbox by Hermann Cuntz
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2017  Hermann Cuntz
 
 function D   = fitD_stack (intree, stack, maxR, options)
 

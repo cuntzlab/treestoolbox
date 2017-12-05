@@ -133,7 +133,7 @@ end
 % for each node look at point to add on the path:
 for counter      = 1 : N
     if strfind   (options, '-w')       % waitbar option: update
-        if mod (counter, 500) == 0,
+        if mod (counter, 500) == 0
             waitbar (counter / N, HW);
         end
     end

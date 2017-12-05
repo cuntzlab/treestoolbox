@@ -19,7 +19,7 @@
 %        or: {tree1, tree2, ...} or just tree.
 %     '.swc' : from the Neurolucida swc format ([inode R X Y Z D/2 idpar])
 %        comments prefixed with "#", otherwise only pure ASCII data
-%        May contain multiple trees!!     
+%        May contain multiple trees!!
 %     '.neu' : from NEURON transfer format .neu (see neu_tree)
 %        not every NEURON hoc-file represents a correct graph, read
 %        about restrictions in the documentation.
@@ -27,6 +27,7 @@
 % - options  ::string:
 %     '-s'   : show
 %     '-r'   : repair tree, preparing trees for most TREES functions
+%     '-ks'  : keep sections from NEURON as regions
 %     {DEFAULT: '-r' for .swc/.neu 'none' for .mtr}
 %
 % Output
@@ -143,7 +144,7 @@ switch               format
         a1           = a{1};
         a2           = a{3};
         a3           = a{5};
-        c0           = a{2}; 
+        c0           = a{2};
         c1           = a{4};
         if sum       (c0 ~= 0)
             error    (['sorry!!' ...
@@ -166,14 +167,18 @@ switch               format
             end
         end
         % allow region vectors
-        strings      = cell (1, nsec);
-        for counter  = 1 : nsec
-            sa       = char (a1 (counter));
-            insa     = findstr (sa, '[');
-            if ~isempty (insa)
-                sa   = [(sa (1 : insa - 1)) '[]'];
+        if strfind   (options, '-ks')
+            strings  = a1;
+        else
+            strings      = cell (1, nsec);
+            for counter  = 1 : nsec
+                sa       = char (a1 (counter));
+                insa     = findstr (sa, '[');
+                if ~isempty (insa)
+                    sa   = [(sa (1 : insa - 1)) '[]'];
+                end
+                strings{counter} = char (sa);
             end
-            strings{counter} = char (sa);
         end
         % assign region numbers and names:
         [rnames, ~, i2] = unique (strings);
@@ -183,7 +188,7 @@ switch               format
         end
         as           = sum (a3); % total number of nodes
         % cumulative sum of nodes for each branch:
-        a4           = [0; (cumsum (a3))]; 
+        a4           = [0; (cumsum (a3))];
         a5           = [0; 1; (cumsum (a3) + 1)];
         parid        = (0 : as - 1)'; % via the parent id build the swc
         % parent beginning elements: a5(d+1)
@@ -290,7 +295,7 @@ switch               format
                     end
                     tree{tcounter}.dA = dA;
                     % X-locations of nodes on tree:
-                    tree{tcounter}.X  = iswc (:, 3);     
+                    tree{tcounter}.X  = iswc (:, 3);
                     % Y-locations of nodes on tree:
                     tree{tcounter}.Y  = iswc (:, 4);
                     % Z-locations of nodes on tree:
@@ -322,7 +327,7 @@ switch               format
             end
             tree.dA  = dA;
             % X-locations of nodes on tree:
-            tree.X   = swc (:, 3);     
+            tree.X   = swc (:, 3);
             % Y-locations of nodes on tree:
             tree.Y   = swc (:, 4);
             % Z-locations of nodes on tree:

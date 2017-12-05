@@ -10,9 +10,17 @@ for counterN     = 1 : 100
 end
 
 %% test 2
-ipar_tree        (sample_tree, '-s');
+tree             = sample_tree;
+ipar_tree        (tree, '-s');
 tprint           ('./panels/ipar_tree1', ...
     '-jpg -HR',                [10 10]);
+
+%% test 3
+ipar_tree        (tree, '-s', T_tree (tree));
+tprint           ('./panels/ipar_tree2', ...
+    '-jpg -HR',                [10 10]);
+
+
 
 
 

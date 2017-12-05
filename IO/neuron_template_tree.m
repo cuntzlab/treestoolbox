@@ -324,7 +324,7 @@ else
             fwrite (neuron, ['    ', ....
                 'alladendreg.append()',                 nextline], 'char');
         end
-        if  strfind (rnames{ward}, 'axon')
+        if  strfind (rnames{counter}, 'axon')
             fwrite (neuron, ['    allaxonreg.append()', nextline], 'char');
         end
         fwrite   (neuron, ['  }',                       nextline], 'char');
