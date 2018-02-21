@@ -1,7 +1,8 @@
 % NEURON_TEMPLATE_TREE   Export tree as NEURON file.
 % (trees package)
 %
-% [name, path, minterf] = neuron_template_tree (intree, name, options)
+% [name, path, minterf, tree] = ...
+%                         neuron_template_tree (intree, name, options)
 % --------------------------------------------------------------------
 %
 % Saves a complete tree in the section based neuron '.hoc' format.
@@ -32,6 +33,7 @@
 % - path     ::sting:   path of the file
 %     complete string is therefore: [path name]
 % - minterf  ::matrix:  interface matrix with node positions in sections
+% - tree     ::tree: tree in TREES format
 %
 % Example
 % -------
@@ -42,7 +44,8 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2017  Hermann Cuntz
 
-function [tname, path] = neuron_template_tree (intree, tname, options)
+function [tname, path, minterf, tree] = ...
+    neuron_template_tree (intree, tname, options)
 
 % trees : contains the tree structures in the trees package
 global       trees
@@ -82,7 +85,7 @@ if nstart (end) > 0
 end
 name2        = [path 'run_' name '.hoc']; % show file, with '-s' option
 
-if isfield(intree,'artificial')
+if isfield       (intree, 'artificial')
     artflag      = true;
     tree         = intree;
     minterf      = [1 0 0];
@@ -92,11 +95,11 @@ else
     
     % use full tree for this function
     if ~isstruct (intree)
-        tree     = trees {intree};
+        tree     = trees{intree};
     else
         tree     = intree;
     end
-    if isfield (tree, 'frustum') && (tree.frustum == 1)
+    if (isfield (tree, 'frustum')) && (tree.frustum == 1)
         isfrustum  = 1;
     else
         isfrustum  = 0;
@@ -112,7 +115,7 @@ else
         R        = ones (N, 1);      % add a homogeneous regions field
     end
     sect         = dissect_tree (tree);  % find separate branches
-    len = len_tree (tree);
+    len          = len_tree (tree);
     Rsect        = R (sect (:, 2));  % region attribute to sections
     % initializing minterf:
     minterf      = NaN (numel (tree.X) + size (sect, 1) - 1, 3);
@@ -120,17 +123,18 @@ else
     luR          = length (uR);      % number of regions
     if isfield   (tree, 'rnames')
         rnames   = tree.rnames (uR);
-        for counter = 1 : length (uR)
-            rnames{counter} = ...
-                regexprep (rnames{counter}, '[^a-zA-Z0-9]','');
+        for counterR = 1 : length (uR)
+            % delete rnames which have strange characters
+            rnames{counterR} = ...
+                regexprep (rnames{counterR}, '[^a-zA-Z0-9]','');
         end
     else
         if luR   == 1
             rnames   = {name};
         else
             rnames   = cell (1, luR);
-            for counter = 1 : luR
-                rnames{counter} = num2str (uR (counter));
+            for counterR = 1 : luR
+                rnames{counterR} = num2str (uR (counterR));
             end
         end
     end
@@ -167,8 +171,8 @@ if artflag
     fwrite       (neuron, ['public is_artificial',      nextline], 'char');
     fwrite       (neuron, ['objref cell'                nextline], 'char');
     fwrite       (neuron, ['proc celldef() {',          nextline], 'char');
-    fwrite       (neuron, ['cell = new ', ...
-        tree.artificial,  '()',                         nextline], 'char');
+    fwrite       (neuron, [(sprintf ('cell = new %s()', ...
+        tree.artificial))                               nextline], 'char');
     fwrite       (neuron, ['is_artificial = 1}',        nextline], 'char');
 else
     fwrite       (neuron, ['proc celldef() {',          nextline], 'char');
@@ -192,9 +196,9 @@ else
     fwrite       (neuron, ['public allreg',             nextline], 'char');
     fwrite       (neuron, ['public alladendreg',        nextline], 'char');
     fwrite       (neuron, ['public allaxonreg',         nextline], 'char');    
-    for counter     = 1 : luR
+    for counterR = 1 : luR
         fwrite   (neuron, ['public reg', ...
-            rnames{counter},                            nextline], 'char');
+            rnames{counterR},                           nextline], 'char');
     end
     fwrite       (neuron, ['public is_artificial',      nextline], 'char');
     fwrite       (neuron, ['',                          nextline], 'char');
@@ -213,9 +217,9 @@ else
         e        = sect (counter, 2);       % end compartment of section
         ipsect   = find (s == sect (:, 2)); % parent section
         ip       = sect (ipsect, 2);        % parent index of section
-        if ~isempty(ip)
-            ie  = find (counter   == find (Rsect == R (e)));
-            ipe = find (ipsect    == find (Rsect == R (ip)));
+        if ~isempty (ip)
+            ie   = find (counter   == find (Rsect == R (e)));
+            ipe  = find (ipsect    == find (Rsect == R (ip)));
             fwrite (neuron, ['  connect ', ...
                 rnames{(uR == R (e))}, ...
                 '[' (num2str (ie  - 1)) '](0),' ...
@@ -297,9 +301,9 @@ else
     fwrite       (neuron, ['',                          nextline], 'char');
     fwrite       (neuron, ['objref allreg, allregobj, alladendreg, ', ...
         'allaxonreg, sec',                              nextline], 'char');
-    for counter = 1 : luR
+    for counterR = 1 : luR
         fwrite   (neuron, ['objref reg', ...
-            rnames{counter},                            nextline], 'char');
+            rnames{counterR},                           nextline], 'char');
     end
     fwrite       (neuron, ['proc subsets() { ', ...
         'local counter',                                nextline], 'char');
@@ -311,20 +315,22 @@ else
         'new SectionList()',                            nextline], 'char');
     fwrite       (neuron, ['  allaxonreg  = ', ...
         'new SectionList()',                            nextline], 'char');
-    for counter  = 1 : luR
-        fwrite   (neuron, ['  reg', rnames{counter}, ...
+    for counterR  = 1 : luR
+        fwrite   (neuron, ['  reg', rnames{counterR}, ...
             ' = new SectionList()',                     nextline], 'char');
         fwrite   (neuron, ['  for counter = 0, ', ...
-            (num2str (H1 (counter) - 1)), ' ', ...
-            rnames{counter}, '[counter] {',             nextline], 'char');
-        fwrite   (neuron, ['    reg', rnames{counter}, ...
+            (num2str (H1 (counterR) - 1)), ' ', ...
+            rnames{counterR}, '[counter] {',            nextline], 'char');
+        fwrite   (neuron, ['    reg', rnames{counterR}, ...
             '.append()',                                nextline], 'char');
+        fwrite   (neuron, ['    sec = new SectionRef()',  nextline], 'char');
+        fwrite   (neuron, ['    allregobj.append(sec)',   nextline], 'char');
         fwrite   (neuron, ['    allreg.append()',       nextline], 'char');
-        if  strfind (rnames{counter}, 'adend')
+        if  strfind (rnames{counterR}, 'adend')
             fwrite (neuron, ['    ', ....
                 'alladendreg.append()',                 nextline], 'char');
         end
-        if  strfind (rnames{counter}, 'axon')
+        if  strfind (rnames{counterR}, 'axon')
             fwrite (neuron, ['    allaxonreg.append()', nextline], 'char');
         end
         fwrite   (neuron, ['  }',                       nextline], 'char');
