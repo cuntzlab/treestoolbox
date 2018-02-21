@@ -46,7 +46,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees); 
-end;
+end
 
 % use only node position for this function
 if isnumeric (intree) && numel (intree) > 1
