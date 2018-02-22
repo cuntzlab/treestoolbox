@@ -145,7 +145,7 @@ if strfind       (options, '-m3d')
     if ~isempty (regexpi (options,'-al')) && raxis < 3
         % get index of region to which tree should be aligned:
         if numel (options) >= regexpi (options, '-al') + 3  
-            ind  = str2num (options (regexpi (options, '-al') + 3));
+            ind  = str2double (options (regexpi (options, '-al') + 3));
         else
             ind  = 5;
         end
@@ -246,6 +246,15 @@ end
 
 if (nargout > 0 || (isstruct (intree)))
     varargout{1}   = tree; % if output is defined then it becomes the tree
+    if nargout > 1 && regexpi (options, '-m3d')
+       varargout {2} = angout;
+    end
+    if nargout > 2 && regexpi (options, '-m3d')
+        varargout {3} = cat(2,d,raxis);
+    end
+    if nargout > 3 && regexpi (options, '-m3d')
+        varargout {4} = qual;
+    end
 else
     trees{intree}  = tree; % otherwise add to end of trees cell array
 end
