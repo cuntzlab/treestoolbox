@@ -124,7 +124,9 @@ if strfind       (options, '-m3d')
         (tree.Y (tree.R ~= raxon)) ...
         (tree.Z (tree.R ~= raxon))];
     XYZ (:, raxis) = 0;    % delete information along aligned axis
-    [coeff, ~, latent] = pca (XYZ);
+    [coeff,latent]=eigs(cov(XYZ),3);
+    [~,ind] = sort(diag(latent),'descend');
+    coeff = coeff(:,ind);
     % defining quality of alignment (zero is bad because dendrites
     % distributed equally in 2 dim):
     qual         = latent (1) / latent (2) - 1; 

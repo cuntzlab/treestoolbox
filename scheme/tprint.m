@@ -89,11 +89,11 @@ if (nargin < 4) || isempty (shineoptions)
     shineoptions = 'none';
 end
 
-if     strfind   (options, '-HR')
+if     ~isempty(regexp(options, '-HR','ONCE'))
     res          = 600;
-elseif strfind   (options, '-SHR')
+elseif ~isempty(regexp(options, '-SHR','ONCE'))
     res          = 1200;
-elseif strfind   (options, '-LR')
+elseif ~isempty(regexp(options, '-LR','ONCE'))
     res          = 150;
 else
     res          = 300;
@@ -108,56 +108,64 @@ set              (gcf, ...
 if ~strcmp       (shineoptions, 'none')
     shine        (shineoptions);
 end
-
-if strfind       (options, '-png')
-    if ~isempty  (strfind (tname, '.png'))
+usedFormats = 0;
+if ~isempty(regexp(options, '-png','ONCE'))
+    if ~isempty  (regexp (tname, '.png','ONCE'))
         print    ('-dpng',   ...
             ['-r' (num2str (res))], [tpath tname]);
     else
         print    ('-dpng',   ...
             ['-r' (num2str (res))], [tpath tname '.png']);
     end
+    usedFormats = usedFormats +1;
 end
-if strfind       (options, '-jpg')
+if ~isempty(regexp(options, '-jpg','ONCE'))
     print        ('-djpeg',  ...
         ['-r' (num2str (res))], [tpath tname '.jpg']);
+    usedFormats = usedFormats +1;
 end
-if strfind       (options, '-tif')
-    if ~isempty  (strfind (tname, '.tif'))
+if ~isempty(regexp(options, '-tif','ONCE'))
+    if ~isempty  (regexp (tname, '.tif','ONCE'))
         print    ('-dtiff', ...
             ['-r' (num2str (res))], [tpath tname]);
     else
         print    ('-dtiff', ...
             ['-r' (num2str (res))], [tpath tname '.tif']);
     end    
+    usedFormats = usedFormats +1;
 end
-if strfind       (options, '-eps')
+if ~isempty(regexp(options, '-eps','ONCE'))
     %     print        ('-depsc2', [tpath tname '.eps']);
     print        ('-painters', '-depsc2', ...
         [tpath tname '.eps']);
+    usedFormats = usedFormats +1;
 end
-if strfind       (options, '-pdf')
-    if ~isempty  (strfind (tname, '.pdf'))
+if ~isempty(regexp(options, '-pdf','ONCE'))
+    if ~isempty  (regexp(tname, '.pdf','ONCE'))
         print    ('-painters', '-dpdf', ...
             ['-r' (num2str (res))], '-loose', [tpath tname]);
     else
         print    ('-painters', '-dpdf', ...
             ['-r' (num2str (res))], [tpath tname '.pdf']);
     end
+    usedFormats = usedFormats +1;
 end
-if strfind       (options, '-svg')
+if ~isempty(regexp(options, '-svg','ONCE'))
     axes         ( ...
         'Position',            [0.005 0.005 0.99 0.99], ...
         'xtick',               [], ...
         'ytick',               [], ...
         'box',                 'on');
     set          (gcf, 'children', flipud (get (gcf, 'children')));
-    if exist     ('plot2svg')
+    if exist('plot2svg','file')
         plot2svg ([tpath tname '.svg']);
     else
         warning  ('plot2svg not installed');
     end
+    usedFormats = usedFormats +1;
 end
 
-
+if ~usedFormats
+    error('No file format definition(s) found in option string "%s"',options)
+end
 
