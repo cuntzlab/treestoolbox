@@ -271,6 +271,10 @@ if strfind       (options, '-b')
         if (size (color, 2) == 3) && (size (color, 1) == 1)
             set  (HP, ...
                 'facecolor',   color); % map color
+        elseif (size (color, 2) == 3) && (size (color, 1) == numel(tree.X))
+            C = repmat (color, 1, 4); C = reshape (C', numel (C), 1);
+            C = reshape (C, 3,numel (C)/3)';
+            set (HP, 'facecolor','flat','edgecolor','flat','FaceVertexCData',C);
         end
     end
 end
@@ -425,7 +429,16 @@ if strfind       (options, '-p')
     if strfind   (options, '-thick')
         D        = D + 3;
     end
-    if isfield (tree, 'frustum') && (tree.frustum == 1)
+    
+    % if tree consists of only one point, plot a sphere instead of cylinder
+    if N == 1
+        [XS, YS, ZS] = sphere (16);
+        HP = surface (X1 + D * XS + DD (1),...
+            Y1 + D * YS + DD (2),...
+            Z1 + D * ZS + DD (3));
+        set (HP, 'edgecolor', 'none', 'facecolor', color);
+        return
+    elseif isfield (tree, 'frustum') && (tree.frustum == 1)
         threshold  = 0.15;
         % vector containing index to direct parent:
         idpar    = idpar_tree (intree);
