@@ -83,9 +83,9 @@ if ~isempty (strfind (options, '-b'))
     flag         = 0;
     % check if branch point directly at soma..check if this branchpoint is
     % just the axon (angle should be wider than 90°):
-    if 1 < numel (getchild_tree  (tree, 1))  
-        dr       = dir_tree      (tree);
-        ch       = getchild_tree (tree, 1);
+    if 1 < numel (idchild_tree  (tree, 1))  
+        dr       = direction_tree      (tree);
+        ch       = idchild_tree (tree, 1);
         if abs   (rad2deg (atan2 ( ...
                 norm (cross (dr (ch (1), :), dr (ch (2), :))), ...
                 dot (dr (ch (1), :), dr (ch (2), :))))) > 90
