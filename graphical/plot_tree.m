@@ -300,7 +300,7 @@ if ~isempty      ([ ...
                 color (color > 64) = 64;
             end
             map        = colormap;
-            colors     = map (color, :);
+            color     = map (color, :);
         end
     end
     if ~isempty  ([ ...
@@ -322,7 +322,7 @@ if ~isempty      ([ ...
         if size (color, 1) > 1
             for counter   = 1 : length (ipart)
                 set    (HP (counter), ...
-                    'color',   colors (counter, :));
+                    'color',   color (counter, :));
             end
         else
             set        (HP, ...
