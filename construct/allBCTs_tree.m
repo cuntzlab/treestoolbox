@@ -32,7 +32,7 @@
 % Uses       isBCT_tree BCT_tree sortLO_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2018  Hermann Cuntz
 
 function [BCTs, BCTtrees] = allBCTs_tree (N, options)
 

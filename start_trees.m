@@ -38,7 +38,7 @@
 % D:  [2252x1 double]
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2018  Hermann Cuntz
 
 % This file and all files in this package are part of the TREES toolbox.
 % 
@@ -67,7 +67,7 @@ PPPP         = PPPP  (1 : strfind (PPPP, 'start_trees.m') - 1);
 addpath      (genpath (PPPP));
 clear        PPPP
 
-display      ('the TREES toolbox  Copyright (C) 2009 - 2016  Hermann Cuntz');
+display      ('the TREES toolbox  Copyright (C) 2009 - 2018  Hermann Cuntz');
 display      ('This program comes with ABSOLUTELY NO WARRANTY.');
 display      ('This is free software, and you are welcome to redistribute it');
 display      ('under certain conditions. Type "type(''license.txt'')" for details.');
