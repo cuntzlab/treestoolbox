@@ -312,7 +312,7 @@ switch               format
         else
             N        = size (swc, 1);
             % check index in first column:
-            if sum   (swc (:, 1) ~= (1 : N)')
+            if any(swc (:, 1) ~= (1 : N)')
                 for counter = 2 : N
                     swc (counter, 7) = ...
                         find (swc (counter, 7) == swc (:, 1));
@@ -321,10 +321,7 @@ switch               format
             end
             % index to direct parent:
             idpar    = swc (:, 7);
-            dA       = sparse (N, N);
-            for counter = 2 : N
-                dA (counter, idpar (counter)) = 1;
-            end
+            dA       = sparse (2:N,idpar(2:N),ones(N-1,1),N, N);
             tree.dA  = dA;
             % X-locations of nodes on tree:
             tree.X   = swc (:, 3);
@@ -389,6 +386,23 @@ if strfind           (options, '-s')
     view         (3);
     grid         on;
     axis         image;
+end
+
+% check tree for loops
+if exist('graphisdag','file')
+    if iscell(tree)
+        for t = 1:numel(tree)
+            if  graphisdag(tree{t}.dA)
+                warning('Tree "%s" contains one or multiple loops, which should not be allowed for directed trees. Please fix them!',tree{t}.name)
+            end
+        end
+    else
+        if  graphisdag(tree.dA) 
+            warning('Tree contains one or multiple loops, which should not be allowed for directed trees. Please fix them!')
+        end
+    end
+else
+    warning('Could not check for loops in tree as required Matlab function "graphisdag" was not found. Please check on yourself')
 end
 
 if (nargout > 0)
