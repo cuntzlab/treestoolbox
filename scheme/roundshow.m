@@ -12,7 +12,11 @@
 %     {DEFAULT: 0.02 sec, fast == 0}
 % - options  ::string:
 %     '-p'   print
+%     '-v'   make video from animation, if the videoObj should be
+%     specified, add third argument
 %     {DEFAULT ''}
+%
+% - vidObj   a video object created by Matlabs VideoWriter function
 %
 % Output
 % ------
@@ -29,7 +33,7 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2017  Hermann Cuntz
 
-function roundshow (speed, options)
+function roundshow (speed, options,vidObj)
 
 if (nargin < 1) || isempty (speed)
     % {DEFAULT: 0.02 sec}
@@ -39,6 +43,13 @@ end
 if (nargin < 2) || isempty (options)
     % {DEFAULT: none}
     options      = '';
+end
+if strfind   (options, '-v')
+    if ~exist('vidObj','var')
+        vidObj = VideoWriter('roundshow.avi');
+        vidObj.Quality = 100;
+    end
+    open(vidObj);
 end
 
 for counter         = 0 : 5 : 360
@@ -52,5 +63,10 @@ for counter         = 0 : 5 : 360
         tprint   ( ...
             sprintf ('roundshow%0.3d.png', counter), ...
             '-HR-png', [], '-a');
+    elseif strfind   (options, '-v')
+        writeVideo(vidObj,getframe);
     end
+end
+if strfind   (options, '-v')
+    close(vidObj);
 end
