@@ -32,12 +32,12 @@
 % Uses xdend_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2018  Hermann Cuntz
 
 function varargout = BCT_tree (BCT, options)
 
 % trees : contains the tree structures in the trees package
-global trees
+global       trees
 
 if (nargin < 1) || isempty (BCT)
     BCT      = [1 2 1 0 2 0 0];

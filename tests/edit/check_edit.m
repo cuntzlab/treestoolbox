@@ -1,7 +1,7 @@
 %% check edit folder
 
 check_cat_tree
-check_delete_tree
+check_delete_tree%
 check_elim0_tree
 check_elimt_tree
 check_insert_tree

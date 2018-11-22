@@ -1,7 +1,7 @@
 % check construct folder
 
-check_allBCTS_tree;
-check_BCT_tree;
+check_allBCTS_tree;%
+check_BCT_tree;%
 check_clean_tree;
 % check_clone_tree;
 check_cplotter;

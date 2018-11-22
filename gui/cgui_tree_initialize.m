@@ -40,16 +40,18 @@ set (cgui.ui.F, 'KeyPressFcn', 'cgui_tree(''keymap'')');
 % there:
 cgui_tree_keys;
 
+
+% prevent closing
+set (cgui.ui.F, 'CloseRequestFcn', '');
+
 % activate mouse wheel
 try
-    set (cgui.ui.F, 'WindowScrollWheelFcn', {@cgui_mouse_tree, 'mouse_wheel'});
+    set (cgui.ui.F, 'WindowScrollWheelFcn', {@cgui_mousewheel_tree, 'mouse_wheel'});
 catch
     warndlg ({'No mouse wheel support,', 'use keyboard for zooming', ...
         'DEFAULT: q/Q e/E'});
 end
 
-% prevent closing
-set (cgui.ui.F, 'CloseRequestFcn', '');
 
 % activate mouse button
 set (cgui.ui.F, 'WindowButtonDownFcn', {@cgui_mouse_tree, 'mouse_bdown'});

@@ -310,6 +310,8 @@ switch               format
                 end
             end
         else
+            % sort to make sure node #1 comes first
+            swc      = sortrows (swc);
             N        = size (swc, 1);
             % check index in first column:
             if any(swc (:, 1) ~= (1 : N)')
