@@ -67,6 +67,9 @@ if nstart (end)  > 0
     tname (1 : nstart (end)) = '';
 end
 
+if ~exist(tpath,'dir')
+    mkdir(tpath)
+end
  % percent symbol makes problems with ghostscript:
 tname (strfind (tname, '%')) = 'p';
 
