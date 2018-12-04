@@ -6106,6 +6106,7 @@ switch action, % respond to mouse in dependence of edit/select/viewing mode
         end
     case 'mouse_stk_selector'       % edit-select mode: show which stack is ROIed:
         if ~isempty (cgui.stk.M)
+
             % get mouse cursor position and check which stack is closest
             [x y z cgui.stk.distance cgui.stk.active] = ...
                 close2cursor (cgui.stk.coord (:, 1), cgui.stk.coord (:, 2), ...
