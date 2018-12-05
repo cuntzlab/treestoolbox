@@ -322,8 +322,8 @@ switch               format
                 warning  ('index needs to be 1 .. n, correcting...');
             end
             % index to direct parent:
-            idpar    = swc    (:, 7);
-            dA       = sparse (2 : N, idpar (2 : N), ones (N - 1, 1), N, N);
+            idpar    = swc (:, 7);
+            dA       = sparse (2:N,idpar(2:N),ones(N-1,1),N, N);
             tree.dA  = dA;
             % X-locations of nodes on tree:
             tree.X   = swc (:, 3);
@@ -390,40 +390,12 @@ if strfind           (options, '-s')
     axis         image;
 end
 
-% % check tree for loops
-% if exist ('graphisdag', 'file')
-%     if iscell (tree)
-%         for t = 1 : numel (tree)
-%             if iscell (tree{t})
-%                 for t2 = 1 : numel (tree)
-%                     if  graphisdag (tree{t}{t2}.dA)
-%                         warning ([ ...
-%                             'Tree "%s" contains one or multiple loops, ' ...
-%                             'which should not be allowed for directed trees.'], ...
-%                             tree{t}{t2}.name);
-%                     end
-%                 end
-%             else
-%                 if  graphisdag (tree{t}.dA)
-%                     warning ([ ...
-%                         'Tree "%s" contains one or multiple loops, ' ...
-%                         'which should not be allowed for directed trees.'], ...
-%                         tree{t}.name);
-%                 end
-%             end
-%         end
-%     else
-%         if  graphisdag (tree.dA)
-%             warning    ([ ...
-%                 'Tree contains one or multiple loops,' ...
-%                 'which should not be allowed for directed trees.']);
-%         end
-%     end
-% else
-%     warning ([ ...
-%         'Could not check for loops in tree as required' ...
-%         'Matlab function "graphisdag" was not found.']);
-% end
+% check tree for loops
+if exist('graphisdag','file')
+    checkLoop(tree)
+else
+    warning('Could not check for loops in tree as required Matlab function "graphisdag" was not found. Please check on yourself')
+end
 
 if (nargout > 0)
     % if output is defined then it becomes the tree:
@@ -435,6 +407,16 @@ else
     trees{length (trees) + 1} = tree;
 end
 
+function checkLoop(tree)
+if iscell(tree)
+    for t = 1:numel(tree)
+        checkLoop(tree{t})
+    end
+else
+    if  ~graphisdag(tree.dA) 
+        warning('Tree %s contains one or multiple loops, which should not be allowed for directed trees. Please fix them!',tree.name)
+    end
+end
 
 
 
