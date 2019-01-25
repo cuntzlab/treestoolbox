@@ -268,47 +268,91 @@ switch               format
                 end
             end
         end
-        itree        = find (swc (:, 7) == -1);
-        if length    (itree) > 1
-            itree    = [itree; (size (swc, 1))];
-            tree     = cell (1, 1);
-            tcounter = 1;
-            for counter  = 1 : length (itree) - 1
-                iswc     = swc ( ...
-                    itree (counter) : ...
-                    itree (counter + 1) - 1, :);
-                N        = size (iswc, 1);
-                if N > 1
-                    iswc (:, 1)       = iswc (:, 1) - ...
-                        itree (counter) + 1;
-                    iswc (2 : end, 7) = iswc (2 : end, 7) - ...
-                        itree (counter) + 1;
-                    % check index in first column:
-                    if sum     (iswc (:, 1) ~= (1 : N)')
-                        error  ('index needs to be 1 .. n');
-                    end
-                    % vector containing index to direct parent:
-                    idpar    = iswc   (:, 7);
-                    dA       = sparse (N, N);
-                    for acounter = 2 : N
-                        dA (acounter, idpar (acounter)) = 1;
-                    end
-                    tree{tcounter}.dA = dA;
-                    % X-locations of nodes on tree:
-                    tree{tcounter}.X  = iswc (:, 3);
-                    % Y-locations of nodes on tree:
-                    tree{tcounter}.Y  = iswc (:, 4);
-                    % Z-locations of nodes on tree:
-                    tree{tcounter}.Z  = iswc (:, 5);
-                    % local diameter values of nodes on tree:
-                    tree{tcounter}.D  = iswc (:, 6) * 2;
-                    [i1, ~, i3]       = unique (iswc (:, 2));
-                    tree{tcounter}.R  = i3;
-                    tree{tcounter}.rnames = cellstr (num2str (i1))';
-                    tree{tcounter}.name   = [name '_' (num2str (counter))];
-                    tcounter   = tcounter + 1;
+        iroots        = find (swc (:, 7) == -1);
+        if length    (iroots) > 1
+            N        = size (swc, 1);
+            
+            idpar    = swc (:, 7);
+            R        = swc (:, 2);
+            X        = swc (:, 3);
+            Y        = swc (:, 4);
+            Z        = swc (:, 5);
+            D        = swc (:, 6) * 2;
+
+            
+            
+            
+            iroots   = find (idpar == -1);
+            indy     = 1 : N;
+            indy (iroots) = [];
+            oners    = ones (N, 1);
+            oners (iroots) = [];
+            dA       = sparse (indy, idpar (indy), oners, N, N);
+            
+            tree         = cell (1, length (iroots));
+            
+            for rcounter = 1 : length (iroots)
+                counter      = 1;
+                rooty           = dA (:, iroots (rcounter));
+                itree        = rooty;
+                inodes       = [(iroots (rcounter)); (find (itree))];
+                while sum (itree == 1) ~= 0
+                    counter  = counter + 1;
+                    % use adjacency matrix to walk through tree:
+                    itree    = dA * itree;
+                    inodes = [inodes; find(itree)];
                 end
+                inodes = sort (inodes);
+                tree{rcounter}.dA = dA (inodes, inodes);
+                tree{rcounter}.X = X (inodes);
+                tree{rcounter}.Y = Y (inodes);
+                tree{rcounter}.Z = Z (inodes);
+                tree{rcounter}.D = D (inodes);
+                [i1, ~, i3] = unique (R (inodes));
+                tree{rcounter}.R   = i3;
+                tree{rcounter}.rnames = cellstr (num2str (i1))';
+                tree{rcounter} = repair_tree (tree{rcounter});
             end
+% % if they are in order:            
+%             itree    = [itree; (size (swc, 1))];
+%             tree     = cell (1, 1);
+%             tcounter = 1;
+%             for counter  = 1 : length (itree) - 1
+%                 iswc     = swc ( ...
+%                     itree (counter) : ...
+%                     itree (counter + 1) - 1, :);
+%                 N        = size (iswc, 1);
+%                 if N > 1
+%                     iswc (:, 1)       = iswc (:, 1) - ...
+%                         itree (counter) + 1;
+%                     iswc (2 : end, 7) = iswc (2 : end, 7) - ...
+%                         itree (counter) + 1;
+%                     % check index in first column:
+%                     if sum     (iswc (:, 1) ~= (1 : N)')
+%                         error  ('index needs to be 1 .. n');
+%                     end
+%                     % vector containing index to direct parent:
+%                     idpar    = iswc   (:, 7);
+%                     dA       = sparse (N, N);
+%                     for acounter = 2 : N
+%                         dA (acounter, idpar (acounter)) = 1;
+%                     end
+%                     tree{tcounter}.dA = dA;
+%                     % X-locations of nodes on tree:
+%                     tree{tcounter}.X  = iswc (:, 3);
+%                     % Y-locations of nodes on tree:
+%                     tree{tcounter}.Y  = iswc (:, 4);
+%                     % Z-locations of nodes on tree:
+%                     tree{tcounter}.Z  = iswc (:, 5);
+%                     % local diameter values of nodes on tree:
+%                     tree{tcounter}.D  = iswc (:, 6) * 2;
+%                     [i1, ~, i3]       = unique (iswc (:, 2));
+%                     tree{tcounter}.R  = i3;
+%                     tree{tcounter}.rnames = cellstr (num2str (i1))';
+%                     tree{tcounter}.name   = [name '_' (num2str (counter))];
+%                     tcounter   = tcounter + 1;
+%                 end
+%             end
         else
             % sort to make sure node #1 comes first
             swc      = sortrows (swc);
@@ -323,7 +367,7 @@ switch               format
             end
             % index to direct parent:
             idpar    = swc (:, 7);
-            dA       = sparse (2:N,idpar(2:N),ones(N-1,1),N, N);
+            dA       = sparse (2 : N, idpar (2 : N), ones (N - 1, 1), N, N);
             tree.dA  = dA;
             % X-locations of nodes on tree:
             tree.X   = swc (:, 3);
@@ -391,10 +435,13 @@ if strfind           (options, '-s')
 end
 
 % check tree for loops
-if exist('graphisdag','file')
-    checkLoop(tree)
+if exist ('graphisdag', 'file')
+    checkLoop (tree)
 else
-    warning('Could not check for loops in tree as required Matlab function "graphisdag" was not found. Please check on yourself')
+    warning ([ ...
+        'Could not check for loops in tree as required ' ...
+        'Matlab function "graphisdag" was not found. ' ...
+        'Please check on yourself']);
 end
 
 if (nargout > 0)
@@ -407,14 +454,16 @@ else
     trees{length (trees) + 1} = tree;
 end
 
-function checkLoop(tree)
-if iscell(tree)
-    for t = 1:numel(tree)
-        checkLoop(tree{t})
+function checkLoop (tree)
+if iscell (tree)
+    for t = 1 : numel (tree)
+        checkLoop (tree{t})
     end
 else
-    if  ~graphisdag(tree.dA) 
-        warning('Tree %s contains one or multiple loops, which should not be allowed for directed trees. Please fix them!',tree.name)
+    if  ~graphisdag (tree.dA) 
+        warning (['Tree %s contains one or multiple loops, ' ...
+            'which should not be allowed for directed trees. ' ...
+            'Please fix them!'],tree.name);
     end
 end
 
