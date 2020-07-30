@@ -25,8 +25,10 @@
 % See also vonMises_tree
 % Uses cyl_tree ver_tree resample_tree
 %
+% Contributed by Alexander Bird (modified for TREES)
+%
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2019  Hermann Cuntz
+% Copyright (C) 2009 - 2020  Hermann Cuntz
 
 function [rootangle] = rootangle_tree (intree, options)
 
@@ -46,7 +48,7 @@ end
 ver_tree     (intree); % verify that input is a tree structure
 
 
-rtree=resample_tree(intree,1);
+rtree        = resample_tree (intree, 1);
 %------------------ Get pure root angles ----------------------------------
 
 [X1, X2, Y1, Y2, Z1, Z2]         = cyl_tree (rtree);
@@ -85,4 +87,5 @@ if strcmp (options, '-s')
     ylabel   ('Density');
 end
 
-end
+
+
