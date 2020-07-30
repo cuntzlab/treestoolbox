@@ -271,19 +271,20 @@ switch               format
         iroots        = find (swc (:, 7) == -1);
         if length    (iroots) > 1
             N        = size (swc, 1);
-            
+            indy     = (1 : N)';
+            inodes   = swc (:, 1);
             idpar    = swc (:, 7);
             R        = swc (:, 2);
             X        = swc (:, 3);
             Y        = swc (:, 4);
             Z        = swc (:, 5);
             D        = swc (:, 6) * 2;
-
-            
-            
-            
+            if sum (indy ~= inodes) > 0 % if node indices are not 1..N
+                M    = (inodes == idpar');
+                [a, b] = ind2sub (size (M), find (M));
+                idpar (b) = indy (a);
+            end
             iroots   = find (idpar == -1);
-            indy     = 1 : N;
             indy (iroots) = [];
             oners    = ones (N, 1);
             oners (iroots) = [];
@@ -434,15 +435,15 @@ if strfind           (options, '-s')
     axis         image;
 end
 
-% check tree for loops
-if exist ('graphisdag', 'file')
-    checkLoop (tree)
-else
-    warning ([ ...
-        'Could not check for loops in tree as required ' ...
-        'Matlab function "graphisdag" was not found. ' ...
-        'Please check on yourself']);
-end
+% % check tree for loops
+% if exist ('graphisdag', 'file')
+%     checkLoop (tree)
+% else
+%     warning ([ ...
+%         'Could not check for loops in tree as required ' ...
+%         'Matlab function "graphisdag" was not found. ' ...
+%         'Please check on yourself']);
+% end
 
 if (nargout > 0)
     % if output is defined then it becomes the tree:
@@ -454,18 +455,18 @@ else
     trees{length (trees) + 1} = tree;
 end
 
-function checkLoop (tree)
-if iscell (tree)
-    for t = 1 : numel (tree)
-        checkLoop (tree{t})
-    end
-else
-    if  ~graphisdag (tree.dA) 
-        warning (['Tree %s contains one or multiple loops, ' ...
-            'which should not be allowed for directed trees. ' ...
-            'Please fix them!'],tree.name);
-    end
-end
+% function checkLoop (tree)
+% if iscell (tree)
+%     for t = 1 : numel (tree)
+%         checkLoop (tree{t})
+%     end
+% else
+%     if  ~graphisdag (tree.dA) 
+%         warning (['Tree %s contains one or multiple loops, ' ...
+%             'which should not be allowed for directed trees. ' ...
+%             'Please fix them!'],tree.name);
+%     end
+% end
 
 
 
