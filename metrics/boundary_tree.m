@@ -1,8 +1,8 @@
 % BOUNDARY_TREE Produces spanning boundary of a tree.
 % (trees package)
 %
-% [bound] = boundary_tree(intree,c,options)
-% --------------------------------------
+% [bound] = boundary_tree (intree, c, options)
+% --------------------------------------------
 %
 % returns a boundary structure in two- or three- dimensions.
 %
@@ -12,7 +12,9 @@
 % - options::string: {DEFAULT: '-3d'}
 %     '-3d'  : three-dimensional triangulation
 %     '-2d'  : two-dimensional polygon
-% - c: convexity of intree: {DEFAULT: Unknown, calculated using conv_tree}
+%     '-s'   : Show boundary mesh
+% - c        : convexity of intree: 
+%    {DEFAULT: Unknown, calculated using convexity_tree}
 %
 % Output
 % -------
@@ -28,16 +30,18 @@
 % Uses convexity_tree
 %
 % the TREES toolbox: edit, visualize and analyze neuronal trees
-% Copyright (C) 2009 - 2018 Hermann Cuntz
+% Copyright (C) 2009 - 2022 Hermann Cuntz
 
-function [bound] = boundary_tree(intree,options,c)
+function [bound] = boundary_tree (intree,options,c)
 
 % trees : contains the tree structures in the trees package
 global       trees
+
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
 end
+
 ver_tree     (intree); % verify that input is a tree structure
 
 if (nargin < 2) || isempty (options)
@@ -47,26 +51,26 @@ end
 
 if (nargin < 3) || isempty (c)
     % {DEFAULT: convexity unknown}
-    [c]=convexity_tree(intree,options);
+    c = convexity_tree (intree, options);
 end
 
-S=1-c; % Optimal shrink factor
-if contains(options,'-2d') % Two-dimensional case    
-    X=intree.X;
-    Y=intree.Y;
+S                = 1 - c; % Optimal shrink factor
+if contains (options, '-2d') % Two-dimensional case    
+    X            = intree.X;
+    Y            = intree.Y;
     
-    [k,V]=boundary(X,Y,S);
+    [k, V]       = boundary (X, Y, S);
     
-    xv=X(k);
-    yv=Y(k);
+    xv           = X (k);
+    yv           = Y (k);
     
-    bound.xv=xv;
-    bound.yv=yv;
-    bound.V=V;
+    bound.xv     = xv;
+    bound.yv     = yv;
+    bound.V      = V;
 else    
-    X=intree.X;
-    Y=intree.Y;
-    Z=intree.Z;
+    X            = intree.X;
+    Y            = intree.Y;
+    Z            = intree.Z;
     
     [k,V]=boundary(X,Y,Z,S);
     

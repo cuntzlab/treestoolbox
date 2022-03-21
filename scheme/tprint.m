@@ -21,12 +21,13 @@
 %     '-eps' as eps  (more than one output format is possible!)
 %     {DEFAULT '-R -jpg'}
 % - fsize    ::2-tupel: fixed size in cm [horiz. x vertical]
-%     {DEFAULT 15cm x 10cm}
+%     {DEFAULT 8cm x 6cm}
 % - shineoptions ::string:
 %     '-a'   : axis invisible
 %     '-f'   : full axis
 %     '-s'   : scalebar in um
 %     '-p'   : camlight and lighting gouraud
+%     '-q'   : publication quality  
 %     '-3d'  : 3D view
 %     {DEFAULT: ''} , see shine
 %
@@ -75,17 +76,17 @@ tname (strfind (tname, '%')) = 'p';
 
 
 if (nargin < 2) || isempty (options)
-    options      = '-R';
+    options      = '-HR -q';
     switch       tname (end - 2 : end)
         case     {'pdf', 'eps', 'png', 'tif', 'svg'}
             options = strcat (options, ' -', tname (end - 2 : end));
         otherwise
-            options = strcat (options, ' -jpg');
+            options = strcat (options, ' -png');
     end
 end
 
 if (nargin < 3) || isempty (fsize)
-    fsize        = [15 10];
+    fsize        = [8 6];
 end
 
 if (nargin < 4) || isempty (shineoptions)
@@ -100,6 +101,19 @@ elseif ~isempty(regexp(options, '-LR','ONCE'))
     res          = 150;
 else
     res          = 300;
+end
+
+if contains (options, '-q')
+    set              (gca, ...
+        'ActivePositionProperty',  'position', ...
+        'position',                [0.2 0.2 0.75 0.75], ...
+        'XMinorTick',              'on', ...
+        'YMinorTick',              'on', ...
+        'ticklength',              [0.096 0.24] ./ max (fsize), ...
+        'tickdir',                 'out', ...
+        'linewidth',               0.5, ...
+        'fontsize',                6, ...
+        'fontname',                'arial');
 end
 
 set              (gcf, ...

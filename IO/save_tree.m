@@ -28,37 +28,38 @@
 % Uses
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2020  Hermann Cuntz
 
-function [tname path]  = save_tree (intree, tname)
+function [tname, path]  = save_tree (intree, tname)
 
 % trees : contains the tree structures in the trees package
-global trees
+global        trees
 
-if (nargin < 1)||isempty(intree),
-    tree = trees; % {DEFAULT: save entire trees cell array}
+if (nargin < 1) || isempty (intree)
+    tree      = trees; % {DEFAULT: save entire trees cell array}
 else
-    tree = intree;
-end;
+    tree      = intree;
+end
 
 % defining a name for the povray-tree
-if (nargin < 2)||isempty(tname),
-    [tname path] = uiputfile ('.mtr', 'save trees', 'tree.mtr');
-    if tname  == 0,
+if (nargin < 2) || isempty (tname)
+    [tname, path] = uiputfile ('.mtr', 'save trees', 'tree.mtr');
+    if tname  == 0
         tname = [];
         return
     end
 else
-    path = '';
-end
-% extract a sensible name from the filename string:
-nstart = unique ([0 strfind(tname, '/') strfind(tname, '\')]);
-if nstart (end) > 0,
-    path = [path tname(1 : nstart (end))];
-    tname(1 : nstart (end)) = '';
+    path      = '';
 end
 
-save ([path tname], 'tree', '-v7.3');
+% extract a sensible name from the filename string:
+nstart        = unique ([0 (strfind (tname, '/')) (strfind (tname, '\'))]);
+if nstart (end) > 0
+    path      = [path (tname (1 : nstart (end)))];
+    tname (1 : nstart (end)) = '';
+end
+
+save          ([path tname], 'tree', '-v7.3');
 
 
 

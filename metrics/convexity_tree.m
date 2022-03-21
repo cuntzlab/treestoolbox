@@ -26,8 +26,10 @@
 % See also boundary_tree
 % Uses T_tree B_tree ver_tree
 %
+% 
+%
 % the TREES toolbox: edit, visualize and analyze neuronal trees
-% Copyright (C) 2009 - 2018  Hermann Cuntz
+% Copyright (C) 2009 - 2022  Hermann Cuntz
 
 
 function[c]=convexity_tree(intree,options)

@@ -70,7 +70,7 @@ function cgui_tree (action)
 global cgui
 
 % if no action is defined initialize GUI (call "cgui_tree_initialize")
-if (nargin<1) || isempty (action), % initialization
+if (nargin<1) || isempty (action) % initialization
     action = 'initialize';
     % initializing the global variables of all panels
     
@@ -211,13 +211,13 @@ end
 % mtr_:     constructing trees in various ways (also fully automatic reconstr.)
 %           and - manual editing of the trees
 % plx_:     outside figure plots
-switch action,      % respond to actions arranged by ui panels:
+switch action      % respond to actions arranged by ui panels:
     case 'ui_close'             % quit the TREES toolbox GUI (only in menu)
         selection = questdlg ('Close TREES toolbox control center?',...
             'Close Request Function',...
             'Yes','No','Yes');
-        switch selection,
-            case 'Yes',
+        switch selection
+            case 'Yes'
                 delete (cgui.ui.F);
                 if strcmp(get(cgui.cat.tautosave,'Running'),'on')
                     stop(cgui.cat.tautosave)
@@ -237,8 +237,8 @@ switch action,      % respond to actions arranged by ui panels:
         skl.S = cgui.skl.S;
         % save all about trees:
         cgui_tree ('cat_update'); supercat.trees = cgui.cat.trees;
-        [name path] = uiputfile ('.tw1', 'save workspace', 'workspace.tw1');
-        if name ~= 0, % if a filename has been chosen
+        [name, path] = uiputfile ('.tw1', 'save workspace', 'workspace.tw1');
+        if (name ~= 0) % if a filename has been chosen
             % save the variables in a matlab workspace file, extension:
             % ".tw1"
             save ([path name], 'stk', 'thr', 'skl', 'supercat');
@@ -257,20 +257,26 @@ switch action,      % respond to actions arranged by ui panels:
         set (cgui.stk.ui.ed_vox3,  'string', '1'); % voxel resolution  z
         cgui_tree ('stk_clear_all'); % clear all stacks
         % clear skeletonization variables:
-        cgui.skl.I  = []; cgui.skl.BI  = []; cgui.skl.DI  = [];
-        cgui.skl.LI = []; cgui.skl.CI  = [];
-        cgui.skl.CN = []; cgui.skl.tCN = []; cgui.skl.dCN = [];
+        cgui.skl.I  = [];
+        cgui.skl.BI  = [];
+        cgui.skl.DI  = [];
+        cgui.skl.LI = [];
+        cgui.skl.CI  = [];
+        cgui.skl.CN = [];
+        cgui.skl.tCN = [];
+        cgui.skl.dCN = [];
         cgui_tree ('skl_clear');     % clear soma locations
         cgui_tree ('vis_cla');       % redraw everything
         % inactivate all editor panels:
-        cgui_tree ('stk_showpanels'); cgui_tree ('skl_showpanels');
+        cgui_tree ('stk_showpanels');
+        cgui_tree ('skl_showpanels');
         cgui_tree ('mtr_showpanels');
         % echo on text frame of vis_ panel:
         set (cgui.vis.ui.txt1, 'string', {'cleared workspace'});
     case 'ui_load'              % load a previously saved TREES workspace (.tw1)
         % (.tw1 is the currently used format for cgui_tree)
-        [name path] = uigetfile ('.tw1', 'load workspace', 'workspace.tw1');
-        if (name ~= 0), % if a filename has been chosen
+        [name, path] = uigetfile ('.tw1', 'load workspace', 'workspace.tw1');
+        if (name ~= 0) % if a filename has been chosen
             data = load ([path name], '-mat');
             cgui_tree ('ui_clear_all'); % first clear the full workspace
             % read out data (see 'ui_save' action):
