@@ -59,7 +59,7 @@
 % See also rpoints_tree quaddiameter_tree BCT_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2022  Hermann Cuntz
 
 function [tree, indx] = MST_tree (msttrees, X, Y, Z, bf, ...
     thr, mplen, DIST, options)
@@ -149,14 +149,14 @@ if ~isempty      (DIST)
     end
 end
 
-if strfind       (options, '-t')  % time lapse save
+if contains       (options, '-t')  % time lapse save
     timetrees    = cell (lent, 1);
     for countert = 1 : lent
         timetrees{countert}{1} = msttrees{countert};
     end
 end
 
-if strfind       (options, '-s')  % prepare a plot if showing
+if contains       (options, '-s')  % prepare a plot if showing
     clf;
     % choose colors for the different trees:
     colors       = [ ...
