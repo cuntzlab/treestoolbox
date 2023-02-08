@@ -34,7 +34,7 @@
 % Uses       ipar_tree T_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [xdend, tree] = xdend_tree (intree, options)
 
@@ -67,10 +67,10 @@ di               = [0; (diff (i1))];
 idi              = [(diff (i1)); 1];
 minT             = b (di  == 1);
 maxT             = b (idi == 1);
-maxT             = maxT (2 : length (maxT));
+maxT             = maxT (2 : length (maxT)); 
 xdend            = (maxT + minT) ./ 2;     % there you go
 
-if (nargout > 1) || ~isempty (strfind (options, '-s'))
+if (nargout > 1) || contains (options, '-s')
     if ~isstruct (intree)
         tree     = trees{intree};
     else
@@ -79,6 +79,7 @@ if (nargout > 1) || ~isempty (strfind (options, '-s'))
     angle        = pi - 2 * pi * xdend ./ max (xdend);
     N            = length (xdend);
     PL           = PL_tree (tree);
+    angle        = [0; angle];
     if isfield   (tree, 'X')
         len      = len_tree (tree);
         tree.X   = cos   (angle) .* PL;
@@ -95,19 +96,22 @@ if (nargout > 1) || ~isempty (strfind (options, '-s'))
         len      = 10 * ones (N, 1);
     end
     % (avoid showing result as well but conserve waitbar)
-    if strfind   (options, '-w')
+    if contains  (options, '-w')
         tree     = morph_tree (tree, len, '-w');
     else
         tree     = morph_tree (tree, len, 'none');
     end
 end
 
-if strfind       (options, '-s') % show option
-    clf; hold on;
+if contains      (options, '-s') % show option
+    clf;
+    hold         on;
     HP           = plot_tree (intree, [], -150);
-    set          (HP, 'facealpha', .5);
+    set          (HP, ...
+        'facealpha',           0.5);
     HP           = plot_tree (tree,   [1 0 0]);
-    set          (HP, 'facealpha', .5);
+    set          (HP, ...
+        'facealpha',           0.5);
     xlabel       ('x [\mum]');
     ylabel       ('y [\mum]');
     zlabel       ('z [\mum]');
