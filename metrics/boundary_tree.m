@@ -13,7 +13,7 @@
 %     '-3d'  : three-dimensional triangulation
 %     '-2d'  : two-dimensional polygon
 %     '-s'   : Show boundary mesh
-% - c        : convexity of intree: 
+% - c        : convexity of intree:
 %    {DEFAULT: Unknown, calculated using convexity_tree}
 %
 % Output
@@ -55,25 +55,25 @@ if (nargin < 3) || isempty (c)
 end
 
 S                = 1 - c; % Optimal shrink factor
-if contains (options, '-2d') % Two-dimensional case    
+if contains (options, '-2d') % Two-dimensional case
     X            = intree.X;
     Y            = intree.Y;
-    
+
     [k, V]       = boundary (X, Y, S);
-    
+
     xv           = X (k);
     yv           = Y (k);
-    
+
     bound.xv     = xv;
     bound.yv     = yv;
     bound.V      = V;
-else    
+else
     X            = intree.X;
     Y            = intree.Y;
     Z            = intree.Z;
-    
+
     [k,V]=boundary(X,Y,Z,S);
-    
+
     figure
     F=gcf;
     h=trisurf(k,X,Y,Z);
