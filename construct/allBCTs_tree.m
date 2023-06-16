@@ -29,10 +29,10 @@
 %
 %
 % See also   BCT_tree
-% Uses       isBCT_tree BCT_tree sortLO_tree
+% Uses       isBCT_tree BCT_tree sort_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2018  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [BCTs, BCTtrees] = allBCTs_tree (N, options)
 
@@ -47,7 +47,7 @@ if (nargin < 2) || isempty (options)
 end
 
 MT               = [];
-if strfind       (options, '-w')     % waitbar option: initialization
+if contains       (options, '-w')     % waitbar option: initialization
     if ((3^N) - 1) > 19998
         HW       = waitbar (0, 'trying out BCT strings...');
         set      (HW, 'Name', '..PLEASE..WAIT..YEAH..');
@@ -55,7 +55,7 @@ if strfind       (options, '-w')     % waitbar option: initialization
 end
 for counter      = 0 : (3^N) - 1
     % waitbar option: update:
-    if strfind   (options, '-w')
+    if contains   (options, '-w')
         if  (mod (counter, 20000) == 19999)
             waitbar (counter / ((3^N) - 1), HW);
         end
@@ -67,14 +67,14 @@ for counter      = 0 : (3^N) - 1
         MT       = [MT; BCT];
     end
 end
-if strfind       (options, '-w')     % waitbar option: close
+if contains       (options, '-w')     % waitbar option: close
     if ((3^N) - 1) > 19998
         close    (HW);
     end
 end
 
 MT2              = zeros (size (MT, 1), N);
-for counter      = 1 : size (MT, 1),
+for counter      = 1 : size (MT, 1)
     BCT          = MT (counter, :);
     tree         = BCT_tree  (BCT,  '-dA'); % create tree from BCT string
     tree         = sort_tree (tree, '-LO'); % sort in a unique way
@@ -82,14 +82,14 @@ for counter      = 1 : size (MT, 1),
 end
 
 BCTs             = unique (MT2, 'rows'); % get rid of duplicates
-if (nargout > 1) || ~isempty (strfind (options, '-s'))
+if (nargout > 1) || contains (options, '-s')
     BCTtrees     = cell (1,  size (BCTs, 1));
     for counter  = 1 : size (BCTs, 1)
         BCTtrees{counter} = BCT_tree (BCTs (counter, :));
     end
 end
 
-if strfind       (options, '-s') % show option
+if contains       (options, '-s') % show option
     clf; hold on;
     dd           = spread_tree (BCTtrees);
     for counter  = 1 : length  (BCTtrees)

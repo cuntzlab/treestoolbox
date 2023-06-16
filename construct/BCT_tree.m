@@ -32,7 +32,7 @@
 % Uses xdend_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2018  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function varargout = BCT_tree (BCT, options)
 
@@ -79,19 +79,20 @@ tree             = [];
 tree.dA          = dA;
 
 % add metrics if not explicitly unwanted
-if isempty       (strfind (options, '-dA'))
-    if strfind   (options, '-w')
+if ~contains     (options, '-dA')
+    if contains  (options, '-w')
         [~, tree] = xdend_tree (tree, '-w');
     else
         [~, tree] = xdend_tree (tree, 'none');
     end
 end
 
-if strfind       (options, '-s') % show option
-    clf; hold on;
-    if strfind   (options, '-dA'),
+if contains      (options, '-s') % show option
+    clf;
+    hold         on;
+    if contains  (options, '-dA'),
         dendrogram_tree (tree, [], PL_tree (tree));
-        axis off;
+        axis     off;
     else
         plot_tree    (tree);
         pointer_tree ([0 0 0]);
@@ -109,4 +110,6 @@ else
     % otherwise add to end of trees cell array
     trees{(length (trees) + 1)} = tree;
 end
+
+
 

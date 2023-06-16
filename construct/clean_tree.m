@@ -34,7 +34,7 @@
 % Uses sort_tree idpar_tree ver_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function tree = clean_tree (intree, radius, options)
 
@@ -44,7 +44,7 @@ global trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length(trees);
-end;
+end
 ver_tree (intree); % verify that input is a tree structure
 
 if (nargin < 2) || isempty (radius)
@@ -67,7 +67,7 @@ iBpar            = [];
 idpar            = idpar_tree (tree);
 IFFER            = [];
 if length (iT)   > 1
-    if strfind   (options, '-w') % waitbar option: initialization
+    if contains   (options, '-w') % waitbar option: initialization
         if length (iT) > 499
             HW   = waitbar (0, 'cleaning the tree...');
             set  (HW, 'Name', '..PLEASE..WAIT..YEAH..');
@@ -75,7 +75,7 @@ if length (iT)   > 1
     end
     for counter  = 1 : length (iT)
         % waitbar option: update:
-        if strfind (options, '-w')
+        if contains (options, '-w')
             if   (mod (counter, 500) == 0)
                  waitbar (counter / length (iT), HW);
             end
@@ -97,7 +97,7 @@ if length (iT)   > 1
             IFFER  = [IFFER ibranch];
         end
     end
-    if strfind   (options, '-w') % waitbar option: close
+    if contains   (options, '-w') % waitbar option: close
         if length (iT) > 499
             close (HW);
         end
@@ -108,8 +108,9 @@ if ~isempty      (IFFER)
     tree         = delete_tree (tree, IFFER); % delete all unwanted points
 end
 
-if strfind       (options, '-s')
-    clf; hold on;
+if contains       (options, '-s')
+    clf;
+    hold         on;
     plot_tree    (intree, [],      [], [], [], '-3l');
     plot_tree    (tree,   [1 0 0], [], [], [], '-3l');
     HP (1)       = plot (1, 1, 'k-');
@@ -129,4 +130,6 @@ if (nargout == 0) && ~(isstruct (intree))
     % otherwise the original tree in trees is replaced
     trees {intree} = tree;
 end
+
+
 

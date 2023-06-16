@@ -30,7 +30,7 @@
 % Uses
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function HP  = cplotter (c, color, DD)
 
@@ -48,21 +48,21 @@ if length (DD) < 3
     DD       = [DD (zeros (1, 3 - length (DD)))];
 end
 
-hold         on;
-iic          = 1;
-counter      = 1;
-HP           = [];
-while iic    < size (c, 1)
-    ic       = c (iic, 2);
-    CC       = c (iic + 1 : iic + ic, :);
+hold             on;
+iic              = 1;
+counter          = 1;
+HP               = [];
+while (iic  < size (c, 1))
+    ic           = c (iic, 2);
+    CC           = c (iic + 1 : iic + ic, :);
     HP (counter) = plot3 ( ...
         CC (:, 1) + DD (1), ...
         CC (:, 2) + DD (2), ...
         ones (size (CC, 1), 1) .* DD (3), 'k');
-    iic      = iic + ic + 1;
-    counter  = counter + 1;
+    iic          = iic + ic + 1;
+    counter      = counter + 1;
 end
-set          (HP, ...
+set              (HP, ...
     'color',                   color);
 
 

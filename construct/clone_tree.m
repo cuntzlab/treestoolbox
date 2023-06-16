@@ -40,7 +40,7 @@
 % Uses MST_tree rpoints_tree quaddiameter_tree gscale_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function ctrees = clone_tree (intrees, num, bf, options)
 
@@ -75,7 +75,7 @@ Rother           = find ( ...
     ~strcmp (spanning.regions, 'axon')   & ...
     ~strcmp (spanning.regions, 'soma'));
 
-if strfind       (options, '-w') % waitbar option: initialization
+if contains      (options, '-w') % waitbar option: initialization
     HW           = waitbar (0, 'creating clones one by one...');
     set          (HW, 'Name', '..PLEASE..WAIT..YEAH..');
 end
@@ -83,7 +83,7 @@ end
 % store synthetic trees:
 ctrees           = cell (1, num);
 for counterN     = 1 : num
-    if strfind   (options, '-w') % waitbar option: update
+    if contains  (options, '-w') % waitbar option: update
         waitbar  (counterN / num, HW);
     end
     if ~isempty  (Rsoma)
@@ -106,7 +106,7 @@ for counterN     = 1 : num
             +        mean (spanning.ylims{Rsoma}(:, 1))); ...
             (randn * std  (spanning.ylims{Rsoma}(:, 2)) ...
             +        mean (spanning.ylims{Rsoma}(:, 2)))];
-        if isempty (strfind (options, '-2d'))
+        if ~contains (options, '-2d')
             ZL   = [ ...
                 (randn * std  (spanning.zlims{Rsoma}(:, 1)) ...
                 +        mean (spanning.zlims{Rsoma}(:, 1))); ...
@@ -125,7 +125,7 @@ for counterN     = 1 : num
         Dmax     = randn * std (maxD) + mean (maxD);
         if Dmax  < (mean (maxD) - std (maxD))
             Dmax = mean (maxD);
-        end;
+        end
         Dlen     = sum (len_tree (tree));
         tree.R   = tree.R * 0 + 2;
         tree.rnames = {'new', 'soma'};
@@ -214,7 +214,7 @@ for counterN     = 1 : num
             (max (ZT (ifar)) - min (ZT (ifar)))]) / 30);
         if SR    == 0
             SR   = 1;
-        end;
+        end
         [M, dX, dY, dZ] = gdens_tree ( ...
             [(XT (ifar)) (YT (ifar)) (ZT (ifar))], SR, [], 'none');
         % distribute 2/3 of points there:
@@ -439,12 +439,13 @@ for counterN     = 1 : num
     ctrees{counterN}   = btree;
 end
 
-if strfind   (options, '-w') % waitbar option: close
-    close    (HW);
+if contains      (options, '-w') % waitbar option: close
+    close        (HW);
 end
 
-if strfind   (options, '-s') % waitbar option: close
-    clf; hold on;
+if contains      (options, '-s') % waitbar option: close
+    clf;
+    hold         on;
     if length    (intrees) > 1
         plot_tree (intrees{1});
     else
@@ -462,3 +463,6 @@ if strfind   (options, '-s') % waitbar option: close
     grid         on;
     axis         image;
 end
+
+
+

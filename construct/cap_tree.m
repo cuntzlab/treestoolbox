@@ -27,10 +27,10 @@
 % See also soma_tree
 % Uses ver_tree X Y Z
 %
-% contributed by Marcel Beining, 2017
+% Contributed by Marcel Beining, 2017
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function varargout = cap_tree (intree, options)
 % INACT-so : define soma???
@@ -41,7 +41,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 ver_tree     (intree);
 
@@ -144,5 +144,6 @@ end
 if (nargout >= 2)
     varargout{2}  = idpar;
 end
+
 
 
