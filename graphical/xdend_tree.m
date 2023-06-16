@@ -70,6 +70,8 @@ maxT             = b (idi == 1);
 maxT             = maxT (2 : length (maxT)); 
 xdend            = (maxT + minT) ./ 2;     % there you go
 
+% Now if you want to build a standard tree that disregards the existing
+% spatial embedding use this, but this doesn't seem to work...
 if (nargout > 1) || contains (options, '-s')
     if ~isstruct (intree)
         tree     = trees{intree};
@@ -79,7 +81,7 @@ if (nargout > 1) || contains (options, '-s')
     angle        = pi - 2 * pi * xdend ./ max (xdend);
     N            = length (xdend);
     PL           = PL_tree (tree);
-    angle        = [0; angle];
+    % angle        = [0; angle];
     if isfield   (tree, 'X')
         len      = len_tree (tree);
         tree.X   = cos   (angle) .* PL;
