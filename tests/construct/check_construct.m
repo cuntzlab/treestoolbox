@@ -1,9 +1,11 @@
 % check construct folder
 
 check_allBCTS_tree;%
+% check_allBTs_tree; That really doesn't work??
 check_BCT_tree;%
+check_cap_tree;
 check_clean_tree;
-% check_clone_tree;
+check_clone_tree;
 check_cplotter;
 check_cpoints;
 check_gscale_tree;
@@ -18,7 +20,8 @@ check_smooth_tree;
 check_soma_tree;
 check_spines_tree;
 
-
+% Missing still:
+% check_dscam_tree
 
 
 

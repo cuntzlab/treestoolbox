@@ -19,7 +19,7 @@
 % - options  ::string:
 %     '-s' : show plot
 %     '-w' : with waitbar
-%     {DEFAULT '-w'}
+%     {DEFAULT ''}
 %
 % Output
 % ------
@@ -37,7 +37,7 @@
 % Uses
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [spanning, ctrees] = gscale_tree (intrees, options)
 
@@ -50,10 +50,10 @@ if (nargin < 1) || isempty (intrees)
 end
 
 if (nargin < 2) || isempty (options)
-    options  = '-w';
+    options  = 'none';
 end
 
-for counterT = 1 : length (intrees)
+for counterT     = 1 : length (intrees)
     intrees {counterT} = tran_tree (intrees{counterT});
 end
 
@@ -76,22 +76,22 @@ spanning.zmass   = cell   (1, lenr);
 spanning.iR      = cell   (1,    1);
 spanning.nBT     = cell   (1,    1);
 dR               = zeros  (1, lenr); % empty region flag
-if strfind       (options, '-w') % waitbar option: initialization
+if contains      (options, '-w') % waitbar option: initialization
     HW           = waitbar (0, ...
         'scanning spanning fields region by region...');
     set          (HW, ...
         'Name',                '..PLEASE..WAIT..YEAH..');
 end
 for counterR     = 1 : length (spanning.regions);
-    if strfind   (options, '-w') % waitbar option: update
+    if contains  (options, '-w') % waitbar option: update
         waitbar  (counterR / length (spanning.regions), HW);
     end
     flag         = 0;
-    for counterT  = 1 : length (intrees)
+    for counterT = 1 : length (intrees)
         iR0      = find (strcmp ( ...
             intrees{counterT}.rnames, ...
             spanning.regions{counterR}));
-        if ~isempty  (iR0)
+        if ~isempty (iR0)
             % read out index values for each region in each cell:
             spanning.iR{counterR}{counterT} = ...
                 find (intrees{counterT}.R == iR0);
@@ -187,7 +187,7 @@ end
 % parameters:
 qtrees           = cell (1, 1);
 for counterT     = 1 : length (intrees)
-    if strfind   (options, '-w') % waitbar option: update
+    if contains  (options, '-w') % waitbar option: update
         waitbar  (counterT / length (intrees), HW);
     end
     qtrees{counterT} = quaddiameter_tree (intrees {counterT});
@@ -197,7 +197,7 @@ end
 % (can be expanded):
 spanning.wriggles = zeros (length (intrees), 2);
 for counterT     = 1 : length (intrees)
-    if strfind   (options, '-w'), % waitbar option: update
+    if contains  (options, '-w'), % waitbar option: update
         waitbar  (counterT / length (intrees), HW);
     end
     tree         = intrees{counterT};
@@ -210,7 +210,7 @@ end
 
 % delete emptyregions:
 emptyregion      = find (dR);
-for counterR         = 1 : length (emptyregion)
+for counterR     = 1 : length (emptyregion)
     spanning.regions (emptyregion (counterR)) = [];
     spanning.xlims   (emptyregion (counterR)) = [];
     spanning.ylims   (emptyregion (counterR)) = [];
@@ -229,27 +229,27 @@ spanning.mydiff      = zeros (lenr, 1);
 spanning.stdydiff    = zeros (lenr, 1);
 spanning.mzdiff      = zeros (lenr, 1);
 spanning.stdzdiff    = zeros (lenr, 1);
-for counterR             = 1 : lenr
+for counterR         = 1 : lenr
     % readout mean and standard deviation of spanning hull limits:
     isy              = ~isnan ( ...
         spanning.xlims{counterR} (:, 1));
     spanning.mxdiff  (counterR) = ...
         mean (diff (spanning.xlims{counterR} (isy, :), [], 2));
-    if spanning.mxdiff  (counterR) == 0,
+    if spanning.mxdiff  (counterR) == 0
         spanning.mxdiff (counterR) = 1;
     end
     spanning.stdxdiff   (counterR) = ...
         std  (diff (spanning.xlims{counterR} (isy, :), [], 2));
     spanning.mydiff     (counterR) = ...
         mean (diff (spanning.ylims{counterR} (isy, :), [], 2));
-    if spanning.mydiff  (counterR) == 0,
+    if spanning.mydiff  (counterR) == 0
         spanning.mydiff (counterR) = 1;
     end
     spanning.stdydiff   (counterR) = ...
         std  (diff (spanning.ylims{counterR} (isy, :), [], 2));
     spanning.mzdiff     (counterR) = ...
         mean (diff (spanning.zlims{counterR} (isy, :), [], 2));
-    if spanning.mzdiff  (counterR) == 0,
+    if spanning.mzdiff  (counterR) == 0
         spanning.mzdiff (counterR) = 1;
     end
     spanning.stdzdiff  (counterR) = ...
@@ -261,7 +261,7 @@ spanning.Y       = cell (1, 1);
 spanning.Z       = cell (1, 1);
 spanning.qdiam   = cell (1, 1);
 for counterR     = 1 : length (spanning.regions);
-    if strfind   (options, '-w') % waitbar option: update
+    if contains  (options, '-w') % waitbar option: update
         waitbar  (counterR / length (spanning.regions), HW);
     end
     spanning.qdiam{counterR} = [];
@@ -332,25 +332,47 @@ end
 
 spanning.mnBT    = zeros (lenr, 1);
 spanning.stdnBT  = zeros (lenr, 1);
-for counterR         = 1 : lenr
+for counterR     = 1 : lenr
     spanning.mnBT   (counterR) = mean (cat (2, spanning.nBT{counterR}{:}));
     spanning.stdnBT (counterR) = std  (cat (2, spanning.nBT{counterR}{:}));
 end
 
-if strfind       (options, '-w') % waitbar option: close
+if contains      (options, '-w') % waitbar option: close
     close        (HW);
 end
 
-if strfind       (options, '-s')
-    clf; hold on;
-    cX           = ...
-        [0 0 0 0; 0 1 1 0; 0 1 1 0; 1 1 0 0; 1 1 0 0; 1 1 1 1] - 0.5;
-    cY           = ...
-        [0 0 1 1; 0 0 1 1; 1 1 1 1; 0 1 1 0; 0 0 0 0; 0 0 1 1] - 0.5;
-    cZ           = ...
-        [0 1 1 0; 0 0 0 0; 1 1 0 0; 1 1 1 1; 1 0 0 1; 0 1 1 0] - 0.5;
-    colors       = [[0 0 0]; [1 0 0]; [0 1 0]; [0 0 1]];
-    colors       = [colors; (rand (lenr - 4, 3))];
+if contains      (options, '-s')
+    clf;
+    hold         on;
+    cX           = [ ...
+        0 0 0 0; ...
+        0 1 1 0; ...
+        0 1 1 0; ...
+        1 1 0 0; ...
+        1 1 0 0; ...
+        1 1 1 1] - 0.5;
+    cY           = [ ...
+        0 0 1 1; ...
+        0 0 1 1; ...
+        1 1 1 1; ...
+        0 1 1 0; ...
+        0 0 0 0; ...
+        0 0 1 1] - 0.5;
+    cZ           = [ ...
+        0 1 1 0; ...
+        0 0 0 0; ...
+        1 1 0 0; ...
+        1 1 1 1; ...
+        1 0 0 1; ...
+        0 1 1 0] - 0.5;
+    colors       = [ ...
+        0 0 0; ...
+        1 0 0; ...
+        0 1 0; ...
+        0 0 1];
+    colors       = [ ...
+        colors; ...
+        (rand (lenr - 4, 3))];
     for counterR = 1 : lenr
         HP       = patch ( ...
             mean (spanning.xmass{counterR}) + ...
@@ -397,3 +419,6 @@ if strfind       (options, '-s')
     grid         on;
     axis         image;
 end
+
+
+
