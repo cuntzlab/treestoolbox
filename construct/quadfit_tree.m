@@ -30,7 +30,7 @@
 % Uses quaddiameter_tree fminsearch
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function  [P0, tree] = quadfit_tree (intree, options)
 
@@ -49,24 +49,25 @@ if (nargin < 2) || isempty (options)
     options  = '';
 end
 
-if strfind       (options, '-w')   % waitbar option: initialization
-    HW           = waitbar (0.3, 'fitting quad diameter...');
-    set          (HW, ...
+if contains  (options, '-w')   % waitbar option: initialization
+    HW       = waitbar (0.3, 'fitting quad diameter...');
+    set      (HW, ...
         'Name',                '..PLEASE..WAIT..YEAH..');
 end
 
 P0               = fminsearch (@(P) qfit (P, intree), rand (1, 2));
 
-if strfind       (options, '-w')   % waitbar option: close
+if contains      (options, '-w')   % waitbar option: close
     close        (HW);
 end
 
-if (nargout > 1) || ~isempty (strfind (options, '-s')),
-    tree         = quaddiameter_tree (intree, P0(1), P0(2), 'none');
+if (nargout > 1) || contains (options, '-s')
+    tree         = quaddiameter_tree (intree, P0 (1), P0 (2), 'none');
 end
 
-if strfind       (options, '-s') % show option
-    clf; hold on;
+if contains      (options, '-s') % show option
+    clf;
+    hold         on;
     plot_tree    (tree,   [1 0 0]);
     plot_tree    (intree, [0 0 0], 20);
     HP (1)       = plot (1, 1, 'k-');
@@ -84,7 +85,7 @@ end
 end
 
 function err     = qfit (P, intree)
-qtree            = quaddiameter_tree (intree, P(1), P(2));
+qtree            = quaddiameter_tree (intree, P (1), P (2));
 err              = norm (intree.D - qtree.D);
 end
 

@@ -45,7 +45,7 @@
 % Uses Pvec_tree ipar_tree T_tree ver_tree dA D
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function  varargout = quaddiameter_tree (intree, scale, offset, options, ...
     P, ldend)
@@ -85,14 +85,14 @@ end
 if (nargin < 5) || isempty (P)
     % {DEFAULT: parameters calculated for optimal current transfer for
     % branches on their own}
-    load     P
+    load     quaddiameter_P P
 end
 
 if (nargin < 6) || isempty (ldend)
     % {DEFAULT: length values of branches for which P is given
     % quaddiameter_tree uses the P whos ldend is closest to the
     % path length for each path to termination point}
-    load     ldend
+    load     quaddiameter_ldend ldend
 end
 
 N            = size (tree.dA, 1); % number of nodes in tree
@@ -104,7 +104,7 @@ ipari        = [(1 : N)' (ipar_tree (tree))];
 % parent index paths but only for termination nodes:
 ipariT       = ipari (T_tree (tree), :);
 
-if strfind   (options, '-w')      % waitbar option: initialization
+if contains  (options, '-w')      % waitbar option: initialization
     HW       = waitbar ( ...
         0,                     'calculating quad diameter...');
     set      (HW, ...
@@ -113,7 +113,7 @@ end
 
 Ds               = zeros (size (ipariT));
 for counter      = 1    : size (ipariT, 1)
-    if strfind   (options, '-w')    % waitbar option: update
+    if contains   (options, '-w')    % waitbar option: update
         if mod   (counter, 500) == 0
             waitbar (counter / size (ipariT, 1), HW);
         end
@@ -128,7 +128,7 @@ for counter      = 1    : size (ipariT, 1)
     Ds (counter, 1 : length (quadpathh)) = fliplr (quadpathh);
 end
 
-if strfind       (options, '-w')      % waitbar option: close
+if contains      (options, '-w')      % waitbar option: close
     close        (HW);
 end
 
@@ -141,7 +141,7 @@ end
 
 tree.D           = tree.D + offset; % add offset diameter
 
-if strfind       (options, '-s') % show option
+if contains      (options, '-s') % show option
     clf; hold on;
     plot_tree    (intree, [0 0 0]);
     plot_tree    (tree,   [1 0 0]);
