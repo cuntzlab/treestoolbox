@@ -32,7 +32,7 @@
 % Uses ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function varargout = elimt_tree (intree, options)
 
@@ -63,7 +63,7 @@ num              = size (dA, 1);       % number of nodes in tree
 sumdA            = ones (1, num) * dA; % actually faster than sum (dA)!
 idpar            = idpar_tree (tree);
 itrif            = find (sumdA > 2);   % find trifurcations
-if strfind       (options, '-0')       % do not eliminate root trifurcation
+if contains      (options, '-0')       % do not eliminate root trifurcation
     itrif        = setdiff (itrif, find ((dA * ones (num, 1)) == 0));
 end
 
@@ -95,7 +95,7 @@ for counter      = 1 : length (itrif)
         if ~strcmp (S{counterS}, 'dA')
             vec  = tree.(S{counterS});
             if isvector (vec) && isnumeric (vec) && (numel (vec) == N)
-                if strcmp (S{counterS},'X')
+                if     strcmp (S{counterS}, 'X')
                     tree.X = [tree.X; ...
                         (ones (fed, 1) .* ...
                         tree.X (itrif (counter))) + ...
@@ -111,7 +111,8 @@ for counter      = 1 : length (itrif)
                         tree.Z (itrif (counter))) + ...
                         (0.0001 * dZ .* (1 : fed)')];
                 else
-                    tree.(S{counterS}) = [tree.(S{counterS}); ...
+                    tree.(S{counterS}) = [ ...
+                        tree.(S{counterS}); ...
                         ones(fed,1).*tree.(S{counterS})(itrif(counter))];
                 end
             elseif iscell (vec) && (numel (vec) == N)
@@ -136,8 +137,9 @@ for counter      = 1 : length (itrif)
 end
 tree.dA          = dA;
 
-if strfind       (options, '-s')   % show option
-    clf; hold on;
+if contains      (options, '-s')   % show option
+    clf;
+    hold         on;
     xplore_tree  (tree);
     if ~isempty  (itrif)
         pointer_tree (intree, itrif);
@@ -151,9 +153,9 @@ if strfind       (options, '-s')   % show option
     axis         image;
 end
 
-if strfind       (options, '-e')
-    display      ([...
-        'elimt_tree: eliminated ' ...
+if contains      (options, '-e')
+    disp         ([ ...
+        'elimt_tree: eliminated '  ...
         (num2str (length (itrif))) ...
         ' trifurcations']);
 end
@@ -166,3 +168,6 @@ end
 if (nargout >= 2)
     varargout{2}  = ~isempty (itrif);
 end
+
+
+

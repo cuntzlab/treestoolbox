@@ -19,6 +19,7 @@
 %     '-s'   : show
 %     '-w'   : waitbar
 %     '-r'   : do not trim regions array
+%     '-x'   : append children nodes
 %     {DEFAULT: ''}
 %
 % Output
@@ -34,7 +35,7 @@
 % Uses idpar_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function varargout = delete_tree (intree, inodes, options)
 
@@ -82,7 +83,7 @@ if (nargin < 3) || isempty (options)
     options  = '';
 end
 
-if strfind   (options, '-x')
+if contains (options, '-x')
     append_children = false;
 else
     append_children = true;
@@ -90,16 +91,16 @@ end
 
 % nodes get deleted one by one, therefore new index has to be calculated
 % each time, using sindex:
-sindex       = 1 : N;
+sindex           = 1 : N;
 
-if strfind   (options, '-w')      % waitbar option: initialization
+if contains (options, '-w')      % waitbar option: initialization
     if length    (inodes) > 499
         HW       = waitbar (0, 'deleting nodes...');
         set      (HW, 'Name', '..PLEASE..WAIT..YEAH..');
     end
 end
 for counter      = 1 : length (inodes)
-    if strfind   (options, '-w')  % waitbar option: update
+    if contains  (options, '-w')  % waitbar option: update
         if mod   (counter, 500) == 0
             waitbar (counter / length (inodes), HW);
         end
@@ -124,7 +125,7 @@ for counter      = 1 : length (inodes)
     dA (inode, :) = [];
     %end
 end
-if strfind       (options, '-w')  % waitbar option: close
+if contains      (options, '-w')  % waitbar option: close
     if length    (inodes) > 499
         close    (HW);
     end
@@ -143,7 +144,7 @@ for counter      = 1 : length (S)
 end
 
 % eliminate obsolete regions
-if isempty       (strfind (options, '-r'))
+if ~contains (options, '-r')
     if isfield   (tree, 'R')
         [i1, ~, i3]  = unique (tree.R);
         tree.R   = i3;
@@ -170,7 +171,7 @@ if ~append_children && length (iA) > 1
             end
         end
         % eliminate obsolete regions
-        if isempty       (strfind (options, '-r'))
+        if ~contains  (options, '-r')
             if isfield   (dtree, 'R')
                 [i1, ~, i3]  = unique (dtree.R);
                 dtree.R   = i3;
@@ -185,13 +186,23 @@ if ~append_children && length (iA) > 1
 end
 
 % display the result
-if strfind       (options, '-s')
-    clf; hold on;
+if contains      (options, '-s')
+    clf;
+    hold         on;
     plot_tree    (intree);
-    colors = [0 1 0; 0 0 1; 0 0.5 0; 0 0.75 0.75; 0.75 0 0.75; 0.75 0.75 0; 0.5 0 0];
+    colors       = [ ...
+        0    1    0; ...
+        0    0    1; ...
+        0    0.5  0; ...
+        0    0.75 0.75; ...
+        0.75 0    0.75; ...
+        0.75 0.75 0; ...
+        0.5  0    0];
     if length    (tree) > 1
         for counter = 1 : length (tree)
-            plot_tree    (tree{counter}, colors(mod(counter - 1, size(colors, 1)) + 1, :), 100);
+            plot_tree ( ...
+                tree{counter}, ...
+                colors (mod (counter - 1, size (colors, 1)) + 1, :), 100);
         end
     else
         plot_tree    (tree, [0 1 0], 100);

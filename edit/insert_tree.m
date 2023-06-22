@@ -42,7 +42,7 @@
 % Added node index output by Marcel Beining 2017
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function varargout = insert_tree (intree, swc, options)
 
@@ -103,7 +103,7 @@ if ~isempty  (swc)
     end
     if isfield       (tree, 'R')
         % eliminate obsolete regions (only if everything is correct)
-        if ~isempty (strfind (options, '-d'))
+        if contains (options, '-d')
             if isfield   (tree, 'rnames')
                 % my god! Handling regions is not easy!!!!!!
                 % AND IS WRONG!!!!! IF FIRST REGION DOES NOT EXIST, THERE IS A
@@ -127,8 +127,9 @@ if ~isempty  (swc)
     end
 end
 
-if strfind       (options, '-s')   % show option
-    clf; hold on;
+if contains      (options, '-s')   % show option
+    clf;
+    hold         on;
     if ~isempty (swc)
         pointer_tree ( [ ...
             (swc (:, 3)), ...
@@ -145,7 +146,7 @@ if strfind       (options, '-s')   % show option
     axis         image;
 end
 
-if strfind       (options, '-e')   % echo changes
+if contains      (options, '-e')   % echo changes
     warning      ('TREES:notetreechange', ...
         ['added ' (num2str (size (swc, 1))) ' node(s)']);
 end

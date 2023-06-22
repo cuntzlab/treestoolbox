@@ -41,7 +41,7 @@
 % Uses redirect_tree sort_tree ver_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function varargout = cat_tree (intree1, intree2, inode1, inode2, options)
 
@@ -110,7 +110,7 @@ for counter      = 1 : length (S)
                         tree1.(S{counter}); ...
                         tree2.(S{counter})];
                 else
-                    if strfind (options, '-e')
+                    if contains (options, '-e')
                         warning ( ...
                             'TREES:treeinconsistency', ...
                             ['degenerating field: ' S{counter}]);
@@ -122,7 +122,7 @@ for counter      = 1 : length (S)
 end
 
 % eliminate obsolete regions (only if everything is correct)
-if isempty (strfind (options, '-r'))
+if ~contains (options, '-r')
     if isfield (tree1,'R') && isfield (tree2, 'R')
         if      isfield (tree1, 'rnames') && ...
                 isfield (tree2, 'rnames')
@@ -149,8 +149,9 @@ end
 
 tree             = sort_tree (tree, '-LO');
 
-if strfind       (options, '-s')
-    clf; hold on;
+if contains      (options, '-s')
+    clf;
+    hold         on;
     plot_tree    (intree1);
     plot_tree    (intree2, [1 0 0]);
     plot_tree    (tree,    [0 1 0], [20 0 0]);
@@ -174,3 +175,6 @@ if (nargout == 1) || (isstruct (intree1))
 else
     trees{intree1} = tree;
 end
+
+
+

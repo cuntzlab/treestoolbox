@@ -38,7 +38,7 @@
 % Uses ipar_tree Pvec_tree ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function varargout = insertp_tree (intree, inode, plens,  options)
 
@@ -84,21 +84,21 @@ if (nargin < 4) || isempty (options)
 end
 
 % pathi: node indices of path from inode to root
-ipar         = ipar_tree (intree);
-pathi        = fliplr    (ipar (inode, ipar (inode, :) > 0));
+ipar             = ipar_tree (intree);
+pathi            = fliplr    (ipar (inode, ipar (inode, :) > 0));
 
 % plen: path lengths from root to nodes on the path
-plen         = Plen';
-plen         = plen    (pathi);
+plen             = Plen';
+plen             = plen    (pathi);
 % don't add points where points are already:
-plens        = setdiff (plens, plen);
+plens            = setdiff (plens, plen);
 % otherwise the branch would explode
-plens        = plens   (plens < max (plen));
+plens            = plens   (plens < max (plen));
 % number of points to be added:
-N2           = length  (plens);
+N2               = length  (plens);
 
 % expand adjacency matrix:
-tree.dA      = [ ...
+tree.dA          = [ ...
     [tree.dA, ...
     (sparse (N,  N2))]; ...
     (sparse (N2, N + N2))];
@@ -149,7 +149,7 @@ for counter      = 1 : N2
     end
 end
 
-if strfind (options, '-s')
+if contains (options, '-s')
     HP           = plot3 ( ...
         tree.X (N + 1 : N + N2), ...
         tree.Y (N + 1 : N + N2), ...
@@ -161,8 +161,9 @@ end
 [tree, indx]     = sort_tree (tree, '-LO');
 indx             = indx > N;
 
-if strfind (options, '-s')
-    clf; hold on;
+if contains (options, '-s')
+    clf;
+    hold         on;
     xplore_tree  (tree);
     pointer_tree (tree, find (indx));
     title        ('insert nodes on path');
@@ -174,7 +175,7 @@ if strfind (options, '-s')
     axis         image;
 end
 
-if strfind   (options, '-e')
+if contains (options, '-e')
    warning       ('TREES:notetreechange', ...
        ['added ' (num2str (N2)) ' node(s)']);
 end

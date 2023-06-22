@@ -1,6 +1,6 @@
 % ROOT_TREE   Add tiny segment at tree root.
 % (trees package)
-% 
+%
 % tree = root_tree (intree, options)
 % ----------------------------------
 %
@@ -27,7 +27,7 @@
 % Uses ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function varargout = root_tree (intree, options)
 
@@ -36,7 +36,7 @@ global       trees
 
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees); 
+    intree   = length (trees);
 end
 
 ver_tree     (intree); % verify that input is a tree structure
@@ -80,16 +80,17 @@ if isfield       (tree, 'X')
     tree.X (1)   = tree.X (1) - 0.0001;
 end
 
-if strfind       (options, '-s') % show option
-    clf; hold on; 
-    pointer_tree (tree, 1); 
+if contains (options, '-s') % show option
+    clf;
+    hold         on;
+    pointer_tree (tree, 1);
     xplore_tree  (tree);
     title        ('root tree');
     xlabel       ('x [\mum]');
     ylabel       ('y [\mum]');
     zlabel       ('z [\mum]');
     view         (2);
-    grid         on; 
+    grid         on;
     axis         image;
 end
 
@@ -98,8 +99,6 @@ if (nargout == 1) || (isstruct (intree))
 else
     trees {intree} = tree; % otherwise replace orginal tree in trees
 end
-
-
 
 
 

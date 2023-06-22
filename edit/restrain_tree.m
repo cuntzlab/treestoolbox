@@ -32,7 +32,7 @@
 % Uses idpar_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function varargout = restrain_tree (intree, maxpl, options)
 
@@ -67,11 +67,11 @@ end
 Plen             = Pvec_tree (tree); %get path lengths
 
 if any           (Plen > maxpl)
-    if ~isempty (strfind (options, '-i'))
+    if contains (options, '-i')
         idpar    = idpar_tree (tree); % get parent indices
         % delete all nodes whose parent nodes are too far away from soma,
         % too:
-        ind      = Plen > maxpl & Plen(idpar) > maxpl;
+        ind      = Plen > maxpl & Plen (idpar) > maxpl;
         tree     = delete_tree (tree, ind, '-r');
         % for the rest, make them be as far away as possible (maxpl)
         % without changing direction
@@ -89,13 +89,14 @@ if any           (Plen > maxpl)
             direction (ind, 3) .* (maxpl - Plen (idpar (ind)));
     else
         % delete all nodes which are farther away as maxpl
-        tree = delete_tree (tree, Plen > maxpl, '-r');
+        tree     = delete_tree (tree, Plen > maxpl, '-r');
     end
 end
 
 % display the result
-if strfind       (options, '-s')
-    clf; hold on;
+if contains      (options, '-s')
+    clf;
+    hold         on;
     plot_tree    (intree);
     colors       = [ ...
         0    1    0; ...

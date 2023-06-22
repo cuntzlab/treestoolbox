@@ -76,14 +76,15 @@ if (nargin < 3) || isempty (options)
     options  = ''; 
 end
 
-if ~isempty (strfind (options, '-r'))
+if contains (options, '-r')
     doptions = '-r';
 else
     doptions = '';
 end
 
-if strfind   (options, '-s')
-    clf;     hold on;
+if contains (options, '-s')
+    clf;
+    hold         on;
 end
 
 %%%%%%
@@ -100,7 +101,7 @@ options2 (i1 : i1 + 1) = '';
 if isempty   (options2)
     options2 = 'none';
 end
-if ~isempty  (strfind (options, '-b'))
+if contains (options, '-b')
     idpar    = idpar_tree (tree); % indices to direct parents
     Bs       = B_tree     (tree);
     lenT (lenT < sr & Bs & Bs (idpar)) = sr;
@@ -124,7 +125,7 @@ nY           = tree.Y;
 nZ           = tree.Z;
 nD           = tree.D;
 
-if strfind       (options, '-w')  % waitbar option: initialisation
+if contains (options, '-w')  % waitbar option: initialisation
     if N > 499
         HW           = waitbar (0, 'insert points on all paths ...');
         set          (HW, 'Name', 'please wait...');
@@ -132,7 +133,7 @@ if strfind       (options, '-w')  % waitbar option: initialisation
 end
 % for each node look at point to add on the path:
 for counter      = 1 : N
-    if strfind   (options, '-w')       % waitbar option: update
+    if contains (options, '-w')       % waitbar option: update
         if mod (counter, 500) == 0
             waitbar (counter / N, HW);
         end
@@ -172,7 +173,7 @@ for counter      = 1 : N
         end
     end
 end
-if strfind       (options, '-w') % waitbar option: close
+if contains (options, '-w') % waitbar option: close
     if N > 499
         close        (HW);
     end
@@ -187,7 +188,7 @@ ntree.Z          = nZ;
 if isfield       (tree, 'name')
     ntree.name   = tree.name;
 end
-if strfind       (options, '-d')
+if contains (options, '-d')
     ntree.D      = nD;
 end
 
@@ -201,7 +202,7 @@ for counterS     = 1 : length (S)
             ~strcmp (S{counterS}, 'Z')  && ...
             ~strcmp (S{counterS}, 'name'))
         if  ...
-                (~isempty (strfind (options, '-d')) && ...
+                (contains (options, '-d') && ...
                 strcmp (S{counterS}, 'D'))
             continue
         end
@@ -219,7 +220,7 @@ for counterS     = 1 : length (S)
 end
 tree             = delete_tree (ntree, 2 : N, doptions); % resampled tree
 
-if isempty       (strfind (options, '-v'))
+if ~contains (options, '-v')
     % a bit complicated for collapsing multifurcations:
     iF           = [1; (N + 1 : size (ntree.dA))'];
     % collapse small angle branches:
@@ -282,7 +283,7 @@ if isempty       (strfind (options, '-v'))
     end
 end
 
-if ~isempty  (strfind (options, '-l'))
+if contains (options, '-l')
     % now after deleting points on the way the length of an edge is not sr
     % anymore (because we cut the paths short), prolong all pieces to sr
     % via morphing:
@@ -290,7 +291,7 @@ if ~isempty  (strfind (options, '-l'))
         sr * ones (length (tree.X), 1), options2);
 end
 
-if strfind   (options, '-s') % show option
+if contains (options, '-s') % show option
     clf; hold on;
     HP       = plot_tree (intree, [], 20, [], 2, '-b');
     set      (HP, ...
@@ -318,8 +319,8 @@ if strfind   (options, '-s') % show option
     axis     image;
 end
 
-if strfind   (options, '-e')
-    display  ('resample_tree: added some nodes');
+if contains (options, '-e')
+    disp  ('resample_tree: added some nodes');
 end
 
 if (nargout > 0) || (isstruct (intree))
@@ -327,11 +328,6 @@ if (nargout > 0) || (isstruct (intree))
 else
     trees{intree}  = tree;
 end
-
-
-
-
-
 
 
 

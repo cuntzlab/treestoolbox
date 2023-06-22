@@ -34,7 +34,7 @@
 % Uses ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function varargout = repair_tree (intree, options)
 
@@ -85,8 +85,9 @@ end
  % sort tree to be BCT conform, heavy parts left:
 tree         = sort_tree  (tree, '-LO');
 
-if strfind       (options, '-s') % show option
-    clf; hold on; 
+if contains (options, '-s') % show option
+    clf;
+    hold         on; 
     xplore_tree  (intree, [], [], -20);
     xplore_tree  (tree,   [], [0 1 0]);
     HP (1)       = plot (1, 1, 'k-');

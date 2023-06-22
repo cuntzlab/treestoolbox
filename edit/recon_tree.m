@@ -34,7 +34,7 @@
 % Uses idpar_tree sub_tree ver_tree X Y Z
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function varargout = recon_tree (intree, ichilds, ipars, options)
 
@@ -44,7 +44,7 @@ global trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 ver_tree     (intree); % verify that input is a tree structure
 
@@ -60,7 +60,7 @@ if (nargin < 4) || isempty (options)
     options  = '-h';
 end
 
-if strfind       (options, '-h')
+if contains (options, '-h')
     for counter  = 1 : length (ichilds) % move subtrees:
         isub     = find (sub_tree (tree, ichilds (counter)));
         dX       = ...
@@ -85,8 +85,9 @@ for counter  = 1 : length (ichilds)
     tree.dA  (ichilds (counter), ipars (counter))           = 1;
 end
 
-if strfind       (options, '-s') % show option
-    clf; hold on; 
+if contains (options, '-s') % show option
+    clf;
+    hold         on; 
     plot_tree    (intree, [0 0 0], -20);
     plot_tree    (tree,   [1 0 0]);
     HP (1)       = plot (1, 1, 'k-');
@@ -109,3 +110,6 @@ if (nargout == 1) || (isstruct (intree))
 else
     trees{intree}  = tree; % otherwise original tree in trees is replaced
 end
+
+
+

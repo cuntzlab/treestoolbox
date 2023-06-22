@@ -33,7 +33,7 @@
 % Uses delete_tree len_tree ver_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function varargout = elim0_tree (intree, options)
 
@@ -43,7 +43,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 ver_tree     (intree); % verify that input is a tree structure
 
@@ -56,7 +56,7 @@ len          = len_tree (intree);
 ilen         = find     (len == 0);
 
 if length (ilen) > 1
-    if strfind (options, '-r')
+    if contains (options, '-r')
         tree = delete_tree (intree, ilen (2 : end));
     else
         tree = delete_tree (intree, ilen (2 : end), '-r');
@@ -70,26 +70,27 @@ else
     end
 end
 
-if strfind   (options, '-e')
-    display  ([ ...
+if contains (options, '-e')
+    disp  ([ ...
         'elim0_tree: deleted ' ...
         (num2str (length (ilen) - 1)) ...
         ' nodes']);
 end
 
-if strfind   (options, '-s')
-    clf; hold on;
-    xplore_tree (tree);
+if contains (options, '-s')
+    clf;
+    hold         on;
+    xplore_tree  (tree);
     if ~isempty (ilen (2 : end))
         pointer_tree (intree, ilen (2 : end));
     end
-    title    ('eliminate 0-length segments');
-    xlabel   ('x [\mum]');
-    ylabel   ('y [\mum]'); 
-    zlabel   ('z [\mum]');
-    view     (2);
-    grid     on;
-    axis     image;
+    title        ('eliminate 0-length segments');
+    xlabel       ('x [\mum]');
+    ylabel       ('y [\mum]'); 
+    zlabel       ('z [\mum]');
+    view         (2);
+    grid         on;
+    axis         image;
 end
 
 if (nargout == 1) || (isstruct (intree))
