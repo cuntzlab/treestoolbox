@@ -4,7 +4,7 @@
 % tree = smooth_tree (intree, pwchild, p, n, options)
 % ---------------------------------------------------
 %
-% Smoothns a tree along its longest paths. This changes (shortens) the
+% Smoothes a tree along its longest paths. This changes (shortens) the
 % total length of the branch significantly. First finds the heavier
 % sub-branches and puts them together to longest paths. Then a smoothing
 % step is applied on the branches individually. smooth_tree calls
@@ -39,7 +39,7 @@
 % Uses dissect_tree ipar_tree child_tree smoothbranch
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function  varargout = smooth_tree (intree, pwchild, p, n, options)
 
@@ -49,7 +49,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 ver_tree     (intree); % verify that input is a tree structure
 
@@ -81,22 +81,22 @@ if (nargin < 5) || isempty (options)
 end
 
 % starting and end points of all branches:
-sect         = dissect_tree (tree);
+sect             = dissect_tree (tree);
 % parent index structure (see "ipar_tree"):
-ipar         = ipar_tree    (tree);
+ipar             = ipar_tree    (tree);
 % vector containing index to direct parent:
-idpar        = ipar         (:, 2);
+idpar            = ipar         (:, 2);
 % number of daugther nodes:
-nchild       = child_tree   (tree);
+nchild           = child_tree   (tree);
 
-if strfind   (options, '-w')       % waitbar option: initialization
-    HW       = waitbar (0, 'finding heavy sub-branches...');
-    set      (HW, ...
+if contains      (options, '-w')       % waitbar option: initialization
+    HW           = waitbar (0, 'finding heavy sub-branches...');
+    set      (    HW, ...
         'Name',                '..PLEASE..WAIT..YEAH..');
 end
 counter          = 1;
 while counter    <= size (sect, 1)
-    if strfind   (options, '-w')   % waitbar option: update
+    if contains  (options, '-w')   % waitbar option: update
         if mod   (counter, 500) == 0
             waitbar (counter / (size (sect, 1)), HW);
         end
@@ -124,11 +124,11 @@ while counter    <= size (sect, 1)
     end
 end
 
-if strfind       (options, '-w')   % waitbar option: reinitialization
+if contains      (options, '-w')   % waitbar option: reinitialization
     waitbar      (0, HW, 'smoothing heavy sub-branches...');
 end
 for counter      = 1 : size (sect, 1)
-    if strfind   (options, '-w')   % waitbar option: update
+    if contains   (options, '-w')   % waitbar option: update
         waitbar  (counter / (size (sect, 1)), HW);
     end
     % corresponds to "plotsect_tree":
@@ -143,12 +143,13 @@ for counter      = 1 : size (sect, 1)
     tree.Y (indi2) = Ys;
     tree.Z (indi2) = Zs;
 end
-if strfind       (options, '-w')   % waitbar option: close
+if contains      (options, '-w')   % waitbar option: close
     close        (HW);
 end
 
-if strfind       (options, '-s')   % show option
-    clf; hold on;
+if contains      (options, '-s')   % show option
+    clf;
+    hold         on;
     plot_tree    (intree);
     plot_tree    (tree, [1 0 0]);
     HP (1)       = plot (1, 1, 'k-');
@@ -169,3 +170,6 @@ if (nargout == 1) || (isstruct (intree))
 else
     trees{intree}  = tree;  % otherwise add to end of trees cell array
 end
+
+
+

@@ -24,10 +24,10 @@
 % isBCT_tree ([1 1 1 1 0]) % termination and it becomes BCT
 %
 % See also BCT_tree allBCT_tree typeN_tree
-% Uses BCT_tree dA
+% Uses dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function isBCT = isBCT_tree (intree)
 
@@ -36,28 +36,29 @@ global trees
 
 if (nargin < 1) || isempty (intree)
     intree   = length (trees);
-end;
+end
 
 if ~isstruct (intree)
-    if numel (intree) >= 1
-        BCT  = intree;
+    if (numel (intree) >= 1)
+        BCT      = intree;
     else
-        BCT  = sum (trees (intree).dA);
+        BCT      = sum (trees (intree).dA);
     end
 else
-    BCT      = sum (intree.dA);
+    BCT          = sum (intree.dA);
 end
 
-len          = length (BCT);
-C            = cumsum (BCT - 1) + 1;
-iF           = find (C == 0);
-isBCT        = 1;
-if isempty   (iF)
-    isBCT    = 0;
+len              = length (BCT);
+C                = cumsum (BCT - 1) + 1;
+iF               = find (C == 0);
+isBCT            = 1;
+if isempty (iF)
+    isBCT        = 0;
 else
-    if iF (1) < len
-        isBCT = 0;
+    if (iF (1) < len)
+        isBCT    = 0;
     end    
 end
+
 
 

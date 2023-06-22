@@ -42,17 +42,17 @@
 % -------
 % % define a 65 point circular polygon with diameter 100 um:
 % circlec    = [0 65;[ ...
-%   (sin (0 : pi / 32 : 2 * pi)')
-%   (cos (0 : pi / 32 : 2 * pi)')] * 100];
+%     (sin (0 : pi / 32 : 2 * pi)') ...
+%     (cos (0 : pi / 32 : 2 * pi)')] * 100];
 % % distribute 1000 points in the boundaries -100 to 100 um
-% [X Y Z]    = rpoints_tree ([], 1000, ...
-%   circlec, [-100 100], [-100 100], [], 20, '-s');
+% [X, Y, Z]    = rpoints_tree ([], 1000, ...
+%     circlec, [-100 100], [-100 100], [], 20, '-s');
 %
 % See also gdens_tree
-% Uses
+% Uses cpoints for -s option
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [X, Y, Z, HP] = rpoints_tree (M, N, c, x, y, z, thr, options)
 
@@ -92,7 +92,7 @@ if ~isempty      (M)
     if (nargin < 6) || isempty (z)
         z        = 1 : size (M, 3);
     end
-    if strfind   (options, '-w')
+    if contains  (options, '-w')
         HW       = waitbar (0, 'distributing points...');
         set      (HW, ...
             'Name',            '..PLEASE..WAIT..YEAH..');
@@ -106,7 +106,7 @@ if ~isempty      (M)
         r1       = zeros (length (R), 1);
         r2       = zeros (length (R), 1);
         for counter  = 1 : length (R)
-            if strfind   (options, '-w')
+            if contains   (options, '-w')
                 if mod (counter, 5000) == 1
                     waitbar  (counter / length (R), HW);
                 end
@@ -130,7 +130,7 @@ if ~isempty      (M)
         r2       = zeros (length (R), 1);
         r3       = zeros (length (R), 1);
         for counter = 1 : length (R)
-            if strfind (options, '-w')
+            if contains (options, '-w')
                 if mod (counter, 5000) == 1
                     waitbar (counter / length (R), HW);
                 end
@@ -146,7 +146,7 @@ if ~isempty      (M)
         Y        = y (r1)' + (rand (N, 1) - 0.5) .* (diff (y (1 : 2)));
         Z        = z (r3)' + (rand (N, 1) - 0.5) .* (diff (z (1 : 2)));
     end
-    if strfind   (options, '-w')
+    if contains  (options, '-w')
         close    (HW);
     end
 else % if no density matrix was defined do a fully homogeneous picking
@@ -178,8 +178,9 @@ if ~isempty      (c)
     Z            = zeros (length (Y), 1);
 end
 
-if strfind       (options, '-s') % show option
-    clf; hold on;
+if contains      (options, '-s') % show option
+    clf;
+    hold         on;
     if ~isempty  (c)
         cplotter (c);
     end

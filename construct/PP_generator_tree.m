@@ -40,9 +40,10 @@
 % - epsilon  :: minimum distance between points 
 %     	{DEFAULT: 0}
 % - options  ::string:
-%     	'-m' : show the point cloud in each iteration
-%		'-s' : show the resulting point cloud
+%     	'-m'  : show the point cloud in each iteration
+%		'-s'  : show the resulting point cloud
 %	  	'-3d' : 3D point cloud
+%       '-e'  : echo
 %     	{DEFAULT: '-2d -m'}
 %
 % Output
@@ -63,7 +64,7 @@
 % Contributed by Laura Anton
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2018  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [P, numIt, Rvalues] = PP_generator_tree ( ...
     N, R, a, alpha, n_mc, level, epsilon, options)
@@ -97,20 +98,20 @@ if nargin    < 7 || isempty (epsilon)
 end
 
 if nargin    < 8 || isempty (options)
-    options  = '-2d -m';
+    options  = '-2d -m -e';
 end
 
 if (epsilon > 0) % volume exclusion (epsilon is the minimum distance between points)
 	X                    = [0];
 	Y                    = [0];
-	if strfind           (options, '-3d')
+	if contains           (options, '-3d')
 		Z                = [0];
 	end
 	counter              = 1;
 	while                (counter < N)
 		xini             = ceil (rand (1, 1) * 200 - 100);
 		yini             = ceil (rand (1, 1) * 200 - 100);
-		if strfind       (options, '-3d')
+		if contains       (options, '-3d')
 			zini         = ceil (rand (1, 1) * 200 - 100);
 			distance     = sqrt ( ...
 				(xini - X).^2 + ...
@@ -124,14 +125,14 @@ if (epsilon > 0) % volume exclusion (epsilon is the minimum distance between poi
 		if (sum (distance < epsilon) == 0) % no intersections
 			X            = [X; xini];
 			Y            = [Y; yini];
-			if strfind   (options, '-3d')
+			if contains   (options, '-3d')
 				Z        = [Z; zini];
 			end
 			counter      = counter + 1;
 		end
 	end
 
-	if strfind           (options, '-3d')
+	if contains           (options, '-3d')
 		P                = [X, Y, Z];
 		t                = struct( ...
 			'X', X, ...
@@ -148,9 +149,9 @@ if (epsilon > 0) % volume exclusion (epsilon is the minimum distance between poi
 	end
 	Rvalues              = Ract; % initial R value
 
-	if strfind           (options, '-m')
+	if contains           (options, '-m')
 		clf;
-		if strfind       (options, '-3d')
+		if contains       (options, '-3d')
 			plot3        (X, Y, Z, 'k.');
             view         (3);
 		else
@@ -167,11 +168,13 @@ if (epsilon > 0) % volume exclusion (epsilon is the minimum distance between poi
 
 	numIt                = 0;
 	while ((Ract < R - 0.01) || (Ract > R + 0.01))
-		disp             ([Ract R]);
+        if contains      (options, '-e')
+    		disp         ([Ract R]);
+        end
 		iNN              = zeros (N, 1);
 		dR               = abs   (R - Ract);
 		for counterNN    = 1 : N
-			if strfind   (options, '-3d')
+			if contains   (options, '-3d')
 				d        = sqrt ( ...
 					(X (counterNN) - X).^2 + ...
 					(Y (counterNN) - Y).^2 + ...
@@ -204,7 +207,7 @@ if (epsilon > 0) % volume exclusion (epsilon is the minimum distance between poi
 				if (newy > 100)
 					newy = 100;
 				end
-				if strfind (options, '-3d')
+				if contains (options, '-3d')
 					dZ   = (Z (counterNN) - Z (iNN (counterNN)));
 					newz = Z (counterNN) + dR * a * dZ;
 					if (newz < -100)
@@ -226,7 +229,7 @@ if (epsilon > 0) % volume exclusion (epsilon is the minimum distance between poi
 				if (sum(distance < epsilon) == 0) % no intersections
 					X (counterNN) = newx;
 					Y (counterNN) = newy;
-					if strfind (options, '-3d')
+					if contains (options, '-3d')
 						Z (counterNN) = newz;
 					end
 					movedPoint = 1;
@@ -239,7 +242,7 @@ if (epsilon > 0) % volume exclusion (epsilon is the minimum distance between poi
 			end
         end
         
-		if strfind       (options, '-3d')
+		if contains       (options, '-3d')
 			P            = [X, Y, Z];
 			t            = struct ( ...
 				'X', X, ...
@@ -260,9 +263,9 @@ if (epsilon > 0) % volume exclusion (epsilon is the minimum distance between poi
 			a            = -a;
 		end
 		
-		if strfind       (options, '-m')
+		if contains       (options, '-m')
 			clf; hold    on;
-			if strfind   (options, '-3d')
+			if contains   (options, '-3d')
 				plot3    (X, Y, Z, 'k.');
                 view     (3)
 			else
@@ -280,7 +283,7 @@ else % no volume exclusion
 	yini                 = ceil (rand ((N - 1), 1) * 200 - 100);
 	X                    = [0; xini];
 	Y                    = [0; yini];
-	if strfind           (options, '-3d')
+	if contains           (options, '-3d')
 		zini             = ceil (rand ((N - 1), 1) * 200 - 100);
 		Z                = [0; zini];
 		P                = [X, Y, Z];
@@ -293,9 +296,9 @@ else % no volume exclusion
 	end
 	Rvalues              = Ract; % initial R value
 
-	if strfind           (options, '-m')
+	if contains           (options, '-m')
 		clf;
-		if strfind       (options, '-3d')
+		if contains       (options, '-3d')
 			plot3        (X, Y, Z, 'k.');
             view         (3);
 		else
@@ -312,11 +315,13 @@ else % no volume exclusion
 
 	numIt                = 0;
 	while ((Ract < R - 0.01) || (Ract > R + 0.01))
-		disp             ([Ract R]);
+        if contains      (options, '-e')
+    		disp         ([Ract R]);
+        end
 		iNN              = zeros (N, 1);
 		dR               = abs   (R - Ract);
 		for counterNN    = 1 : N
-			if strfind   (options, '-3d')
+			if contains   (options, '-3d')
 				d        = sqrt ( ...
                     (X (counterNN) - X).^2 + ...
                     (Y (counterNN) - Y).^2 + ...
@@ -339,7 +344,7 @@ else % no volume exclusion
 		X (X >  100)     =  100;
 		Y (Y >  100)     =  100;
 		
-		if strfind       (options, '-3d')
+		if contains       (options, '-3d')
 			dZ           = (Z - Z (iNN));
 			Z            = Z + dR * a * dZ;
 			Z (Z < -100) = -100;
@@ -358,9 +363,9 @@ else % no volume exclusion
 			a = -a;
 		end
 
-		if strfind (options, '-m')
+		if contains (options, '-m')
 			clf;
-			if strfind (options, '-3d')
+			if contains (options, '-3d')
 				plot3 (X, Y, Z, 'k.');
                 view (3);
 			else
@@ -376,10 +381,10 @@ else % no volume exclusion
 
 end
 
-if strfind       (options, '-s')
+if contains      (options, '-s')
     clf;
     hold         on;
-    if strfind   (options, '-3d')
+    if contains   (options, '-3d')
         plot3    (X, Y, Z, 'k.');
     else
         plot     (X, Y, 'k.');
@@ -389,5 +394,6 @@ if strfind       (options, '-s')
     drawnow;
 end
 end
+
 
 

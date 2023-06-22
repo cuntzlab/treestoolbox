@@ -53,7 +53,7 @@
 % Massive improvement by Marcel Beining 2017
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [tree, indhead, indneck] = spines_tree (intree, XYZ, ...
     dneck, dhead, mlneck, stdlneck, ...
@@ -65,7 +65,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 ver_tree     (intree);       % verify that input is a tree structure
 
@@ -134,7 +134,7 @@ XYZ              = [ ...
 
 if isfield       (tree, 'R')
     if isfield   (tree, 'rnames')
-        if ~isempty (strfind (options, '-sr'))
+        if contains (options, '-sr')
             r    = find (strcmpi (tree.rnames, 'spine_neck'));
             if ~isempty (r)
                 iR (1) = r (1);
@@ -164,22 +164,22 @@ else
     iR           = 1;
 end
 
-if numel (iR)    == 1
+if numel (iR) == 1
     iR (2)       = iR (1);
 end
-if ~isempty (strfind (options, '-sr'))
+if contains (options, '-sr')
     tree.rnames{iR(1)} = 'spines_neck';
     tree.rnames{iR(2)} = 'spines_head';
 end
 
-if strfind (options, '-w') % waitbar option: initialization
+if contains (options, '-w') % waitbar option: initialization
     if size (XYZ, 1) > 99
         HW = waitbar (0, 'spining...');
         set (HW, 'Name', '..PLEASE..WAIT..YEAH..');
     end
 end
 for counter = 1 : size (XYZ, 1)
-    if strfind (options, '-w') % waitbar option: update
+    if contains (options, '-w') % waitbar option: update
         if mod (counter, 100) == 0
             waitbar (counter / size (XYZ, 1), HW);
         end
@@ -197,12 +197,13 @@ for counter = 1 : size (XYZ, 1)
         (XYZ (counter, 3) + dXYZ (counter, 3) * dhead) ...
         dhead (N + 1 + 2 * (counter - 1))], 'none');
 end
-if strfind (options, '-w') % waitbar option: close
-    close (HW);
+if contains (options, '-w') % waitbar option: close
+    close        (HW);
 end
 
-if strfind       (options, '-s')
-    clf; hold on;
+if contains      (options, '-s')
+    clf;
+    hold         on;
     plot_tree    (tree);
     title        ('spinalized tree');
     xlabel       ('x [\mum]');

@@ -60,7 +60,7 @@
 % See also rpoints_tree quaddiameter_tree BCT_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2022  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [tree, indx] = MST_tree (msttrees, X, Y, Z, bf, ...
     thr, mplen, DIST, options)

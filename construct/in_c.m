@@ -30,10 +30,10 @@
 % plot       (X (IN), Y (IN), 'k.');
 %
 % See also hull_tree cplotter cpoints rpoints_tree contourc
-% Uses
+% Uses inpolygon
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [IN, ON] = in_c (X, Y, c, dx, dy)
 
@@ -45,31 +45,30 @@ if (nargin < 4) || isempty (dx)
     dx       = 0;
 end
 
-iic          =  1;
-POL          = {};
-POLSIZE      = [];
-ward         =  1;
-while iic    < size (c, 1)
-    ic             = c (iic, 2);
-    POL{ward}     = [ ...
+iic              =  1;
+POL              = {};
+POLSIZE          = [];
+counter          =  1;
+while (iic < size (c, 1))
+    ic           = c (iic, 2);
+    POL{counter} = [ ...
         (c (iic + 1 : iic + ic, 1) + dx) ...
         (c (iic + 1 : iic + ic, 2) + dy)];
-    POLSIZE (ward) = ic;
-    iic            = iic + ic + 1;
-    ward           = ward + 1;
+    POLSIZE (counter) = ic;
+    iic          = iic + ic + 1;
+    counter      = counter + 1;
 end
 
-[~, i2]      = max (POLSIZE);
-
-[IN, ON]     = inpolygon (X, Y, ...
+[~, i2]          = max (POLSIZE);
+[IN, ON]         = inpolygon (X, Y, ...
     POL{i2} (:, 1), ...
     POL{i2} (:, 2));
 
-for ward     = 1 : length (POLSIZE)
-    if ward ~= i2
-        IN   = IN & ~inpolygon (X, Y, ...
-            POL{ward} (:, 1), ...
-            POL{ward} (:, 2));
+for counter      = 1 : length (POLSIZE)
+    if (counter ~= i2)
+        IN       = IN & ~inpolygon (X, Y, ...
+            POL{counter} (:, 1), ...
+            POL{counter} (:, 2));
     end
 end
 

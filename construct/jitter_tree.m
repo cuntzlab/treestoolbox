@@ -4,7 +4,7 @@
 % tree = jitter_tree (intree, stde, lambda, options, ipart)
 % ---------------------------------------------------------
 %
-% adds spatial noise to the coordinates of the nodes of a tree.
+% Adds spatial noise to the coordinates of the nodes of a tree.
 %
 % Input
 % -----
@@ -32,11 +32,11 @@
 % See also smooth_tree MST_tree
 % Uses ipar_tree
 %
-% speed up suggested  by Calvin Schneider 2014
+% speed up suggested by Calvin Schneider 2014
 % added ipart option by Marcel Beining   2015
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function  varargout = jitter_tree (intree, stde, lambda, options, ipart)
 
@@ -72,6 +72,7 @@ N            = size (tree.X, 1);
 if (nargin < 5) || isempty (ipart)
     ipart    = 1 : N;
 end
+
 if islogical (ipart) && numel (ipart) == N  % transform logical indexing
     ipart    = find (ipart);
 end
@@ -80,14 +81,14 @@ end
 A                = tree.dA + tree.dA';
 As               = cell (1, 1);
 
-if strfind       (options, '-w')     % waitbar option: initialization
+if contains      (options, '-w')     % waitbar option: initialization
     HW           = waitbar (0, 'calculating paths...');
     set          (HW, ...
         'Name',                  '..PLEASE..WAIT..YEAH..');
 end
 
 for counter      = 1 : lambda
-    if strfind   (options, '-w')   % waitbar option: update
+    if contains  (options, '-w')   % waitbar option: update
         if mod   (counter, 5) == 0
             waitbar (counter / lambda, HW);
         end
@@ -98,13 +99,13 @@ R                = zeros (N, 3);
 R (ipart, :)     = randn (numel (ipart), 3) * stde * lambda;
 R1               = zeros (N, 3);
 
-if strfind       (options, '-w')     % waitbar option: reinitialization
+if contains      (options, '-w')     % waitbar option: reinitialization
     waitbar      (0, ...
-        HW,                      'jittering...');
+        HW,                    'jittering...');
 end
 
 for counter      = 1 : N
-    if strfind   (options, '-w')   % waitbar option: update
+    if contains  (options, '-w')   % waitbar option: update
         if mod   (counter, 50) == 0
             waitbar (counter / N, HW);
         end
@@ -124,7 +125,7 @@ for counter      = 1 : N
     R1 (counter, :) = sum   (R .* [S S S]);
 end
 
-if strfind       (options, '-w')       % waitbar option: close
+if contains      (options, '-w')       % waitbar option: close
     close        (HW);
 end
 
@@ -132,8 +133,9 @@ tree.X           = tree.X + R1 (:, 1) - R1 (1, 1);
 tree.Y           = tree.Y + R1 (:, 2) - R1 (1, 2);
 tree.Z           = tree.Z + R1 (:, 3) - R1 (1, 3);
 
-if strfind       (options, '-s')
-    clf; hold on;
+if contains      (options, '-s')
+    clf;
+    hold         on;
     plot_tree    (intree);
     plot_tree    (tree, [1 0 0]);
     HP (1)       = plot (1, 1, 'k-');

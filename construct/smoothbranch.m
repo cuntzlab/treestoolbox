@@ -32,11 +32,11 @@
 % Uses
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [Xs, Ys, Zs] = smoothbranch (X, Y, Z, p, n)
 
-if length (X)    > 2
+if (length (X) > 2)
     for counter  = 1 : n
         X2       = X (2 : end - 1);
         Y2       = Y (2 : end - 1);

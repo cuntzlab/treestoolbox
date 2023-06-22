@@ -37,7 +37,7 @@
 % added -r and -b options by Marcel Beining   2017
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function varargout = soma_tree (intree, maxD, l, options)
 
@@ -79,7 +79,7 @@ dmaxD            = max       ( ...
     tree.D (indy), ...
     maxD * cos (pi * Plen (indy) / l) );
 
-if ~isempty (strfind (options, '-b'))
+if contains (options, '-b')
     flag         = 0;
     % check if branch point directly at soma..check if this branchpoint is
     % just the axon (angle should be wider than 90°):
@@ -104,15 +104,16 @@ end
 
 tree.D (indy)    = dmaxD;
 
-if ~isempty      (strfind (options, '-r'))
+if contains (options, '-r')
     if ~any (strcmp (intree.rnames,'soma'))
         tree.rnames  = [tree.rnames, 'soma'];
     end
     tree.R (indy)    = find (strcmp (tree.rnames, 'soma'));
 end
 
-if strfind       (options, '-s')
-    clf; hold on;
+if contains      (options, '-s')
+    clf;
+    hold         on;
     HP           = plot_tree (intree);
     set          (HP, 'facealpha', .5);
     HP           = plot_tree (tree, [1 0 0]);
@@ -135,3 +136,6 @@ if (nargout == 1) || (isstruct (intree))
 else
     trees{intree} = tree;
 end
+
+
+
