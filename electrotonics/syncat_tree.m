@@ -49,7 +49,7 @@
 % Uses M_tree ver_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function syn = syncat_tree (...
     intrees, ...
@@ -164,8 +164,9 @@ MMg              = MM + ...
 % and then inject the corresponding current
 syn              = MMg \ ((ge .* Ee) + (gi .* Ei) + I);
 
-if strfind       (options, '-s')
-    clf; hold on;
+if contains      (options, '-s')
+    clf;
+    hold         on;
     X            = zeros (N, 1);
     Y            = zeros (N, 1);
     Z            = zeros (N, 1);
@@ -178,7 +179,7 @@ if strfind       (options, '-s')
             intrees{counter}.Y;
         Z (sumsiz (counter) + 1 : sumsiz (counter + 1)) = ...
             intrees{counter}.Z;
-    end;
+    end
     L            = [];
     ige          = find (ge ~= 0);
     R            = rand ( ...

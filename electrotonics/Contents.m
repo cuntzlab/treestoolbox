@@ -3,7 +3,8 @@
 % functions to calculate current flow in a tree
 %
 % Files
-%   elen_tree     - Electrotonic length of segments in a tree
+%   cgin_tree     - Collapsed input conductance.
+%   elen_tree     - Electrotonic length of segments in a tree.
 %   gi_tree       - Axial conductances of the segments of a tree.
 %   gm_tree       - Membrane conductances of the segments of a tree.
 %   lambda_tree   - Length constants of the segments of a tree.

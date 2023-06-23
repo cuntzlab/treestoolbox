@@ -27,7 +27,7 @@
 % Uses idpar_tree cvol_tree surf_tree dA Gm Ri
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function M  = M_tree (intree, options)
 
@@ -78,8 +78,9 @@ Mgm              = Msurf .* tree.Gm;
 % factor matching scale to [nA] and [mV]:
 M                = (Mgm + Mgi) * 1000000;
 
-if strfind       (options, '-s') % show option
-    clf; hold on;
+if contains      (options, '-s') % show option
+    clf;
+    hold         on;
     [i1, i2]     = ind2sub (size (M), find (M > 0));
     R1           = [i1 i2 (repmat ([0 1 0], length (i1), 1))];
     [i1, i2]     = ind2sub (size (M), find (M < 0));

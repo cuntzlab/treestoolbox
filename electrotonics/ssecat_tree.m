@@ -45,7 +45,7 @@
 % Uses M_tree ver_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function sse = ssecat_tree ( ...
     intrees, ...
@@ -57,7 +57,7 @@ global       trees
 
 if (nargin < 1) || isempty(intrees)
     intrees  = trees;
-end;
+end
 
 len          = length (intrees);
 
@@ -125,7 +125,7 @@ else
     sse          = MM \ I;
 end
 
-if strfind       (options, '-s')
+if contains      (options, '-s')
     if numel (MM) == numel (sse)
         clf;
         imagesc  (sse);
@@ -170,8 +170,6 @@ if strfind       (options, '-s')
             'clim', [0 (full (1.2 * max (max (sse))))]);
     end
 end
-
-
 
 
 

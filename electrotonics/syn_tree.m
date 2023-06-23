@@ -39,7 +39,7 @@
 % Uses M_tree ver_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function syn = syn_tree ( ...
     intree, ...
@@ -51,7 +51,7 @@ global       trees
 
 if (nargin < 1) || isempty (intree)
     intree   = length (trees);
-end;
+end
 
 ver_tree     (intree);
 
@@ -108,8 +108,9 @@ M                = M + ...
 % and then inject the corresponding current
 syn              = M \ ((ge .* Ee) + (gi .* Ei) + I);
 
-if strfind       (options, '-s')
-    clf; hold on;
+if contains      (options, '-s')
+    clf;
+    hold on;
     plot_tree    (intree, syn(:, 1));
     colorbar;
     L (1)        = pointer_tree (intree, find (ge ~= 0), ...

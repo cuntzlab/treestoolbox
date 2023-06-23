@@ -42,7 +42,7 @@
 % Uses M_tree ver_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function sse = sse_tree (intree, I, options)
 
@@ -72,7 +72,7 @@ else
     sse          = full (M \ I);
 end
 
-if strfind       (options, '-s')
+if contains      (options, '-s')
     if numel     (M) == numel (sse)
         clf; 
         imagesc  (sse);

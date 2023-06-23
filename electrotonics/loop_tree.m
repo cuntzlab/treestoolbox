@@ -34,7 +34,7 @@
 % Uses M_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function M   = loop_tree (intree, ...
     inodes1, inodes2, gelsyn, ...     % electrical synapses
@@ -46,7 +46,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 ver_tree     (intree); % verify that input is a tree structure
 
@@ -88,8 +88,9 @@ for counter      = 1 : size (inodes1, 1)
         gelsyn (counter);
 end
 
-if strfind       (options, '-s')     % show option
-    clf; hold on;
+if contains      (options, '-s')     % show option
+    clf;
+    hold         on;
     [i1, i2]     = ind2sub (size (M), find (M > 0));
     R1           = [i1 i2 (repmat ([0 1 0], length (i1), 1))];
     [i1, i2]     = ind2sub (size (M), find (M < 0));

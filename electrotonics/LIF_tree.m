@@ -3,7 +3,7 @@
 %
 % [v, t, sp] = LIF_tree (intree, time, options, ...
 %                  Vzone, ge, gi, Ee, Ei, I, iroot, thr, vreset, Aspike)
-% -----------------------------------------------------------------
+% ----------------------------------------------------------------------
 %
 % Calculates passive or spiking responses to synaptic inputs with dynamic
 % structure. The spiking mechanism is
@@ -48,7 +48,7 @@
 % Uses M_tree ver_tree
 %
 % the TREES toolbox: edit, visualize and analyze neuronal trees
-% Copyright (C) 2009 - 2018  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [v, time, sp] = LIF_tree (intree, time, options, ...
     Vzone, ge, gi, Ee, Ei, I, iroot, thr, vreset, Aspike)
@@ -174,8 +174,10 @@ Mcm_vec          = full      (diag (Mcm)); % get capacitance vector
 v                = zeros     (size (I));
 sp               = [];
 for counterT     = 1 : T - 1
-    if mod       (counterT - 1, 100) == 0
-        disp     (time (counterT));
+    if contains  (options, '-e')
+        if mod (counterT - 1, 100) == 0
+            disp (time (counterT));
+        end
     end
     M1           = M;
     % feed into M the synaptic conductances
@@ -199,9 +201,5 @@ for counterT     = 1 : T - 1
         sp       =   [sp; (counterT * dt)];
     end
 end
-
-
-
-
 
 

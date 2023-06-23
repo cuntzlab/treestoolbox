@@ -1,4 +1,4 @@
-% CGIN_TREE   Collapsed input conductance
+% CGIN_TREE   Collapsed input conductance.
 % (trees package)
 % 
 % cgin = cgin_tree (intree, options)
@@ -28,7 +28,7 @@
 % Uses surf_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function cgin = cgin_tree (intree, options)
 
@@ -59,12 +59,12 @@ cgin             = 1 / ...
 % conversion here from [um2] to [cm2] since electrotonic properties
 % are per cm2
 
-if strfind       (options, '-s')
+if contains (options, '-s')
     % calculate local input conductance in tree:
-    gin          = 1 ./ (diag (sse_tree (intree))*1000000);
-    
-    
-    clf; hold on;
+    gin          = 1 ./ (diag (sse_tree (intree)) * 1000000);
+
+    clf;
+    hold         on;
     plot_tree    (intree, gin ./ cgin, [], [], [], '-p');
     colorbar;
     title        ([ ...

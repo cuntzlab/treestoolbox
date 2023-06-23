@@ -4,7 +4,7 @@
 % lambda = lambda_tree (intree, options)
 % --------------------------------------
 %
-% Returns the length constant for each segment.
+% Returns the length constant for each segment in cm.
 %
 % Input
 % -----
@@ -25,7 +25,7 @@
 % Uses D Gm Ri
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function lambda = lambda_tree (intree, options)
 
@@ -53,8 +53,9 @@ end
 
 lambda           = sqrt ((tree.D / 4) ./ (10000 .* tree.Gm .* tree.Ri));
 
-if strfind       (options, '-s')         % show option
-    clf; hold on; 
+if contains      (options, '-s')         % show option
+    clf;
+    hold         on; 
     plot_tree    (intree, lambda);
     colorbar;
     title        ('length constants [cm]');
@@ -65,3 +66,6 @@ if strfind       (options, '-s')         % show option
     grid         on;
     axis         image;
 end
+
+
+

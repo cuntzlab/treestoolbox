@@ -1,4 +1,4 @@
-% ELEN_TREE   Electrotonic length of segments in a tree
+% ELEN_TREE   Electrotonic length of segments in a tree.
 % (trees package)
 % 
 % elen = elen_tree (intree, options)
