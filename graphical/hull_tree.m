@@ -48,7 +48,7 @@
 % Uses       cyl_tree ver_tree X Y (Z)
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [c, M, HP] = hull_tree (intree, thr, bx, by, bz, options)
 
@@ -75,13 +75,13 @@ else
     if ~isstruct (intree)
         X        = trees{intree}.X;
         Y        = trees{intree}.Y;
-        if isempty (strfind (options, '-2d'))
+        if ~contains (options, '-2d')
             Z    = trees{intree}.Z;
         end
     else
         X    = intree.X;
         Y    = intree.Y;
-        if isempty (strfind (options, '-2d'))
+        if ~contains (options, '-2d')
             Z    = intree.Z;
         end
     end
@@ -121,7 +121,7 @@ if numel (by)    == 1
         max (Y) + 2 * thr;
 end
 
-if isempty       (strfind (options, '-2d'))  % 3D option
+if ~contains (options, '-2d')  % 3D option
     if numel     (bz) == 1                   % only here do you need bz
         bz       = ...
             min (Z) - 2 * thr : ...
@@ -139,14 +139,14 @@ if isempty       (strfind (options, '-2d'))  % 3D option
     Y2           = repmat (Y2, 1, len);
     Z1           = repmat (Z1, 1, len);
     Z2           = repmat (Z2, 1, len);
-    if strfind   (options, '-w')           % waitbar option: initialization
+    if contains (options, '-w')           % waitbar option: initialization
         if length  (bz) > 9
             HW   = waitbar (0, 'building up distance matrix ...');
             set  (HW, 'Name', '..PLEASE..WAIT..YEAH..');
         end
     end
     for counterz = 1 : length (bz)
-        if strfind   (options, '-w')     % waitbar option: update
+        if contains (options, '-w')     % waitbar option: update
             if mod   (counterz, 10) == 0
                 waitbar  (counterz ./ length (bz), HW);
             end
@@ -179,13 +179,13 @@ if isempty       (strfind (options, '-2d'))  % 3D option
             M (:, counterx, counterz)  = reshape (i1, len, 1, 1);
         end
     end
-    if strfind   (options, '-w') % waitbar option: close
+    if contains (options, '-w') % waitbar option: close
         if length    (bz) > 9
             close    (HW);
         end
     end
     c            = isosurface (bx, by, bz, M, thr);
-    if strfind   (options, '-s') % show option
+    if contains (options, '-s') % show option
         HP       = patch (c);
         set      (HP, ...
             'FaceColor',       'red', ...
@@ -211,14 +211,14 @@ else                                     % 2D option:
         Y1       = repmat (Y1, 1, len2);
         X2       = repmat (X2, 1, len2);
         Y2       = repmat (Y2, 1, len2);
-        if strfind   (options, '-w')
+        if contains (options, '-w')
             if length (BX) > 9
                 HW   = waitbar (0, 'building up distance matrix ...');
                 set  (HW, 'Name', 'please wait...');
             end
         end
         for counterx = 1 : length (BX)
-            if strfind   (options, '-w')
+            if contains (options, '-w')
                 if mod   (counterx, 10) == 0
                     waitbar (counterx ./ length (BX), HW);
                 end
@@ -248,7 +248,7 @@ else                                     % 2D option:
             M (:, counterx)  = reshape (i1, leny, lenx);
         end
         bx       = BX;
-        if strfind   (options, '-w')
+        if contains (options, '-w')
             if length    (BX) > 9
                 close    (HW);
             end
@@ -286,7 +286,7 @@ else                                     % 2D option:
     % checkout "cpoints" and "cplotter" to find out more about contour
     % convention:
     c            = c';
-    if strfind   (options, '-s')
+    if contains (options, '-s')
         HP       = cplotter (c);
         if sum   (get (gca, 'Dataaspectratio') == [1 1 1]) ~= 3
             axis equal;
@@ -294,7 +294,7 @@ else                                     % 2D option:
     end
 end
 
-if isempty       (strfind (options, '-F')) % threshold distance matrix
+if ~contains (options, '-F') % threshold distance matrix
     M            = M < thr;
 end
 

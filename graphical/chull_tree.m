@@ -43,7 +43,7 @@
 % Uses cyl ver X Y Z
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [HP,  hull] = chull_tree ( ...
     intree, ...
@@ -55,7 +55,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 % use only node position for this function
 if isnumeric (intree) && numel (intree) > 1
@@ -105,8 +105,8 @@ if (nargin < 6) || isempty (options)
 end
 
 % this is basically simple graphical patch of the output of convhull
-if strfind       (options, '-2d')
-    if length    (ipart) > 2
+if contains      (options, '-2d')
+    if     length (ipart) > 2
         ch       = convhull (X (ipart), Y (ipart));
         HP       = patch    ( ...
             X (ipart (ch)) + DD (1), ...
@@ -126,9 +126,9 @@ if strfind       (options, '-2d')
             Y (ipart) + DD (2), 'k.');
         set      (HP, ...
             'color',           color);
-    end;
+    end
 else
-    if length    (ipart) > 2
+    if     length (ipart) > 2
         XYZ      = [ ...
             (X (ipart) + DD (1)), ...
             (Y (ipart) + DD (2)), ...
@@ -158,7 +158,7 @@ else
             Z (ipart) + DD (3) , 'k.');
         set      (HP, ...
             'color',           color);
-    end;
+    end
 end
 
 if sum (get (gca, 'Dataaspectratio') == [1 1 1]) ~= 3
@@ -166,7 +166,7 @@ if sum (get (gca, 'Dataaspectratio') == [1 1 1]) ~= 3
 end
 
 if (nargout > 1)
-    if strfind   (options, '-2d')
+    if contains (options, '-2d')
         hull     = [];
         hull.XY  = [ ...
             (X (ipart) + DD (1)) ...
@@ -180,8 +180,6 @@ if (nargout > 1)
     end
     hull.ch      = ch;
 end
-
-
 
 
 

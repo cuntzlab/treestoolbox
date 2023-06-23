@@ -36,7 +36,7 @@
 % Uses       X, Y, Z
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function HP = dA_tree (intree, color, DD, xyscale, options)
 
@@ -46,7 +46,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 % use only directed adjacency for this function (obviously..)
 if ~isstruct (intree)
@@ -92,8 +92,8 @@ hold on;
 X                = xyscale * X + DD (1);
 Y                = xyscale * Y - DD (2);
 if ...
-        (isempty  (strfind (options, '-g')) && (N < 50)) || ...
-        (~isempty (strfind (options, '-t')))
+        (~contains (options, '-g') && (N < 50)) || ...
+        (contains (options, '-t'))
     HP1          = line ( ...
         repmat   (xyscale  * (0.5 : 1 : N + 0.5), 2, 1)     + DD (1), ...
         repmat   (-xyscale * [0.5 (N + 0.5)]',    1, N + 1) + DD (2));

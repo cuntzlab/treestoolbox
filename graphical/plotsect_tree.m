@@ -34,7 +34,7 @@
 % Uses       ipar_tree ver_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [HP, indy] = plotsect_tree ( ...
     intree, sect, color, DD, options, ipar)
@@ -86,7 +86,7 @@ else
     Z            = intree.Z;
 end
 
-hold on;
+hold             on;
 indy             = ipar  ( ...
     sect (1, 2), ...
     1 : find (ipar (sect (1, 2), :) == sect (1, 1)));

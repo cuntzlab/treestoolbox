@@ -30,7 +30,7 @@
 %     '-b'   : 2D pieces are displayed on a 3D grid (-b stands for -blatt)
 %     showing the diameter but not as real cylinders. Output is a
 %     series of patches. Fastest representation.
-%       '-b1': patches are mapped on x y 
+%       '-b1': patches are mapped on x y
 %       '-b2': patches are mapped on x z
 %       '-b3': patches are mapped on y z
 %     '-p'   : correct cylinder representation but not yet flawless and a
@@ -58,11 +58,11 @@
 % See also   vtext_tree xplore_tree
 % Uses       cyl_tree ver_tree
 %
-% directly adapted for TREES toolbox, code for correct cylinders from:
+% Directly adapted for TREES toolbox, code for correct cylinders from:
 % Friedrich Forstner
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function HP  = plot_tree (intree, color, DD, ipart, res, options)
 
@@ -124,16 +124,16 @@ if (nargin < 6) || isempty (options)
     options  = '-p';
 end
 
-if strfind       (options, '-b')
+if contains (options, '-b')
     if isfield   (tree, 'D')
         D        = tree.D (ipart);
     else
         D        = ones (length (ipart), 1);
     end
-    if strfind   (options, '-thin')
+    if contains (options, '-thin')
         D        = ones (length (ipart), 1);
     end
-    if strfind   (options, '-thick')
+    if contains (options, '-thick')
         D        = D + 3;
     end
     [X1, X2, Y1, Y2, Z1, Z2] = ...
@@ -265,16 +265,20 @@ if strfind       (options, '-b')
             end
     end
     if (size (color, 1) > 1) && (size (color, 2) == 1)
-        HP       = patch (MX, MY, MZ, color');
+        HP           = patch (MX, MY, MZ, color');
     else
-        HP       = patch (MX, MY, MZ, 0);
+        HP           = patch (MX, MY, MZ, 0);
         if (size (color, 2) == 3) && (size (color, 1) == 1)
             set  (HP, ...
                 'facecolor',   color); % map color
         elseif (size (color, 2) == 3) && (size (color, 1) == numel(tree.X))
-            C = repmat (color, 1, 4); C = reshape (C', numel (C), 1);
-            C = reshape (C, 3,numel (C)/3)';
-            set (HP, 'facecolor','flat','edgecolor','flat','FaceVertexCData',C);
+            C        = repmat (color, 1, 4);
+            C        = reshape (C', numel (C), 1);
+            C        = reshape (C, 3,numel (C)/3)';
+            set      (HP, ...
+                'facecolor',   'flat', ...
+                'edgecolor',   'flat', ...
+                'FaceVertexCData', C);
         end
     end
 end
@@ -306,13 +310,13 @@ if ~isempty      ([ ...
     if ~isempty  ([ ...
             (strfind (options, '-2l')) ...
             (strfind (options, '-3l'))])
-        if   strfind (options, '-2l')
+        if   contains(options, '-2l')
             [X1, X2, Y1, Y2] = cyl_tree (intree, '-2d');
             HP         = line ( ...
                 [(X1 (ipart)) (X2 (ipart))]' + DD (1), ...
                 [(Y1 (ipart)) (Y2 (ipart))]' + DD (2));
         end
-        if   strfind (options, '-3l')
+        if   contains(options, '-3l')
             [X1, X2, Y1, Y2, Z1, Z2] = cyl_tree (intree);
             HP         = line ( ...
                 [(X1 (ipart)) (X2 (ipart))]' + DD (1), ...
@@ -329,7 +333,7 @@ if ~isempty      ([ ...
                 'color',       color);
         end
     end
-    if strfind (options, '-2q')
+    if contains(options, '-2q')
         [X1, X2, Y1, Y2] = cyl_tree (intree, '-2d');
         HP             = quiver ( ...
             X1 (ipart) + DD (1), ...
@@ -342,7 +346,7 @@ if ~isempty      ([ ...
         set            (HP, ...
             'color',           color);
     end
-    if strfind (options, '-3q')
+    if contains(options, '-3q')
         [X1, X2, Y1, Y2, Z1, Z2] = ...
             cyl_tree (intree);
         HP             = quiver3 ( ...
@@ -358,17 +362,17 @@ if ~isempty      ([ ...
         set            (HP, ...
             'color', color);
     end
-    if strfind (options, '-thin')
+    if contains(options, '-thin')
         set            (HP, ...
             'linewidth', 0.25);
     end
-    if strfind (options, '-thick')
+    if contains(options, '-thick')
         set            (HP, ...
             'linewidth', 3);
     end
 end
 
-if strfind       (options, '-p')
+if contains      (options, '-p')
     [X1, X2, Y1, Y2, Z1, Z2] = cyl_tree (intree);
     X1           = X1 (ipart) + DD (1);
     X2           = X2 (ipart) + DD (1);
@@ -402,7 +406,7 @@ if strfind       (options, '-p')
     b1           = reshape (b1', 3, 2 * res * size (b1, 1))';
     b2           = repmat  (b2,  1, 2 * res);
     b2           = reshape (b2', 3, 2 * res * size (b2, 1))';
-    
+
     % this is the first translation vector list to move the cylinder
     % terminals away from null
     dP           = cat     (2, ...
@@ -413,7 +417,7 @@ if strfind       (options, '-p')
     % destination
     P            = repmat  (P (1 : end, :), 1, 2 * res);
     P            = reshape (P',             3, 2 * res * N)';
-    
+
     % setup diameters:
     % use frustums for ratio (radius/parent) >$threshold and < 1/treshhold
     % to avoid strange visualization results of thin branches leaving
@@ -423,13 +427,13 @@ if strfind       (options, '-p')
     else
         D        = ones (length (X1),    1);
     end
-    if strfind   (options, '-thin')
+    if contains  (options, '-thin')
         D        = ones (length (ipart), 1);
     end
-    if strfind   (options, '-thick')
+    if contains  (options, '-thick')
         D        = D + 3;
     end
-    
+
     % if tree consists of only one point, plot a sphere instead of cylinder
     if N == 1
         [XS, YS, ZS] = sphere (16);
@@ -489,8 +493,8 @@ if strfind       (options, '-p')
             (size (color, 1) == numel(tree.X)) && (size (color, 2) == 1)) ||  ...
             (size (color, 2) == numel(tree.X)) && (size (color, 1) == 1)
         if (size (color, 2) > 1) && (size (color, 1) == 1)
-           color = color'; 
-        end        
+            color = color';
+        end
         C        = repmat  (color, 1, res * 2);
         C        = reshape (C', numel (C), 1);
         HP       = patch   ( ...

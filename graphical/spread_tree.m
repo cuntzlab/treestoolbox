@@ -37,7 +37,7 @@
 % Uses       X, Y, Z
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [DD, outtrees] = spread_tree (intrees, dX, dY, options)
 
@@ -47,17 +47,17 @@ global       trees
 if (nargin < 1) || isempty (intrees)
     % {DEFAULT: trees cell array}
     intrees  = trees;
-end;
+end
 
 if (nargin < 2) || isempty (dX)
     % {DEFAULT: trees are 50 um apart horizontally}
     dX       = 50;
-end;
+end
 
 if (nargin < 3) || isempty (dY)
     % {DEFAULT: trees are 50 um apart vertically}
     dY       = 50;
-end;
+end
 
 if (nargin < 4) || isempty (options)
     % {DEFAULT: none}
@@ -210,8 +210,8 @@ switch               level
         end
 end
 
-if strfind           (options, '-s')
-    if ~strfind           (options, '-noclear')
+if contains (options, '-s')
+    if ~contains (options, '-noclear')
         clf;
     end
     switch level
@@ -224,7 +224,7 @@ if strfind           (options, '-s')
                 end
             end
         case         1
-            if ~strfind           (options, '-noclear')
+            if ~contains (options, '-noclear')
                 clf;
             end
             for counter = 1 : lent

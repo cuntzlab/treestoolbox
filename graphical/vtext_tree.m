@@ -17,7 +17,7 @@
 %     if vector then values are treated in colormap (must contain one value
 %     per node then!)
 %     if matrix (num x 3) then individual colors are mapped to each element
-%     {DEFAULT [0 0 0]}
+%     {DEFAULT [1 0 0]} red
 % - DD       :: XY-tupel or XYZ-tupel: coordinates offset
 %     {DEFAULT [0,0,0]}
 % - crange   ::2-tupel:      color range [min max]
@@ -35,13 +35,13 @@
 %
 % Example
 % -------
-% vtext_tree   (sample_tree, [], [], [], [], [], '-sc');
+% vtext_tree   (sample2_tree, [], [], [], [], [], '-sc');
 %
 % See also   plot_tree xplore_tree
 % Uses       X, Y, Z
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function HP = vtext_tree (intree, v, color, DD, crange, ipart, options)
 
@@ -64,13 +64,13 @@ ver_tree     (intree);                 % verify that input is a tree
 if ~isstruct (intree)
     X        = trees{intree}.X;
     Y        = trees{intree}.Y;
-    if isempty (strfind (options, '-2d'))
+    if ~contains (options, '-2d')
         Z    = trees{intree}.Z;
     end
 else
     X        = intree.X;
     Y        = intree.Y;
-    if isempty (strfind (options, '-2d'))
+    if ~contains (options, '-2d')
         Z    = intree.Z;
     end
 end
@@ -93,7 +93,8 @@ end
 if (nargin < 3) || isempty (color)
     % {DEFAULT color: red}
     color    = [1 0 0];
-end;
+end
+
 if (size (color, 1) == N) && (size (ipart, 1) ~= N)
     color    = color (ipart);
 end
@@ -135,7 +136,7 @@ if size              (color, 1) > 1
     end
 end
 
-if strfind           (options, '-2d')
+if contains (options, '-2d')
     vt               = num2str (v);
     HP               = text ( ...
         X (ipart) + DD (1), ...
@@ -160,11 +161,11 @@ else
         'fontsize',            14);
 end
 
-if strfind (options, '-sc')
+if contains (options, '-sc')
     axis             equal;
     xlim             ([(min (X)) (max (X))]);
     ylim             ([(min (Y)) (max (Y))]);
-    if isempty       (strfind  (options, '-2d'))
+    if ~contains (options, '-2d')
         zlim         ([(min (Z)) (max (Z))]);
     end
 end

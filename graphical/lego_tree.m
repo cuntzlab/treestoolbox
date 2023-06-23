@@ -26,13 +26,13 @@
 %
 % Example
 % -------
-% lego_tree    (sample_tree, 15)
+% lego_tree    (sample_tree, 15); view (3)
 %
 % See also
-% Uses       gdens_tree ver_tree X Y
+% Uses       gdens_tree ver_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [HP, M] = lego_tree (intree, sr, thr, options)
 
@@ -42,7 +42,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 ver_tree     (intree); % verify that input is a tree structure
 
@@ -114,7 +114,7 @@ end
 
 HP               = [];
 hold             on;
-for counter      = 1 : length (uM);
+for counter      = 1 : length (uM)
     [Y, X, Z]    = ind2sub (size (M), find (M == uM (counter)));
     for counterX = 1 : length (X)
         x        = dX (X (counterX));
@@ -165,11 +165,11 @@ for counter      = 1 : length (uM);
         p (5)    = patch  (SX', SY', SZ', uM (counter));
 
         HP       = [HP; p];
-        if isempty (strfind (options, '-e'))
+        if ~contains (options, '-e')
             set  (p, ...
                 'edgecolor',   'none');       % remove black lines
         end
-        if isempty (strfind (options, '-f'))
+        if ~contains (options, '-f')
             set  (p, ...
                 'facealpha',   nM (counter)); % increase opacity / density
         end
@@ -178,4 +178,6 @@ end
 if sum   (get (gca, 'Dataaspectratio') == [1 1 1]) ~= 3
     axis         equal;
 end
+
+
 

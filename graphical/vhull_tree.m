@@ -40,7 +40,7 @@
 % Uses       ver_tree X Y (Z)
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [HP, VO, KK, vol] = vhull_tree (intree, ...
     v, points, ipart, DD, options)
@@ -68,13 +68,13 @@ else
     if ~isstruct (intree)
         X        = trees{intree}.X;
         Y        = trees{intree}.Y;
-        if isempty (strfind (options, '-2d'))
+        if ~contains (options, '-2d')
             Z    = trees{intree}.Z;
         end
     else
         X        = intree.X;
         Y        = intree.Y;
-        if isempty (strfind (options, '-2d'))
+        if ~contains (options, '-2d')
             Z    = intree.Z;
         end
     end
@@ -100,7 +100,7 @@ if (nargin < 3) || isempty (points)
     options2     = options;
     options2 (i1 : i1 + 1) = '';
     c            = hull_tree (intree, [], [], [], [], options2);
-    if strfind   (options, '-2d')
+    if contains (options, '-2d')
         [Xt, Yt] = cpoints (c);
         points   = [Xt Yt];
     else
@@ -117,7 +117,7 @@ X            = [(X (ipart)); (points (:, 1))] + DD (1);
 Y            = [(Y (ipart)); (points (:, 2))] + DD (2);
 HP           = zeros (length (ipart), 1);
 
-if strfind       (options, '-2d')
+if contains (options, '-2d')
     % voronoi doesn't like duplicate points
     warning      ('off', 'MATLAB:voronoin:DuplicateDataPoints');
     [V, C]       = voronoin (double ([X, Y]));
@@ -144,7 +144,7 @@ if strfind       (options, '-2d')
     vol          = parea (indy);
     KK           = C (indy);
     VO           = VI;
-    if strfind       (options, '-s') % show option: update
+    if contains (options, '-s') % show option: update
         for counter  = 1 : length (KK)
             if isempty (v)
                 HP (counter) = patch ( ...
@@ -193,7 +193,7 @@ else
     vox          = vox (indy);
     voy          = voy (indy);
     voz          = voz (indy);
-    if strfind   (options, '-s') % show option: update
+    if contains (options, '-s') % show option: update
         for counter = 1 : length (KK)
             if isempty (v)
                 p    = patch ( ...
@@ -213,13 +213,13 @@ else
     
 end
 
-if strfind       (options, '-r') % reduce the complexity of the output patch
+if contains (options, '-r') % reduce the complexity of the output patch
     for counter  = 1 : length (HP)
         reducepatch  (HP (counter), 0.1);
     end
 end
 
-if strfind       (options, '-s') % show option
+if contains (options, '-s') % show option
     if ~isempty  (v)
         shading  flat;
     end

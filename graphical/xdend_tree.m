@@ -105,7 +105,7 @@ if (nargout > 1) || contains (options, '-s')
     end
 end
 
-if contains      (options, '-s') % show option
+if contains (options, '-s') % show option
     clf;
     hold         on;
     HP           = plot_tree (intree, [], -150);
@@ -122,9 +122,6 @@ if contains      (options, '-s') % show option
     axis         image;
     title        ('equivalent tree');
 end
-
-
-
 
 
 

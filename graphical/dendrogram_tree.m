@@ -43,7 +43,7 @@
 % Uses       xdend_tree ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function HP = dendrogram_tree ( ...
     intree, diam, yvec, color, DD, wscale, options)
@@ -116,7 +116,7 @@ Z2               = zeros (size (X1, 1), 1)     + DD (3);
 if numel (diam)  == 1
     diam         = ones (size (X1, 1), 1) .* diam;
 end
-if isempty       (strfind (options, '-v'))
+if ~contains (options, '-v')
     % separate in horizontal and vertical components:
     X1           = [X1; X2];
     X2           = [X2; X2];
@@ -136,7 +136,7 @@ else
     end
 end
 
-if isempty       (strfind (options, '-p'))
+if ~contains (options, '-p')
     % as lines:
     HP           = line ( ...
         [X1 X2]', ...

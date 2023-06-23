@@ -33,7 +33,7 @@
 % Uses       plot_tree vtext_tree ver_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [HT, HP] = xplore_tree (intree, options, color, DD)
 
@@ -43,7 +43,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree = length (trees); 
-end;
+end
 
 ver_tree     (intree); % verify that input is a tree structure
 
@@ -66,13 +66,14 @@ end
 if (nargin < 4) || isempty (DD)
     DD       = [0 0 0];
 end
+
 if length (DD) < 3
     DD       = [DD (zeros (1, 3 - length (DD)))];
 end
 
 tree             = tran_tree (tree, DD);
 
-if strfind       (options, '-1')
+if contains (options, '-1')
     hold         on;
     HP           = plot_tree (tree, color);
     plot_tree    (tree, color, [], [], [], '-3q');
@@ -81,7 +82,7 @@ if strfind       (options, '-1')
         'facealpha',           0.1);
 end
 
-if strfind       (options, '-2')
+if contains (options, '-2')
     hold         on;
     HP           = plot_tree (tree, tree.R);
     uR           = unique (tree.R);
@@ -101,7 +102,7 @@ if strfind       (options, '-2')
     end
 end
 
-if strfind       (options, '-3')
+if contains (options, '-3')
     subplot      (2, 1, 1);
     HP           = plot_tree (tree, color, [], [], [],  '-3l');
     set          (HP, ...

@@ -35,8 +35,7 @@
 % Uses       ver_tree X Y Z
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
-
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [M, dX, dY, dZ, HP] = gdens_tree (intree, sr, ipart, options)
 
@@ -109,7 +108,7 @@ dX               = dX + sr / 2;
 dY               = dY + sr / 2;
 dZ               = dZ + sr / 2;
 M (uindx)        = histc (indx, uindx);
-if strfind       (options, '-s')
+if contains (options, '-s')
     hold         on;
     minM         = min (min (min (M)));
     maxM         = max (max (max (M)));

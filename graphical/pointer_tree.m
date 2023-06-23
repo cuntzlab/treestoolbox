@@ -38,7 +38,7 @@
 % Uses ver X Y Z
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function HP = pointer_tree (intree, inodes, llen, color, DD, options)
 
@@ -86,7 +86,7 @@ if (nargin < 6) || isempty (options)
 end
 
 if (nargin < 4) || isempty (color)
-    if strfind   (options, '-v')
+    if contains (options, '-v')
         % {DEFAULT: bluegreenish}
         color    = [0.6 0.7 1];
     else
