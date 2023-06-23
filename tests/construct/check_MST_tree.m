@@ -19,6 +19,10 @@ tprint       ('./panels/MST_tree1', ...
 
 %% test 2
 for counter  = 1 : 20
-    display  (counter)
+    disp  (counter)
     MST_tree ([], [], [], [], [], [], [], [], 'none');
 end
+
+
+
+
