@@ -38,7 +38,7 @@
 % Uses       ipar_tree B_tree ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function asym = asym_tree (intree, v, options)
 
@@ -69,7 +69,7 @@ if (nargin < 3) || isempty (options)
     options  = '';
 end
 
-if strfind(options, '-v')
+if contains (options, '-v')
     vanpelt = true;
 else
     vanpelt = false;
@@ -105,14 +105,18 @@ for counter      = 1 : length (iB)
             asym (counter) = v2 / (v1 + v2);
         end
     end
-    if strfind   (options, '-m')       % movie option
+    if contains (options, '-m')       % movie option
         clf;
         hold     on;
         HP       = plot_tree (intree);
         set      (HP, ...
             'facealpha', 0.2);
-        plot_tree (intree, [1 0 0], [], sub1);
-        plot_tree (intree, [0 1 0], [], sub2);
+        if numel (sub1) > 1
+            plot_tree (intree, [1 0 0], [], sub1);
+        end
+        if numel (sub2) > 1
+            plot_tree (intree, [0 1 0], [], sub2);
+        end
         HT       = text (0, 0, num2str (asym (counter)));
         set      (HT,...
             'fontsize',        12,...
@@ -132,7 +136,7 @@ tasym            = asym;
 asym             = NaN (size (dA, 1), 1);
 asym (iB)        = tasym;
 
-if strfind       (options, '-s') % show option
+if contains (options, '-s') % show option
     clf;
     hold         on;
     HP           = plot_tree (intree, [], [], find (~B_tree (intree)));
@@ -153,3 +157,5 @@ if strfind       (options, '-s') % show option
         'clim',                [0 0.5]);
     colorbar;
 end
+
+

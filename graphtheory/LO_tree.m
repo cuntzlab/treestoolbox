@@ -27,7 +27,7 @@
 % Uses       PL_tree ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function  LO = LO_tree (intree, options)
 
@@ -37,7 +37,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 ver_tree     (intree); % verify that input is a tree structure
 
@@ -70,7 +70,7 @@ end
 LO               = LO + PL;
 LO               = full (LO);
 
-if strfind       (options, '-s') % show option
+if contains (options, '-s') % show option
     clf;
     hold         on; 
     HP           = plot_tree (intree, LO, [], [], [], '-b');
@@ -85,8 +85,6 @@ if strfind       (options, '-s') % show option
     axis         image;
     colorbar;
 end
-
-
 
 
 

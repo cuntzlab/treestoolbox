@@ -13,9 +13,11 @@
 % -----
 % - intree   ::integer:      index of tree in trees or structured tree
 % - options  ::string:
+%     '-T'   : Only paths from termination point to first branch point
 %     '-s'   : show
 %     {DEFAULT: ''}
 % - ipart    ::index:        index to the subpart to be plotted
+%                            (if '-T', selects terminals only from ipart)
 %     {DEFAULT: all nodes}
 %
 % Output
@@ -30,7 +32,7 @@
 % Uses       PL_tree ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function ipar = ipar_tree (intree, options, ipart)
 
@@ -58,7 +60,7 @@ end
 
 if (nargin < 3) || isempty (ipart)
     % {DEFAULT: all nodes}
-    ipart  = (1 : size (dA, 1))';
+    ipart    = [];%(1 : size (dA, 1))';
 end
 
 % number of nodes in tree:
@@ -67,16 +69,31 @@ N                = size (dA, 1);
 maxPL            = max  (PL_tree (intree));
 V                = (1 : N)';
 ipar             = zeros (N, maxPL + 2);
-ipar(:, 1)       = V;
+ipar (:, 1)      = V;
 for counter      = 2 : maxPL + 2
     % use adjacency matrix to walk through tree:
     V            = dA * V;
     ipar (:, counter) = V;
 end
-if ~isempty      (ipart)
+
+if contains      (options, '-T') % Only terminal branches
+    B            = B_tree       (intree);
+    T            = T_tree       (intree);
+    if ~isempty  (ipart)
+        T        = T (ipart);
+    end
+    B1           = [0; B];
+    ibranch      = cumsum       (B1 (ipar + 1), 2) < 1;
+    ipar         = ibranch (T, :) .* ipar (T, :);
+elseif ~isempty      (ipart)
     ipar         = ipar (ipart, any (ipar (ipart, :) ~= 0, 1));
 end
-if strfind       (options, '-s') % show option
+
+% if ~isempty      (ipart)
+%     ipar         = ipar (ipart, any (ipar (ipart, :) ~= 0, 1));
+% end
+
+if contains (options, '-s') % show option
     clf;
     imagesc      (ipar);
     ylabel       ('node #');
@@ -98,7 +115,6 @@ end
 % for counter = 0 : N
 %     ipar = [ipar (dA^counter)*(1:N)'];
 % end
-
 
 
 

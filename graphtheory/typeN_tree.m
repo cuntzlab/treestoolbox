@@ -31,7 +31,7 @@
 % Uses dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function  typeN = typeN_tree (intree, options)
 
@@ -61,13 +61,13 @@ end
 typeN            = (ones (1, size (dA, 1)) * dA)';
 typeN (typeN > 2) = 2;
 
-if strfind       (options, '-bct') % give a string output
+if contains (options, '-bct') % give a string output
     typeN        = 68 - typeN;
     typeN (typeN == 68) = 84;
     typeN        = char (typeN);
 end
 
-if strfind       (options,'-s') % show option
+if contains (options,'-s') % show option
     clf;
     hold         on;
     HP           = plot_tree   (intree, [0 0 0], [], [], [], '-b');

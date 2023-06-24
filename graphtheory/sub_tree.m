@@ -30,7 +30,7 @@
 % Uses dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [sub, subtree] = sub_tree (intree, inode, options)
 
@@ -71,7 +71,7 @@ while sum (tdA)
 end
 sub              = logical (sub);
 
-if strfind       (options, '-s') % show option
+if contains (options, '-s') % show option
     clf;
     hold         on;
     HP           = plot_tree (intree, [],      [], ~sub, [], '-b');

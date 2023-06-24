@@ -29,7 +29,7 @@
 % Uses       ipar_tree len_tree ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function Pvec = Pvec_tree (intree, v, options)
 
@@ -64,7 +64,7 @@ else
     Pvec         = sum (v0 (ipar + 1), 2);
 end
 
-if strfind       (options, '-s')       % show option
+if contains (options, '-s')       % show option
     clf;
     hold         on; 
     HP           = plot_tree (intree, Pvec, [], [], [], '-b');
@@ -79,10 +79,6 @@ if strfind       (options, '-s')       % show option
     grid         on;
     axis         image;
 end
-
-
-
-
 
 
 

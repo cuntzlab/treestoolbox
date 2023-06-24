@@ -27,7 +27,7 @@
 % Uses       ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function B = B_tree (intree, options)
 
@@ -57,7 +57,7 @@ end
 % branch points have more than one entry in dA:
 B                = ((ones (1, size (dA, 1)) * dA) > 1)';
 
-if strfind       (options, '-s') % show option
+if contains (options, '-s') % show option
     clf;
     hold         on; 
     plot_tree    (intree, [], [], [], [], '-b');

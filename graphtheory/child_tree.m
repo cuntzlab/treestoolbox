@@ -5,8 +5,8 @@
 % ---------------------------------------
 %
 % Returns a vector with the added up values in v of all child nodes
-% excluding itself. This is done for each node in the tree. This is a
-% META-FUNCTION and can lead to various applications.
+% excluding itself. This is done for each node in the tree.
+% This is a META-FUNCTION and can lead to various applications.
 %
 % Input
 % -----
@@ -29,7 +29,7 @@
 % Uses       ipar_tree ver_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function child = child_tree (intree, v, options)
 
@@ -39,7 +39,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 ver_tree     (intree); % verify that input is a tree structure
 
@@ -71,7 +71,7 @@ if size          (child, 1) < N
     child (N)    = 0;
 end
 
-if strfind       (options,'-s') % show option
+if contains (options,'-s') % show option
     clf;
     hold         on; 
     plot_tree    (intree, child);

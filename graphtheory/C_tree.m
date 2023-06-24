@@ -26,7 +26,7 @@
 % Uses       ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function C = C_tree (intree, options)
 
@@ -56,7 +56,7 @@ end
 % continuation points have one entry in dA:
 C                = ((ones (1, size (dA, 1)) * dA) == 1)';
 
-if strfind       (options,'-s') % show option
+if contains (options,'-s') % show option
     clf;
     hold         on; 
     plot_tree    (intree, [], [], [], [], '-b');
@@ -69,3 +69,6 @@ if strfind       (options,'-s') % show option
     grid         on;
     axis         image;
 end
+
+
+

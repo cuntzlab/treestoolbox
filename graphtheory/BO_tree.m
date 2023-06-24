@@ -27,7 +27,7 @@
 % Uses       ver_tree typeN_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function BO = BO_tree (intree, options)
 
@@ -69,7 +69,7 @@ end
 BO (1)           = 1;
 BO               = full (log2 (BO));
 
-if strfind       (options,'-s') % show option
+if contains (options,'-s') % show option
     clf;
     hold         on;
     HP           = plot_tree (intree, BO, [], [], [], '-b');
@@ -84,10 +84,6 @@ if strfind       (options,'-s') % show option
     grid         on;
     axis         image;
 end
-
-
-
-
 
 
 

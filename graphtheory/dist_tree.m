@@ -29,7 +29,7 @@
 % Uses       len_tree Pvec_tree idpar_tree ver_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function dist = dist_tree (intree, l, options)
 
@@ -39,7 +39,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 ver_tree     (intree); % verify that input is a tree structure
 
@@ -64,7 +64,7 @@ dist             = sparse ( ...
     (l >= repmat (Plen (idpar), 1, llen)) & ...
     (l <  repmat (Plen, 1, llen)));
 
-if strfind       (options,'-s') % show option
+if contains (options, '-s') % show option
     clf;
     hold         on;
     plot_tree        (intree, [0 0 0], [], ~sum (dist, 2));
@@ -79,8 +79,6 @@ if strfind       (options,'-s') % show option
     grid         on;
     axis         image;
 end
-
-
 
 
 

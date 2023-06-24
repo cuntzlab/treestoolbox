@@ -27,7 +27,7 @@
 % Uses         ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function idpar = idpar_tree (intree, options)
 
@@ -57,12 +57,12 @@ end
 % simple graph theory: feature of adjacency matrix:
 idpar            = dA * (1 : size (dA, 1))';
 
-if isempty       (strfind (options, '-0'))
+if ~contains (options, '-0')
     % null-compartment (root) becomes index to itsself
     idpar (idpar == 0) = find ((idpar == 0));
 end
 
-if strfind       (options,'-s')            % show option
+if contains (options,'-s')            % show option
     clf; 
     HP           = plot_tree  (intree, [], [], [], [], '-b');
     set          (HP, ...

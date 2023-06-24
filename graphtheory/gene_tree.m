@@ -37,7 +37,7 @@
 % Uses       sort_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function  genes = gene_tree (intrees, options)
 
@@ -47,7 +47,7 @@ global       trees
 if (nargin < 1) || isempty (intrees)
     % {DEFAULT trees: trees cell array}
     intrees  = {trees};
-end;
+end
 
 if (nargin < 2) || isempty (options)
     % {DEFAULT: no option}
@@ -57,13 +57,13 @@ end
 genes            = cell (1, 1);
 names            = cell (1, 1);
 counterG         = 0;
-if strfind       (options, '-w') % waitbar option: initialization
+if contains (options, '-w') % waitbar option: initialization
     HW           = waitbar (0, 'sequencing trees...');
     set          (HW, 'Name', '..PLEASE..WAIT..YEAH..');
 end
 for counter1                   = 1 : length (intrees)
     for counter2               = 1 : length (intrees{counter1})
-        if strfind             (options, '-w') % waitbar option: update
+        if contains       (options, '-w') % waitbar option: update
             waitbar            (counter2 / length (intrees{counter1}), HW);
         end
         counterG               = counterG + 1;
@@ -71,7 +71,7 @@ for counter1                   = 1 : length (intrees)
         names{counterG}        = name;
         [gene, pathlen]        = getgene (intrees{counter1}{counter2});
         genes{counterG}        = gene;
-        if strfind             (options, '-s') % show option
+        if contains       (options, '-s') % show option
             clen               = cumsum (pathlen + 5);
             HL                 = line ( ...
                 [[0; (clen (1 : end - 1))], (clen - 5)]', ...
@@ -97,7 +97,7 @@ for counter1                   = 1 : length (intrees)
         end
     end
 end
-if strfind       (options,'-w')        % waitbar option: close
+if contains (options,'-w')        % waitbar option: close
     close        (HW);
 end
 end
@@ -129,10 +129,6 @@ M                = [pathlen typer];
 reshape          (M', numel (M), 1);
 gene             = M;
 end
-
-
-
-
 
 
 

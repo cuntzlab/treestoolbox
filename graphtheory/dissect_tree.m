@@ -35,7 +35,7 @@
 % Uses       root_tree ipar_tree idpar_tree T_tree B_tree Pvec_tree ver_tree R
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [sect, vec] = dissect_tree (intree, options)
 
@@ -63,7 +63,7 @@ ipar             = ipar + 1;
 % iBT: positions at which to cut the tree (branch and terminal nodes):
 iBT              = T_tree (tree) | B_tree (tree);
 if ...
-        (isempty (strfind (options, '-r'))) && ...
+        (~contains (options, '-r')) && ...
         (isfield (tree,'R')) && ...
         (numel   (tree.R) == numel (tree.X))
     idpar        = idpar_tree (tree);      % indices to direct parents
@@ -114,8 +114,9 @@ if nargout       > 1
     vec (1, 2)   = 0;
 end
 
-if strfind       (options, '-s')       % show option
-    clf; hold on;
+if contains (options, '-s')       % show option
+    clf;
+    hold         on;
     if ~isempty  (vec)
         R        = rand (size (sect, 1), 1);
         HP       = plot_tree  (intree, ...

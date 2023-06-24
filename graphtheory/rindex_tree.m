@@ -26,7 +26,7 @@
 % Uses ver_tree R
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function rindex = rindex_tree (intree, options)
 
@@ -63,7 +63,7 @@ for counter      = 1 : luR
     rindex (G)   = 1 : sum (G);
 end
 
-if strfind       (options, '-s') % show option
+if contains (options, '-s') % show option
     clf;
     hold         on;
     colorbar;

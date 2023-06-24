@@ -16,7 +16,7 @@
 %
 % Output
 % ------
-% T::Nx1 logical vector: terminals are 1, others 0
+% - T        ::Nx1 logical vector: Terminals are 1, others 0
 %
 % Example
 % -------
@@ -26,7 +26,7 @@
 % Uses ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function T = T_tree (intree, options)
 
@@ -56,7 +56,7 @@ end
 T                = ((ones (1, size (dA, 1)) * dA) == 0)';
 % (termination points have zero entries in dA)
 
-if strfind(options,'-s'), % show option
+if contains (options, '-s') % show option
     clf;
     hold         on; 
     plot_tree    (intree, [], [], [], [], '-b');

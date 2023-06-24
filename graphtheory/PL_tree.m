@@ -27,7 +27,7 @@
 % Uses       ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function  PL = PL_tree (intree, options)
 
@@ -65,8 +65,9 @@ while sum (resPL == 1) ~= 0
 end
 PL           = full (PL);
 
-if strfind       (options, '-s')           % show option
-    clf; hold on; 
+if contains (options, '-s')           % show option
+    clf;
+    hold         on; 
     HP           = plot_tree (intree, PL, [], [], [], '-b');
     set          (HP, ...
         'edgecolor',           'none');

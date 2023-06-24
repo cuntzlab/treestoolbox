@@ -32,7 +32,7 @@
 % Uses       PL_tree ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function varargout = redirect_tree (intree, istart, options)
 
@@ -99,7 +99,7 @@ for counter      = 1 : length (S)
     end
 end
 
-if strfind       (options,'-s') % show option
+if contains (options,'-s') % show option
     clf;
     hold         on; 
     HP           = plot_tree  (intree, [], [], [], [], '-b');

@@ -39,7 +39,7 @@
 % Uses idpar_tree ver_tree dA
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function varargout = sort_tree (intree, options)
 
@@ -67,7 +67,7 @@ end
 
 N                = size (tree.dA, 1); % number of nodes in tree
 
-if strfind       (options, '-LO')
+if     contains (options, '-LO')
     % path length away from node:
     PL           = PL_tree (intree);
     % level order for each node (see "LO_tree"):
@@ -89,7 +89,7 @@ if strfind       (options, '-LO')
             end
         end
     end
-elseif strfind   (options, '-LEX')
+elseif contains (options, '-LEX')
     % order indices first according to number of daughters:
     % this means that T comes first then C then B
     typeN        = full (sum (tree.dA)');
@@ -165,7 +165,7 @@ for counter      = 1 : length (S)
     end
 end
 
-if strfind       (options, '-s') % show option
+if contains (options, '-s') % show option
     clf;
     hold         on;
     HP           = plot_tree  (intree, [], [], [], [], '-b');
@@ -201,3 +201,5 @@ end
 if (nargout >1)
     varargout{2} = order;
 end
+
+

@@ -29,7 +29,7 @@
 % Uses       idpar_tree ver_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function ratio = ratio_tree (intree, v, options)
 
@@ -62,7 +62,7 @@ idpar            = idpar_tree (intree);
 % well yes, is this worth an extra function?:
 ratio            = v ./ v (idpar);      
 
-if strfind       (options, '-s')       % show option
+if contains (options, '-s')       % show option
     clf;
     hold         on; 
     HP           = plot_tree (intree, ratio, [], [], [], '-b');
@@ -77,9 +77,5 @@ if strfind       (options, '-s')       % show option
     grid         on;
     axis         image;
 end
-
-
-
-
 
 

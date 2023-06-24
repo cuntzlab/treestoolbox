@@ -31,7 +31,7 @@
 % Contributed by Marcel Beining 2017
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function idchild = idchild_tree (intree, ipart, options)
 
@@ -64,8 +64,6 @@ if (nargin < 3) || isempty (options)
     options  = '';
 end
 
-
-
 idchild          = NaN (numel (ipart), 2);
 [row, col]       = find (dA (:, ipart));
 
@@ -73,17 +71,16 @@ for n            = 1 : numel (ipart)
     idchild (n, 1 : sum (col == n)) = row (col == n)';
 end
 
-if ~isempty (strfind (options, '-1'))
+if contains (options, '-1')
    idchild       = idchild (:, 1); 
 end
 
-if strfind       (options, '-s')            % show option
+if contains (options, '-s')            % show option
     clf; 
     HP           = plot_tree  (intree, [], [], [], [], '-b');
     set          (HP, ...
         'facealpha',           0.2, ...
         'edgecolor',           'none');
-    
     T            = vtext_tree (intree, [], [0 0.5 0], [-2 3 5]);
     set          (T, ...
         'fontsize',            14);
@@ -97,7 +94,6 @@ if strfind       (options, '-s')            % show option
         [0 5 0], [], inan);
     set          (T, ...
         'fontsize',            14);
-    
     title        ('direct child ID');
     xlabel       ('x [\mum]');
     ylabel       ('y [\mum]');
@@ -106,8 +102,6 @@ if strfind       (options, '-s')            % show option
     grid         on;
     axis         image;
 end
-
-
 
 
 

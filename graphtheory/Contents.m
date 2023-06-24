@@ -1,6 +1,6 @@
 % GRAPH THEORY CORE
 %
-% functions relating to the tree as a graph
+% Functions relating to the tree as a graph
 %
 % Files
 %   asym_tree     - Branch point asymmetry.
@@ -12,6 +12,7 @@
 %   dissect_tree  - Groups together nodes belonging to same branches.
 %   dist_tree     - Index to tree nodes at um path distance away from root.
 %   gene_tree     - String describing tree topology.
+%   idchild_tree  - Index to direct child nodes in a tree.
 %   idpar_tree    - Index to direct parent node in a tree.
 %   ipar_tree     - Path to root: parent indices. 
 %   LO_tree       - Level order of all nodes of a tree.
@@ -26,6 +27,6 @@
 %   typeN_tree    - Tree node B-C-T info.
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 

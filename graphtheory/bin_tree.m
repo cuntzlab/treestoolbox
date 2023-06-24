@@ -41,7 +41,7 @@
 % See also   ratio_tree child_tree Pvec_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [bi, bins, bh] = bin_tree (intree, v, bins, options)
 
@@ -75,7 +75,7 @@ end
 
 [bh, bi]         = histc (v, bins);
 
-if strfind       (options,'-s') % show option
+if contains (options, '-s') % show option
     clf;
     hold         on;
     plot_tree    (intree,bi);
@@ -88,7 +88,5 @@ if strfind       (options,'-s') % show option
     axis         image;
     colorbar;
 end
-
-
 
 

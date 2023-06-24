@@ -32,20 +32,21 @@
 % Uses ver_tree idpar_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2018  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function strahler = strahler_tree (intree, options)
 
 % trees : contains the tree structures in the trees package
 global trees
 
-if (nargin < 1)||isempty(intree)
-    intree = length(trees); % {DEFAULT tree: last tree in trees cell array} 
+if (nargin < 1) || isempty (intree)
+    % {DEFAULT tree: last tree in trees cell array} 
+    intree   = length(trees);
 end
 
 ver_tree (intree); % verify that input is a tree structure
 
-if (nargin < 2) || isempty(options)
+if (nargin < 2) || isempty (options)
     options  = ''; % {DEFAULT: no option}
 end
 
@@ -100,11 +101,12 @@ while ~isempty   (find (strahler == 0, 1))
     end
 end
 
-if strfind       (options, '-s') % show option
+if contains (options, '-s') % show option
     clf;
     hold         on;
-    shine;
-    plot_tree    (intree, strahler);
+    HP           = plot_tree (intree, strahler, [], [], [], '-b');
+    set          (HP, ...
+        'edgecolor',           'none');
     colorbar;
     title        ('Strahler number');
     xlabel       ('x [\mum]');
