@@ -1,12 +1,12 @@
-% initialize the GUI
+% Initialize the GUI
 %
 % the TREES toolbox: edit, visualize and analyze neuronal trees
-% Copyright (C) 2009  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 clear cgui
 
 % special gui related global structure containing all handles and variables
-global cgui
+global       cgui
 
 % initializing colors of GUI-elements
 cgui.NColor.text =       [.7  .7  .7 ];
@@ -46,7 +46,8 @@ set (cgui.ui.F, 'CloseRequestFcn', '');
 
 % activate mouse wheel
 try
-    set (cgui.ui.F, 'WindowScrollWheelFcn', {@cgui_mousewheel_tree, 'mouse_wheel'});
+    set (cgui.ui.F, ...
+        'WindowScrollWheelFcn', {@cgui_mousewheel_tree, 'mouse_wheel'});
 catch
     warndlg ({'No mouse wheel support,', 'use keyboard for zooming', ...
         'DEFAULT: q/Q e/E'});
@@ -54,8 +55,10 @@ end
 
 
 % activate mouse button
-set (cgui.ui.F, 'WindowButtonDownFcn', {@cgui_mouse_tree, 'mouse_bdown'});
-set (cgui.ui.F, 'WindowButtonUpFcn',   {@cgui_mouse_tree, 'mouse_udown'});
+set (cgui.ui.F, ...
+    'WindowButtonDownFcn', {@cgui_mouse_tree, 'mouse_bdown'});
+set (cgui.ui.F, ...
+    'WindowButtonUpFcn',   {@cgui_mouse_tree, 'mouse_udown'});
 
 % AXES
 cgui.ui.gpos = [.05 .15 .675 .75]; % position of graph
@@ -1680,3 +1683,6 @@ cgui.ged.ui.b34 = uicontrol('Parent', cgui.ui.F, 'units', 'normalized', ...
     .25*cgui.ui.xrel cgui.ui.yrel], 'enable', 'off', ...
     'String', '.', 'callback', 'cgui_tree(''ged_unspread'')', ...
     'tooltipstring', 'unspread tree coordinates if possible');
+
+
+

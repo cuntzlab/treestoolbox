@@ -62,7 +62,7 @@
 % Uses pretty much everything
 %
 % the TREES toolbox: edit, visualize and analyze neuronal trees
-% Copyright (C) 2009  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function cgui_tree (action)
 
@@ -3425,7 +3425,7 @@ switch action      % respond to actions arranged by ui panels:
                         ((i3 - cgui.skl.CI (inCI (ward), 4)).^2));
                     ipV = pV (dist < thr, :);
                     mpV = ipV - repmat (mean (ipV, 1), size (ipV, 1), 1);
-                    dV = princomp (mpV);
+                    dV = princomp (mpV); %#ok<PRINCOMP> 
                     dskin (ward, :) = dV (:, 1)';
                 end
                 dCN (inCI, :) = dskin;

@@ -1,8 +1,8 @@
-% define the keyboard mapping
+% Defines the keyboard mapping
 % change these to your personal preferences
 %
 % the TREES toolbox: edit, visualize and analyze neuronal trees
-% Copyright (C) 2009  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function cgui_tree_keys
 
