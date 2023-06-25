@@ -35,7 +35,7 @@
 % Contributed by Alexander Bird (modified for TREES)
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2020  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [bf, k] = bf_tree (input, options, Values)
 
@@ -49,6 +49,7 @@ k             = vonMises_tree (input, options); % Calculate centripetal bias
 if (nargin < 3) || isempty (Values)
     % {DEFAULT: fit from Bird and Cuntz 2019}
     Values    = cell (2, 1);
+    
     Params.a  = 1.201;
     Params.b  = 4.39;
     Params.c  = 0.2857;
@@ -82,4 +83,5 @@ elseif bf > 1
     bf            = 1;
     warning       ('Balancing factor out of usual range')
 end
+
 

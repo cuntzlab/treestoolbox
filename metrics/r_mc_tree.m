@@ -5,53 +5,51 @@
 %     r_mc_tree (tree, alpha, n_mc, level, options)
 % -------------------------------------------------------------
 %
-% Calculates the R value in a given tree using a Monte Carlo approach. 
-% It is possible to calculate the R value for all the points in the tree, 
-% only for branch points and termination points or only for branch points 
-% or only for termination points. By default, a volume correction is applied 
-% to prevent the R value from being positively biased. It is also possible 
+% Calculates the R value in a given tree using a Monte Carlo approach.
+% It is possible to calculate the R value for all the points in the tree,
+% only for branch points and termination points or only for branch points
+% or only for termination points. By default, a volume correction is applied
+% to prevent the R value from being positively biased. It is also possible
 % to calculate confidence intervals for the R value.
-%
-%
 %
 % Inputs
 % ------
 % - tree     ::structured tree
-% - alpha    ::value	  : shrink factor used to obtain the volume 
-%		supporting a given point cloud. alpha is a scalar between 0 and 1. 
-%		Setting alpha to 0 gives the convex hull, and setting alpha to 1 
+% - alpha    ::value	  : shrink factor used to obtain the volume
+%		supporting a given point cloud. alpha is a scalar between 0 and 1.
+%		Setting alpha to 0 gives the convex hull, and setting alpha to 1
 %		gives a compact boundary that envelops the points
 %     	{DEFAULT: 0.5}
 % - n_mc     :: integer   : maximum number of Monte Carlo iterations
 %     	{DEFAULT: 100}
-% - level    ::value	  : confidence intervals are obtained with 
+% - level    ::value	  : confidence intervals are obtained with
 %		confidence level (1 - level)
 %     	{DEFAULT: 0.05}
 % - options  ::string:
 %     	'-nv' : no volume correction
 %     	'-c' : compute confidence intervals
-%     	'-bt' : R value for branch points and termination points 
-%     	'-b' : R value for branch points 
-%     	'-t' : R value for termination points 
+%     	'-bt' : R value for branch points and termination points
+%     	'-b' : R value for branch points
+%     	'-t' : R value for termination points
 %     	'-2d' : 2D tree
 %     	{DEFAULT: ''}
 %
 % Output
 % ------
-% - R:: R value (r0/rE) of the points of interest (all points in the tree, only 
+% - R:: R value (r0/rE) of the points of interest (all points in the tree, only
 %		branch and termination points, only branch points or only termination points)
 % - Rmin:: lower bound of the confidence interval for R (r0/rEmax)
-% - Rmax:: upper bound of the confidence interval for R (r0/rEmin)     
-% - r0:: observed average nearest neighbor distance between the points        	
-% - rE:: expected average nearest neighbor distance under the assumption 
-%		of a uniform random distribution (estimated via Monte Carlo)        	
+% - Rmax:: upper bound of the confidence interval for R (r0/rEmin)
+% - r0:: observed average nearest neighbor distance between the points
+% - rE:: expected average nearest neighbor distance under the assumption
+%		of a uniform random distribution (estimated via Monte Carlo)
 % - rEmin:: lower bound of the confidence interval for rE
-% - rEmax:: upper bound of the confidence interval for rE       
-% - rEstd:: standard deviation of the rE values obtained in the n_mc Monte Carlo 
-%		iterations       
-% - n:: number of analyzed points to obtain R        
-% - rEs:: average nearest neighbor distances under the assumption 
-%		of a uniform random distribution in the n_mc Monte Carlo iterations        	
+% - rEmax:: upper bound of the confidence interval for rE
+% - rEstd:: standard deviation of the rE values obtained in the n_mc Monte Carlo
+%		iterations
+% - n:: number of analyzed points to obtain R
+% - rEs:: average nearest neighbor distances under the assumption
+%		of a uniform random distribution in the n_mc Monte Carlo iterations
 %
 % Example
 % -------
@@ -63,8 +61,7 @@
 % Contributed by Laura Anton
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2018  Hermann Cuntz
-
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [R, Rmin, Rmax, r0, rE, rEmin, rEmax, rEstd, n, rEs] = ...
     r_mc_tree (tree, alpha, n_mc, level, options)
@@ -86,13 +83,13 @@ if nargin    < 5  || isempty (options)
 end
 
 if contains (options, '-nv') % no volume correction
-    volcorrect = false; 
+    volcorrect = false;
 else
     volcorrect = true;
 end
 
 if contains (options, '-c') % compute confidence intervals
-    confintervals = true; 
+    confintervals = true;
 else
     confintervals = false;
 end
@@ -119,7 +116,7 @@ bb           = [ ...
     (min (Y)) (max (Y)); ...
     (min (Z)) (max (Z))];
 
-%bdRef: vector of point indices representing a single conforming 2D boundary around the points X Y 
+%bdRef: vector of point indices representing a single conforming 2D boundary around the points X Y
 %	or triangulation representing a single conforming 3D boundary around the points X Y Z
 %vRef: area (2D) or volume (3D) which boundary bdRef encloses
 if contains (options, '-2d')

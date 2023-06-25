@@ -31,7 +31,7 @@
 % Uses ver_tree X Y Z
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function varargout = tran_tree (intree, DD, options)
 
@@ -41,7 +41,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees); 
-end;
+end
 
 ver_tree     (intree); % verify that input is a tree structure
 
@@ -76,16 +76,15 @@ else
     tree.Z       = tree.Z - tree.Z (DD);
 end
 
-if strfind       (options, '-s') % show option
+if contains (options, '-s') % show option
     clf;
-    shine;
-    hold on;
-    HP           = plot_tree (intree);
+    hold         on;
+    HP           = plot_tree (intree, [], [], [], [], '-b');
     set          (HP, ...
-        'facealpha',           0.5);
-    HP           = plot_tree (tree, [1 0 0]);
+        'edgecolor',           'none'); 
+    HP           = plot_tree (tree, [1 0 0], [], [], [], '-b');
     set          (HP, ...
-        'facealpha',           0.5);
+        'edgecolor',           'none'); 
     HP (1)       = plot (1, 1, 'k-');
     HP (2)       = plot (1, 1, 'r-');
     legend       (HP, ...
@@ -106,3 +105,6 @@ if (nargout == 1)  || (isstruct (intree))
 else
     trees{intree}  = tree; % otherwise add to end of trees cell array
 end
+
+
+

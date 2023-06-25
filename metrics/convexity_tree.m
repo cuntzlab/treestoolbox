@@ -1,24 +1,24 @@
-%CONVEXITY_TREE Calculates convexity of a tree.
+% CONVEXITY_TREE Calculates convexity of a tree.
 % (trees package)
 %
-% [c] = convexity_tree(intree,options)
+% c = convexity_tree(intree,options)
 % --------------------------------------
 %
-% returns the convexity of a tree structure. Convexity is defined as the
+% Returns the convexity of a tree structure. Convexity is defined as the
 % proportion of direct paths between termination points of a tree that lie
 % entirely within the tightest boundary that can be drawn around said tree.
 %
 % Input
 % -----
 % - intree   ::integer:  index of tree in trees or structured tree
-% - options::string: {DEFAULT: '-3d'}
+% - options  ::string: {DEFAULT: '-3d'}
 %     '-3d'  : three-dimensional triangulation
 %     '-2d'  : two-dimensional polygon
 %
 % Output
 % -------
-% c::scalar: convexity of intree.
-
+% - c        ::scalar: convexity of intree.
+% 
 % Example
 % -------
 % convexity_tree (sample_tree, '-3d')
@@ -29,26 +29,30 @@
 % 
 %
 % the TREES toolbox: edit, visualize and analyze neuronal trees
-% Copyright (C) 2009 - 2022  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 
-function[c]=convexity_tree(intree,options)
+function c = convexity_tree (intree, options)
 
 % trees : contains the tree structures in the trees package
 global       trees
+
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
 end
+
 ver_tree     (intree); % verify that input is a tree structure
-warning('off','all')
+
+warning      ('off', 'all');
+
 if (nargin < 2) || isempty (options)
     % {DEFAULT: no option}
     options  = '-3d';
 end
 
 
-if contains(options,'-3d') % 3d case
+if contains (options, '-3d') % 3d case
     T=T_tree(intree);
     
     X=intree.X(T);
@@ -173,5 +177,7 @@ else % 2d case
     end
     c=nnz(Inds)/(nS1*nS2); 
 end
-warning('on','all')
-end
+warning          ('on', 'all')
+
+
+

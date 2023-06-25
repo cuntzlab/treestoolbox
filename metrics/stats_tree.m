@@ -40,7 +40,7 @@
 % Uses
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [stats, tname, tpath] = stats_tree (intrees, s, tname, options)
 
@@ -72,7 +72,7 @@ if (nargin < 4) || isempty (options)
     options  = '-w -s -x';
 end
 
-if strfind (options, '-f') % save as file option
+if contains (options, '-f') % save as file option
     if (nargin < 3) || isempty (tname)
         [tname, tpath] = uiputfile ( ...
             '.sts', ...
@@ -87,11 +87,10 @@ if strfind (options, '-f') % save as file option
     end
 end
 
-
 gstats           = struct ([]);
 dstats           = struct ([]);
 
-if isempty       (strfind (options, '-x'))   % extras option
+if ~contains (options, '-x')   % extras option
     % sholl plot prescan:
     % first find longest euclidean distance to root among all trees:
     maxlen       = 0;
@@ -107,16 +106,16 @@ if isempty       (strfind (options, '-x'))   % extras option
     dsholl       = 0 : round (1.1 * 2 * max (maxlen));
 end
 
-if strfind       (options, '-w') % waitbar option: initialization
+if contains (options, '-w') % waitbar option: initialization
     HW           = waitbar (0, ...
         'extracting statistics tree by tree ...');
     set          (HW, ...
         'Name',                '..PLEASE..WAIT..YEAH..');
 end
 
-for counter1                     = 1 : lens % walk through tree groups
-    if strfind                   (options, '-w') % waitbar option: update
-        waitbar                  (counter1 ./ lens, HW);
+for counter1     = 1 : lens % walk through tree groups
+    if contains (options, '-w') % waitbar option: update
+        waitbar  (counter1 ./ lens, HW);
     end
     % number of trees in this group:
     lent                         = length (intrees {counter1});
@@ -165,7 +164,7 @@ for counter1                     = 1 : lens % walk through tree groups
     % center of mass z:
     gstats (counter1).chullz     = zeros (lent, 1);
     
-    if isempty (strfind (options, '-x'))   % extras option
+    if ~contains (options, '-x')   % extras option
         % sholl intersections:
         dstats (counter1).sholl  = {};
         % asymmetry at branching points:
@@ -220,7 +219,7 @@ for counter1                     = 1 : lens % walk through tree groups
         % distribution):
         dstats (counter1).blen{counter2}   = blen_d (blen_d > 0.2);
         
-        if isempty (strfind (options, '-x')) % extras option
+        if ~contains (options, '-x') % extras option
             % asymmetry:
             dstats (counter1).asym{counter2}   = asym_tree  ( ...
                 intrees{counter1}{counter2}, ...
@@ -289,7 +288,7 @@ for counter1                     = 1 : lens % walk through tree groups
         % mean branch order
         gstats (counter1).mbo      (counter2)  = mean ( ...
             dstats (counter1).BO{counter2});
-        if isempty (strfind (options, '-x')), % extras option
+        if ~contains (options, '-x') % extras option
             gstats (counter1).mparea (counter2)  = mean ( ...
                 dstats (counter1).parea{counter2});
             [cx, cy]                             = cpoints (dhull);
@@ -328,22 +327,22 @@ for counter1                     = 1 : lens % walk through tree groups
         end
     end
 end
-if strfind       (options, '-w') % waitbar option: close
+if contains (options, '-w') % waitbar option: close
     close        (HW);
 end
 stats.gstats     = gstats;
 stats.dstats     = dstats;
 stats.s          = s;
-if exist         ('dsholl', 'var'),
+if exist         ('dsholl', 'var')
     stats.dsholl = dsholl;
 end
 
-if isempty       (strfind (options, '-x'))
+if ~contains (options, '-x')
     % flag indicating that extras have been calculated:
     stats.extras = 1;
 end
 
-if strfind       (options, '-2d')
+if contains (options, '-2d')
     % indicate that hulls were calculated for 2D:
     stats.dim    = 2;
 else
@@ -351,13 +350,13 @@ else
     stats.dim    = 3;
 end
 
-if strfind       (options, '-f')
+if contains (options, '-f')
     if tname     ~= 0
         save     ([tpath tname], 'stats');
     end
 end
 
-if strfind       (options, '-s') % show option, see "dstats_tree"
+if contains (options, '-s') % show option, see "dstats_tree"
     dstats_tree  (stats, [], '-d -c -g');
 end
 

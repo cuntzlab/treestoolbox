@@ -32,10 +32,10 @@
 % zcorr_tree   (sample_tree, 4,  '-s -m')
 %
 % See also morph_tree flatten_tree
-% Uses sub_tree idpar_tree ver_tree
+% Uses sub_tree ipar_tree ver_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function varargout = zcorr_tree (intree, tZ, options)
 
@@ -46,7 +46,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees); 
-end;
+end
 
 ver_tree     (intree); % verify that input is a tree structure
 
@@ -64,7 +64,7 @@ end
 if (nargin < 3) || isempty (options)
     % {DEFAULT: no option}
     options  = ''; 
-end;
+end
 
 ipar             = ipar_tree (tree);
 idpar            = ipar (:, 2);
@@ -75,7 +75,7 @@ dZ               = tree.Z (idpar) - tree.Z;
 % and index to the nodes at which dZ is bigger than a threshold tZ
 idZ              = find (abs (dZ) > tZ);
 
-if strfind       (options, '-m') % show movie option: initialization
+if contains (options, '-m') % show movie option: initialization
     clf;
     shine;
     hold on;
@@ -85,19 +85,19 @@ if strfind       (options, '-m') % show movie option: initialization
     axis         image;
 end
 
-if strfind       (options, '-w') % waitbar option: initialization
+if contains (options, '-w') % waitbar option: initialization
     HW           = waitbar (0, 'finding jumps in z node by node...');
     set          (HW, 'Name', '..PLEASE..WAIT..YEAH..');
 end
 
 for counter      = 1 : length (idZ)
-    if strfind   (options, '-w') % waitbar option: update
+    if contains (options, '-w') % waitbar option: update
         waitbar  (counter / length (idZ), HW);
     end
     isub         = sub_tree (tree, idZ (counter));
     tree.Z (find (isub)) = ...
         tree.Z (find (isub)) + dZ (idZ (counter));
-    if strfind   (options, '-m') % show movie option: update
+    if contains (options, '-m') % show movie option: update
         set      (HP, ...
             'visible',         'off');
         HP       = plot_tree (tree);
@@ -105,11 +105,11 @@ for counter      = 1 : length (idZ)
     end
 end
 
-if strfind       (options, '-w') % waitbar option: close
+if contains (options, '-w') % waitbar option: close
     close        (HW);
 end
 
-if strfind       (options, '-s') % show option
+if contains (options, '-s') % show option
     clf;
     hold         on;
     HP           = plot_tree (intree);
@@ -142,4 +142,5 @@ end
 if (nargout > 1)
     varargout{2}   = idZ';
 end
+
 

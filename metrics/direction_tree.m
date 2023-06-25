@@ -29,7 +29,7 @@
 % This function was contributed by Marcel Beining, 2017
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function direction = direction_tree (intree, options)
 
@@ -63,7 +63,7 @@ for counter      = 1 : numel (tree.X)
     direction (counter, 1)  = tree.X (counter) - tree.X (idpar (counter));
     direction (counter, 2)  = tree.Y (counter) - tree.Y (idpar (counter));
     direction (counter, 3)  = tree.Z (counter) - tree.Z (idpar (counter));
-    if ~isempty (strfind (options, '-n'))
+    if contains (options, '-n')
         direction (counter, :) = ...
             direction (counter, :) / norm (direction (counter, :));
     end
@@ -71,7 +71,7 @@ end
 direction (1, :) = direction (2, :);
 
 
-if strfind       (options, '-s') % show option
+if contains (options, '-s') % show option
     clf;
     hold         on;
     HP           = plot_tree (intree, direction (:, 1), [], [], [], '-b');

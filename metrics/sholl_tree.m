@@ -44,7 +44,7 @@
 % see http://local.wasp.uwa.edu.au/~pbourke/geometry/sphereline/
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [s, dd, sd, XP, YP, ZP, iD] = sholl_tree (intree, dd, options)
 
@@ -54,7 +54,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 ver_tree (intree); % verify that input is a tree structure
 
@@ -95,13 +95,13 @@ for counter      = 1 : length (dd)
         (Y2 - Y1).^2 + ...
         (Z2 - Z1).^2;
     b            = 2 * ( ...
-        (X2 - X1).*(X1 - X3) + ...
-        (Y2 - Y1).*(Y1 - Y3) + ...
-        (Z2 - Z1).*(Z1 - Z3));
+        (X2 - X1) .* (X1 - X3) + ...
+        (Y2 - Y1) .* (Y1 - Y3) + ...
+        (Z2 - Z1) .* (Z1 - Z3));
     c            = ...
         X3.^2 + Y3.^2 + Z3.^2 + ...
         X1.^2 + Y1.^2 + Z1.^2 - ...
-        2*(X3 .* X1 + Y3 .* Y1 + Z3 .* Z1) - ...
+        2 * (X3 .* X1 + Y3 .* Y1 + Z3 .* Z1) - ...
         (dd (counter) / 2)^2;
     squ          = b .* b - 4 * a .* c;
     iu           = squ >= 0;
@@ -141,18 +141,18 @@ end
 s  (dd == 0)     = 1;
 sd (dd == 0)     = 0;
 
-if strfind       (options, '-o')
+if contains       (options, '-o')
     s            = s - sd;
 end
 
-if strfind       (options, '-e')
+if contains       (options, '-e')
     if sum (sd)  > 0
         warning  ('TREES:wrongcounts', ...
             [(num2str (sum (sd))) ' segments were counted twice']);
     end
 end
 
-if strfind       (options, '-s') % show option
+if contains       (options, '-s') % show option
     clf;
     hold on;
     shine;
@@ -177,10 +177,10 @@ if strfind       (options, '-s') % show option
         'Color',               'none',  ...
         'XColor',              'g',     ...
         'YColor',              'g');
-    hold on;
-    axis image;
-    xlim (get (ax, 'xlim'));
-    ylim (get (ax, 'ylim'));
+    hold         on;
+    axis         image;
+    xlim         (get (ax, 'xlim'));
+    ylim         (get (ax, 'ylim'));
     HP           = plot ( ...
         X1 (1) + dd / 2, ...
         Y1 (1) + .9 * dd (end) * s ./ (2 * max (s)), ...
@@ -203,9 +203,9 @@ if strfind       (options, '-s') % show option
     set          (HT, 'color', [0 1 0]);
 end
 
-if strfind       (options, '-3s') % 3D show option
+if contains (options, '-3s') % 3D show option
     clf;
-    hold on;
+    hold         on;
     plot_tree    (intree);
     HP           = plot3 (XP, YP , ZP, 'r.');
     set          (HP, ...

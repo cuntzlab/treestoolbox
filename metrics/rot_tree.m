@@ -45,7 +45,7 @@
 % Uses ver_tree X Y Z
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function varargout = rot_tree (intree, DEG, options)
 
@@ -71,13 +71,13 @@ if (nargin < 3) || isempty (options)
     options  = '';
 end
 
-if strfind       (options, '-m3d')
+if contains       (options, '-m3d')
     % define axis to which tree is aligned: 1=x 2=y 3=z
-    if     strfind (options, '-m3dX')
+    if     contains (options, '-m3dX')
         e        = [0 1 0];
         raxis    = 1;
         d        = [2 3];
-    elseif strfind (options, '-m3dY')
+    elseif contains (options, '-m3dY')
         e        = [1 0 0];
         raxis    = 2;
         d        = [3 1];
@@ -124,9 +124,9 @@ if strfind       (options, '-m3d')
         (tree.Y (tree.R ~= raxon)) ...
         (tree.Z (tree.R ~= raxon))];
     XYZ (:, raxis) = 0;    % delete information along aligned axis
-    [coeff,latent]=eigs(cov(XYZ),3);
-    [~,ind] = sort(diag(latent),'descend');
-    coeff = coeff(:,ind);
+    [coeff, latent] = eigs (cov (XYZ), 3);
+    [~, ind]     = sort (diag (latent), 'descend');
+    coeff        = coeff (:, ind);
     % defining quality of alignment (zero is bad because dendrites
     % distributed equally in 2 dim):
     qual         = latent (1) / latent (2) - 1; 
@@ -180,15 +180,15 @@ if strfind       (options, '-m3d')
         end
     end
     tree         = tran_tree (tree, XYZ0);
-elseif strfind   (options, '-pca')
+elseif contains   (options, '-pca')
     tree         = tran_tree (tree); % translate tree to coordinate origin
     XYZ          = [tree.X tree.Y tree.Z];
     [~, XYZp]    = pca (XYZ);
-    if strfind   (options, '-pcaX')
+    if contains   (options, '-pcaX')
         Xp       = XYZp (:, 1);
         Yp       = XYZp (:, 2);
         Zp       = XYZp (:, 3);
-    elseif strfind (options, '-pcaY')
+    elseif contains (options, '-pcaY')
         Xp       = XYZp (:, 2);
         Yp       = XYZp (:, 1);
         Zp       = XYZp (:, 3);
@@ -224,7 +224,7 @@ else
     end
 end
 
-if strfind       (options, '-s') % show option
+if contains (options, '-s') % show option
     clf;
     hold         on;
     plot_tree    (intree);
@@ -245,15 +245,16 @@ if strfind       (options, '-s') % show option
 end
 
 if (nargout > 0 || (isstruct (intree)))
-    varargout{1}   = tree; % if output is defined then it becomes the tree
+    % If output is defined then it becomes the tree:
+    varargout{1}       = tree; 
     if nargout > 1 && regexpi (options, '-m3d')
-       varargout {2} = angout;
+       varargout {2}   = angout;
     end
     if nargout > 2 && regexpi (options, '-m3d')
-        varargout {3} = cat(2,d,raxis);
+        varargout {3}  = cat(2,d,raxis);
     end
     if nargout > 3 && regexpi (options, '-m3d')
-        varargout {4} = qual;
+        varargout {4}  = qual;
     end
 else
     trees{intree}  = tree; % otherwise add to end of trees cell array

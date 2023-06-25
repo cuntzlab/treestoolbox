@@ -38,7 +38,7 @@
 % Uses idpar_tree ver_tree dA X Y Z
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function  [X1, X2, Y1, Y2, Z1, Z2] = cyl_tree (intree, options)
 
@@ -48,7 +48,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 ver_tree     (intree); % verify that input is a tree structure
 
@@ -68,14 +68,14 @@ X                = tree.X;         % X-locations of nodes on tree
 Y                = tree.Y;         % Y-locations of nodes on tree
 dA               = tree.dA;        % directed adjacency matrix of tree
 
-if isempty       (strfind (options, '-dA'))
+if ~contains (options, '-dA')
      % vector containing index to direct parent:
     idpar        = idpar_tree (intree);
     X1           = X (idpar); % then it is simple, right?
     X2           = X;
     Y1           = Y (idpar);
     Y2           = Y;
-    if isempty (strfind (options, '-2d'))
+    if ~contains (options, '-2d')
         Z        = tree.Z;
         Z1       = Z (idpar);
         Z2       = Z;
@@ -97,7 +97,7 @@ else
     % coordinates of second point in cylinder:
     X2           =      spdiags (X, 0, N, N) * dA;
     Y2           =      spdiags (Y, 0, N, N) * dA;
-    if isempty   (strfind (options, '-2d'))
+    if ~contains (options, '-2d')
         Z        = tree.Z;
         Z1       = dA * spdiags (Z, 0, N, N);
         Z2       =      spdiags (Z, 0, N, N) * dA;

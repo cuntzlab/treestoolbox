@@ -4,24 +4,24 @@
 % [bound] = boundary_tree (intree, c, options)
 % --------------------------------------------
 %
-% returns a boundary structure in two- or three- dimensions.
+% Returns a boundary structure in two- or three- dimensions.
 %
 % Input
 % -----
 % - intree   ::integer:  index of tree in trees or structured tree
-% - options::string: {DEFAULT: '-3d'}
-%     '-3d'  : three-dimensional triangulation
-%     '-2d'  : two-dimensional polygon
-%     '-s'   : Show boundary mesh
 % - c        : convexity of intree:
 %    {DEFAULT: Unknown, calculated using convexity_tree}
+% - options  ::string: {DEFAULT: '-3d'}
+%     '-3d'  : three-dimensional triangulation
+%     '-2d'  : two-dimensional polygon
+%     '-s'   : Show boundary mesh % NOT IMPLEMENTS
 %
 % Output
 % -------
-% bound::structure: in two dimensions an ordered set of vertices (xv, yv)
+% - bound    ::structure: in two dimensions an ordered set of vertices (xv, yv)
 % of the bounding polygon and the area bounded (V). In three dimensions the
 % Faces and Vertices of the triangulation and the volume bounded (V).
-
+%
 % Example
 % -------
 % boundary_tree (sample_tree, '-3d')
@@ -30,9 +30,9 @@
 % Uses convexity_tree
 %
 % the TREES toolbox: edit, visualize and analyze neuronal trees
-% Copyright (C) 2009 - 2022 Hermann Cuntz
+% Copyright (C) 2009 - 2023 Hermann Cuntz
 
-function [bound] = boundary_tree (intree,options,c)
+function [bound] = boundary_tree (intree, options, c)
 
 % trees : contains the tree structures in the trees package
 global       trees
@@ -51,10 +51,11 @@ end
 
 if (nargin < 3) || isempty (c)
     % {DEFAULT: convexity unknown}
-    c = convexity_tree (intree, options);
+    c        = convexity_tree (intree, options);
 end
 
 S                = 1 - c; % Optimal shrink factor
+
 if contains (options, '-2d') % Two-dimensional case
     X            = intree.X;
     Y            = intree.Y;
@@ -72,17 +73,17 @@ else
     Y            = intree.Y;
     Z            = intree.Z;
 
-    [k,V]=boundary(X,Y,Z,S);
+    [k, V]       = boundary (X, Y, Z, S);
 
     figure
-    F=gcf;
-    h=trisurf(k,X,Y,Z);
-    [rh]=reducepatch(h,0.5);
-    rh.Vertices=rh.vertices;
-    rh.Faces=rh.faces;
-    bound=rh;
-    bound.V=V;
-    close(F)
+    F            = gcf;
+    h            = trisurf (k, X, Y, Z);
+    rh           = reducepatch (h, 0.5);
+    rh.Vertices  = rh.vertices;
+    rh.Faces     = rh.faces;
+    bound        = rh;
+    bound.V      = V;
+    close        (F)
 end
-end
+
 

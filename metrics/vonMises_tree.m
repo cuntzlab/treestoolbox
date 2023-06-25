@@ -30,10 +30,12 @@
 % See also rootangle_tree
 % Uses rootangle_tree ver_tree
 %
+% Requires: Curve fitting toolbox
+%
 % Contributed by Alexander Bird (modified for TREES)
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2020  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [k, gof] = vonMises_tree (input, options)
 
@@ -58,16 +60,17 @@ end
 if isstruct (input)                % Input is a tree structure
     intree       = input;
     ver_tree     (intree);         % verify that input is a tree structure
-    rootangle    = rootangle_tree (intree);  
+    rootangle    = rootangle_tree (intree);
 elseif iscell (input)              % Input is cell array of trees
     nTree        = length (input); % Number of trees in cell array
-    rootangle    =[];
-    for iTree    =1:nTree
-        intree   =input{iTree};
-        ver_tree (intree);         % verify that input contains tree structures
+    rootangle    = [];
+    for iTree    = 1 : nTree
+        intree   = input{iTree};
+        % verify that input contains tree structures:
+        ver_tree (intree);
         irootangle = rootangle_tree (intree);
         % Collate individual rootangle distributions:
-        rootangle  = [rootangle ; irootangle]; 
+        rootangle  = [rootangle ; irootangle];
     end
 elseif isnumeric (input) % Input is a vector of root angles
     if ...
@@ -87,12 +90,12 @@ end
 % Collate root angles into a distribution and fit
 %==========================================================================
 %==========================================================================
-AngV             = linspace(0,pi,25);
-pdf              = histcounts(rootangle,AngV);
-mAngV            = (AngV(2:25)+AngV(1:24))/2; % Get midpoints
-pdf              = pdf/trapz(mAngV,pdf); % Normalise
+AngV             = linspace (0, pi, 25);
+pdf              = histcounts (rootangle, AngV);
+mAngV            = (AngV (2 : 25) + AngV (1 : 24)) / 2; % Get midpoints
+pdf              = pdf / trapz (mAngV, pdf); % Normalise
 [xData, yData]   = prepareCurveData (mAngV, pdf);
-if contains (options, '-2d')
+if     contains (options, '-2d')
     ft           = fittype ( ...
         'exp(k*cos(x))/(pi*besseli(0,k))', ...
         'independent', 'x', ...
@@ -113,7 +116,7 @@ k                = fitresult.k;
 
 if contains (options, '-s') % Show root angle distribution and best fit
     clf;
-    hold on;
+    hold         on;
     plot         (mAngV, pdf, 'black'); % True distribution
     AngVr        = linspace (0, pi, 1000);
     if contains  (options, '-2d')

@@ -30,7 +30,7 @@
 % Uses ver_tree X Y Z
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function eucl = eucl_tree (intree, point, options)
 
@@ -57,13 +57,13 @@ else
     if ~isstruct (intree)
         X    =   trees{intree}.X;
         Y    =   trees{intree}.Y;
-        if isempty (strfind (options, '-2d'))
+        if ~contains (options, '-2d')
             Z  = trees{intree}.Z;
         end
     else
         X    =   intree.X;
         Y    =   intree.Y;
-        if isempty (strfind (options, '-2d'))
+        if ~contains (options, '-2d')
             Z  = intree.Z;
         end
     end
@@ -79,7 +79,7 @@ if numel (point) == 1
     point        = [(X (point)) (Y (point)) (Z (point))];
 end
 
-if isempty       (strfind (options, '-2d')) % 3D option
+if ~contains (options, '-2d') % 3D option
     eucl         = sqrt ( ...
         (X - point (1)).^2 + ...
         (Y - point (2)).^2 + ...
@@ -90,7 +90,7 @@ else
         (Y - point (2)).^2);
 end
 
-if strfind       (options, '-s') % show option
+if contains (options, '-s') % show option
     clf;
     hold         on;
     HP           = plot_tree (intree, eucl, [], [], [], '-b');

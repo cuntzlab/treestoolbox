@@ -46,7 +46,7 @@ if (nargin < 2) || isempty (options)
     options  = '';
 end
 
-if strfind       (options, '-2d')
+if contains       (options, '-2d')
     % segments 2D start and end coordinates:
     [X1, X2, Y1, Y2]         = cyl_tree (intree, '-2d');
     len          = sqrt ( ...
@@ -61,7 +61,7 @@ else
         (Z2 - Z1).^2);
 end
 
-if strfind       (options, '-s') % show option
+if contains       (options, '-s') % show option
     ipart        = find (len ~= 0); % single out non-0-length segments
     clf;
     hold         on;

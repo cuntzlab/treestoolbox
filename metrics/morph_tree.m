@@ -1,4 +1,4 @@
-% MORPH_TREE   Morph a tree's metrics without changing angles or topology
+% MORPH_TREE   Morph a metrics preserving angles and topology.
 % (trees package)
 %
 % tree = morph_tree (intree, v, options)

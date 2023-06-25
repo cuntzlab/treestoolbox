@@ -26,7 +26,7 @@
 % Uses len_tree ver_tree D
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function surf = surf_tree (intree, options)
 
@@ -36,7 +36,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 ver_tree     (intree); % verify that input is a tree structure
 
@@ -74,7 +74,7 @@ else
     surf         =  pi *  D .* len;
 end
 
-if strfind       (options, '-s') % show option
+if contains (options, '-s') % show option
     ipart        = find (surf ~= 0); % single out non-0-length segments
     clf;
     hold         on;

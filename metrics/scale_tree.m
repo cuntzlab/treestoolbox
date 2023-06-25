@@ -35,7 +35,7 @@
 % Uses ver_tree X Y Z
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function varargout = scale_tree (intree, fac, options)
 
@@ -66,7 +66,7 @@ if (nargin < 3) || isempty (options)
     options  = '';
 end
 
-if isempty       (strfind (options, '-o'))
+if ~contains (options, '-o')
     ORI          = [tree.X(1) tree.Y(1) tree.Z(1)];
     tree.X       = tree.X - ORI (1);
     tree.Y       = tree.Y - ORI (2);
@@ -78,25 +78,25 @@ if numel (fac) > 1
     tree.X       = tree.X * fac (1);
     tree.Y       = tree.Y * fac (2);
     tree.Z       = tree.Z * fac (3);
-    if isempty   (strfind (options, '-d'))
+    if ~contains (options, '-d')
         tree.D   = tree.D * mean (fac (1 : 2));
     end    
 else
     tree.X       = tree.X * fac;
     tree.Y       = tree.Y * fac;
     tree.Z       = tree.Z * fac;
-    if isempty   (strfind (options, '-d'))
+    if ~contains (options, '-d')
         tree.D   = tree.D * fac;
     end
 end
 
-if isempty       (strfind (options, '-o'))
+if ~contains (options, '-o')
     tree.X       = tree.X + ORI (1);
     tree.Y       = tree.Y + ORI (2);
     tree.Z       = tree.Z + ORI (3);
 end
 
-if strfind       (options, '-s') % show option
+if contains (options, '-s') % show option
     clf;
     hold         on;
     HP           = plot_tree (intree, [], [], [], [], '-b');
@@ -120,7 +120,7 @@ if strfind       (options, '-s') % show option
     axis         image;
 end
 
-if (nargout == 1)||(isstruct (intree))
+if (nargout == 1) || (isstruct (intree))
     varargout {1}  = tree; % if output is defined then it becomes the tree
 else
     trees {intree} = tree; % otherwise add to end of trees cell array

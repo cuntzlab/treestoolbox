@@ -30,7 +30,7 @@
 % Uses ipar_tree tran_tree ver_tree
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function varargout = flatten_tree (intree, options)
 
@@ -61,10 +61,10 @@ ipar             = ipar_tree (tree);
 % set root Z to 0:
 tree             = tran_tree (tree, [0 0 (-tree.Z (1))]);
 
-eps = 1e-3;
-if all(tree.Z < eps)
-    tree.Z(:) = 0;
-    warning('tree already flat, nothing to do');
+eps              = 1e-3;
+if all (tree.Z < eps)
+    tree.Z (:)   = 0;
+    warning      ('tree already flat, nothing to do');
     if (nargout > 0) || (isstruct (intree))
         varargout{1}   = tree;
     else
@@ -73,7 +73,7 @@ if all(tree.Z < eps)
     return;
 end
 
-if strfind       (options, '-m') % show movie option
+if contains      (options, '-m') % show movie option
     clf;
     HP           = plot_tree (tree);
     title        ('flatten a tree');
@@ -85,15 +85,15 @@ if strfind       (options, '-m') % show movie option
     axis         image;
 end
 
-if strfind       (options, '-w') % waitbar option: initialization
+if contains      (options, '-w') % waitbar option: initialization
     if length    (tree.X) > 998
         HW       = waitbar (0, 'flattening ...');
         set      (HW, 'Name', '..PLEASE..WAIT..YEAH..');
     end
 end
 
-domovie = strfind   (options, '-m');
-dowaitbar = strfind   (options, '-w');
+domovie          = contains   (options, '-m');
+dowaitbar        = contains   (options, '-w');
 
 for counter      = 2 : length (tree.X) % walk through tree
     if dowaitbar % waitbar option: update
@@ -133,13 +133,13 @@ for counter      = 2 : length (tree.X) % walk through tree
         drawnow;
     end
 end
-if strfind       (options, '-w') % waitbar option: close
+if contains (options, '-w') % waitbar option: close
     if length    (tree.X) > 998
         close    (HW);
     end
 end
 
-if strfind       (options, '-s') % show option
+if contains (options, '-s') % show option
     clf;
     hold         on;
     HP           = plot_tree (intree);

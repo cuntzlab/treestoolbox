@@ -29,7 +29,7 @@
 % Uses       ipar_tree B_tree ver_tree dA X Y Z
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function angleB = angleB_tree (intree, options)
 
@@ -121,7 +121,7 @@ tangleB          = angleB;
 angleB           = NaN (size (tree.dA, 1), 1);
 angleB (iB)      = tangleB;
 
-if strfind       (options, '-s') % show option
+if contains (options, '-s') % show option
     clf;
     hold         on;
     HP           = plot_tree ( ...
@@ -142,3 +142,5 @@ if strfind       (options, '-s') % show option
     axis         equal;
     colorbar;
 end
+
+

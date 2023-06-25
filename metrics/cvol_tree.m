@@ -27,7 +27,7 @@
 % Uses len_tree ver_tree D
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function cvol = cvol_tree (intree, options)
 
@@ -37,7 +37,7 @@ global       trees
 if (nargin < 1) || isempty (intree)
     % {DEFAULT tree: last tree in trees cell array}
     intree   = length (trees);
-end;
+end
 
 ver_tree     (intree); % verify that input is a tree structure
 
@@ -81,8 +81,9 @@ else
     cvol (cvol == 0) = 0.0001; % !!!!!!!! necessary numeric correction
 end
 
-if strfind       (options, '-s') % show option
-    clf; hold on; 
+if contains (options, '-s') % show option
+    clf;
+    hold         on; 
     HP           = plot_tree (intree, cvol, [], [], [], '-b');
     set          (HP, ...
         'edgecolor',           'none');

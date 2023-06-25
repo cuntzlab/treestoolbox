@@ -31,7 +31,7 @@
 % Uses
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function dstats_tree (stats, vcolor, options)
 
@@ -62,8 +62,8 @@ if (nargin < 3) || isempty (options)
 end
 
 clf;
-if strfind                     (options, '-g')
-    if strfind                 (options, '-d')
+if contains (options, '-g')
+    if contains (options, '-d')
         by                     = 2;
     else
         by                     = 1;
@@ -189,8 +189,8 @@ if strfind                     (options, '-g')
     end
 end
 
-if strfind                     (options, '-d')
-    if strfind                 (options, '-g')
+if contains               (options, '-d')
+    if contains           (options, '-g')
         by                     = 2;
     else
         by                     = 1;
@@ -280,7 +280,7 @@ if strfind                     (options, '-d')
             for counter3       = 1 : length (y)
                 yax            = histc (y{counter3}, xax)';
                 yax            = yax ./ max (yax);
-                if strfind     (options, '-c') % smoothing:
+                if contains (options, '-c') % smoothing:
                     HP         = plot ( ...
                         xax, ...
                         1.2 * (counter1 - 1) + ...
@@ -338,7 +338,7 @@ if strfind                     (options, '-d')
             for counter3       = 1 : length (y)
                 yax            = y{counter3};
                 yax            = yax ./ max (yax);
-                if strfind     (options, '-c') % smoothing:
+                if contains (options, '-c') % smoothing:
                     HP         = plot ( ...
                         stats.dsholl (indy_dsholl), ...
                         convn (yax (indy_dsholl), ones(1, 5) / 5, 'same') + ...
