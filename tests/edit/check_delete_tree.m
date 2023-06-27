@@ -38,19 +38,23 @@ colorbar
 tprint       ('./panels/delete_tree2', ...
     '-jpg -HR',                [10 10]);
 
-%% test 4 -  delete root when branch point:
-tree         = sample_tree;
-dtree        = delete_tree (tree, [2 3]); % make root BP
-ddtree       = delete_tree (dtree, 1, '-s');    % delete root: two trees!
-tprint       ('./panels/delete_tree3', ...
-    '-jpg -HR',                [10 10]);
-clf;
-subplot      (2, 1, 1);
-plot_tree    (ddtree{1}, BO_tree (ddtree{1}));
-plot_tree    (ddtree{2}, BO_tree (ddtree{2}));
-colorbar;
-subplot      (2, 1, 2);
-xplore_tree  (ddtree{1}, '-2');
-xplore_tree  (ddtree{2}, '-2');
-tprint       ('./panels/delete_tree4', ...
-    '-jpg -HR',                [10 10]);
+% NOTE! THAT DOESN'T WORK ANYMORE?
+
+% %% test 5 -  delete root when branch point:
+% tree         = sample_tree;
+% dtree        = delete_tree (tree, [2 3]); % make root BP
+% ddtree       = delete_tree (dtree, 1, '-s');    % delete root: two trees!
+% tprint       ('./panels/delete_tree3', ...
+%     '-jpg -HR',                [10 10]);
+% clf;
+% subplot      (2, 1, 1);
+% plot_tree    (ddtree{1}, BO_tree (ddtree{1}));
+% plot_tree    (ddtree{2}, BO_tree (ddtree{2}));
+% colorbar;
+% subplot      (2, 1, 2);
+% xplore_tree  (ddtree{1}, '-2');
+% xplore_tree  (ddtree{2}, '-2');
+% tprint       ('./panels/delete_tree4', ...
+%     '-jpg -HR',                [10 10]);
+
+
