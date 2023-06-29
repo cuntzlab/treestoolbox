@@ -39,7 +39,7 @@
 % Uses show_stack
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [stack, tpath] = loaddir_stack (tpath, options)
 
@@ -64,7 +64,7 @@ if tpath        ~= 0
     stack.sM {1} = name;
     stack.coord  = [0 0 0];
     stack.voxel  = [1 1 1];
-    if strfind   (options, '-w') % waitbar option: initialization
+    if contains   (options, '-w') % waitbar option: initialization
         HW       = waitbar (0, 'loading images...');
         set      (HW, 'Name', '..PLEASE..WAIT..YEAH..');
     end
@@ -72,9 +72,9 @@ if tpath        ~= 0
     cd           (tpath);
     P            = dir;
     if length (P) > 2
-        if strfind (options, '-k')
+        if contains (options, '-k')
             for counter      = 3 : 2 : length (P)
-                if strfind   (options, '-w') % waitbar option: update
+                if contains (options, '-w') % waitbar option: update
                     waitbar  (counter / length (P), HW);
                 end
                 A            = imread (P (counter).name);
@@ -86,7 +86,7 @@ if tpath        ~= 0
             end
         else
             for counter      = 3 : length (P)
-                if strfind   (options, '-w'), % waitbar option: update
+                if contains (options, '-w') % waitbar option: update
                     waitbar  (counter / length (P), HW);
                 end
                 A            = imread (P (counter).name);
@@ -99,15 +99,16 @@ if tpath        ~= 0
         end
     end
     cd           (d);
-    if strfind   (options, '-w') % waitbar option: close
+    if contains (options, '-w') % waitbar option: close
         close    (HW);
     end
 else
     stack        = [];
 end
 
-if strfind (options, '-s') % show option
-    clf; hold on;
+if contains (options, '-s') % show option
+    clf;
+    hold         on;
     show_stack   (stack);
     xlabel       ('x [\mum]');
     ylabel       ('y [\mum]');

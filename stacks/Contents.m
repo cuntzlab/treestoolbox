@@ -1,6 +1,6 @@
 % STACKS
 %
-% functions to deal with image stacks
+% Functions to deal with image stacks.
 %
 % Files
 %   fitD_stack     - get cylinder diameter values from image stack.
@@ -12,7 +12,7 @@
 %   show_stack     - Show maximum intensity projection of an image stack.
 %   skel_stack     - Skeletonize a 3D image matrix.
 %
-% the TREES toolbox: edit, visualize and analyze neuronal trees
-% Copyright (C) 2009  Hermann Cuntz
+% the TREES toolbox: edit, generate, visualise and analyse neuronal trees
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 

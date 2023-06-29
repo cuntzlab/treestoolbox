@@ -34,13 +34,13 @@
 %
 % Example
 % -------
-% stack        = imload_stack ([],'-s')
+% stack        = imload_stack ([], '-s')
 %
 % See also load_stack loaddir_stack loadtifs_stack save_stack show_stack
 % Uses
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [stack, tname, path] = imload_stack (tname, options)
 
@@ -72,15 +72,16 @@ if (nargin < 2) || isempty (options)
     options  = '';
 end
 
-stack.M      = {};
-stack.sM     = {};
-stack.sM{1}  = name;
-stack.coord  = [0 0 0]; 
-stack.voxel  = [1 1 1];
-stack.M{1}   = imread ([path tname]);
+stack.M          = {};
+stack.sM         = {};
+stack.sM{1}      = name;
+stack.coord      = [0 0 0]; 
+stack.voxel      = [1 1 1];
+stack.M{1}       = imread ([path tname]);
 
-if strfind (options, '-s') % show option
-    clf; hold on;
+if contains (options, '-s') % show option
+    clf;
+    hold         on;
     show_stack   (stack);
     xlabel       ('x [\mum]');
     ylabel       ('y [\mum]');

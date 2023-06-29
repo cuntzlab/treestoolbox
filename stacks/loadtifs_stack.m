@@ -41,7 +41,7 @@
 % Significant speed improvement by Marcel Beining 2017
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [stack, tname, path] = loadtifs_stack (tname, options)
 
@@ -90,7 +90,7 @@ end
 sizeM            = [(info(1).Height) (info(1).Width) (numel (info))];
 lenl             = sizeM (3);
 
-if strfind       (options, '-w') % waitbar option: initialization
+if contains (options, '-w') % waitbar option: initialization
     HW           = waitbar (0, 'loading images...');
     set          (HW, ...
         'Name',                '..PLEASE..WAIT..YEAH..');
@@ -99,19 +99,20 @@ end
 stack.M{1}       = zeros (sizeM, 'uint8');
 
 for counter      = 1 : lenl
-    if strfind   (options, '-w') % waitbar option: update
+    if contains (options, '-w') % waitbar option: update
         waitbar  (counter / lenl, HW);
     end
     stack.M{1}(:, :, counter) = ...
         imread (fullfile (path, tname), 'tif', counter);
 end
 
-if strfind       (options, '-w') % waitbar option: close
+if contains (options, '-w') % waitbar option: close
     close        (HW);
 end
 
-if strfind       (options, '-s') % show option
-    clf; hold on;
+if contains (options, '-s') % show option
+    clf;
+    hold         on;
     show_stack   (stack);
     xlabel       ('x [\mum]');
     ylabel       ('y [\mum]');

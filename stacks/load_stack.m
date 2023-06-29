@@ -1,8 +1,8 @@
-% LOAD_STACK   load stack file into a stack structure.
+% LOAD_STACK   Load stack file into a stack structure.
 % (trees package)
 %
-% [stack name path] = load_stack (name, options)
-% ----------------------------------------------
+% [stack, name, path] = load_stack (name, options)
+% ------------------------------------------------
 %
 % loads a stack structure from a file.
 %
@@ -40,7 +40,7 @@
 % Uses
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2016  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function [stack, tname, path] = load_stack (tname, options)
 
@@ -69,8 +69,9 @@ else
     stack    = [];
 end
 
-if strfind (options, '-s') % show option
-    clf; hold on;
+if contains (options, '-s') % show option
+    clf;
+    hold         on;
     show_stack   (stack);
     xlabel       ('x [\mum]');
     ylabel       ('y [\mum]');

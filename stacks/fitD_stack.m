@@ -43,7 +43,7 @@
 % adpated for TREES toolbox by Hermann Cuntz
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2017  Hermann Cuntz
+% Copyright (C) 2009 - 2023  Hermann Cuntz
 
 function D   = fitD_stack (intree, stack, maxR, options)
 
@@ -80,15 +80,15 @@ end
 [X1, X2, Y1, Y2] = cyl_tree (intree);
 N                = length (X1);
 D                = ones   (N, 1);
-if strfind       (options, '-m')       % cutest animation ever
+if contains (options, '-m')       % cutest animation ever
     F            = figure;
 end
-if strfind       (options, '-w')       % waitbar option: initialization
+if contains (options, '-w')       % waitbar option: initialization
     HW           = waitbar (0, 'friedrich diametering...');
     set          (HW, 'Name', '..PLEASE..WAIT..YEAH..');
 end
 for counter      = 1 : N
-    if strfind   (options, '-w')         % waitbar option: update
+    if contains (options, '-w')         % waitbar option: update
         waitbar  (counter / N, HW);
     end
     
@@ -180,7 +180,7 @@ for counter      = 1 : N
     else
         D (counter)  = 1;
     end
-    if strfind   (options, '-m') % cutest animation ever
+    if contains (options, '-m') % cutest animation ever
         figure   (F);
         clf;
         colormap gray;
@@ -195,10 +195,13 @@ for counter      = 1 : N
         pause    (0.01);
     end
 end
-if strfind       (options, '-w') % waitbar option: close
+if contains (options, '-w') % waitbar option: close
     close        (HW);
 end
 
-if strfind       (options, '-m') % cutest animation ever
+if contains (options, '-m') % cutest animation ever
     close        (F)
 end
+
+
+
