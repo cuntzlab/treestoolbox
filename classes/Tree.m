@@ -94,7 +94,7 @@ classdef Tree < handle
                tree = load_tree(filename);
             else
                warning('File %s does not exist!', filename);
-               trees = [];
+               tree = [];
                return;
             end
             tree = Tree(tree);
@@ -129,14 +129,14 @@ classdef Tree < handle
             end
 
             N = max([edge1(:); edge2(:)]);
-            dA = sparse(N, N);
-            for i=1:numel(edge1)
-                m = min([edge1(i) edge2(i)]);
-                M = max([edge1(i) edge2(i)]);
-                dA(m, M) = 1;
+            nnzNum = numel(edge1);
+            nnzRows = zeros(nnzNum, 1);
+            nnzCols = zeros(nnzNum, 1);
+            for i=1:nnzNum
+                nnzRows(i) = min([edge1(i) edge2(i)]);
+                nnzCols(i) = max([edge1(i) edge2(i)]);
             end
-
-            t.dA = dA;
+            t.dA = sparse(nnzRows, nnzCols, ones(1, nnzNum), N, N);
             t.X = zeros(N, 1);
             t.Y = zeros(N, 1);
             t.Z = zeros(N, 1);
@@ -145,11 +145,11 @@ classdef Tree < handle
         end
 
         function tree = random_bct(n)
-            T = [0];
+            T = 0;
             while sum(T == 0) < n
                 idx = find(T == 0);
                 p = randi(numel(idx));
-                T = [T(1:idx(p) - 1) 2 0 T(idx(p):end)];
+                T = [T(1:idx(p) - 1), 2, 0, T(idx(p):end)];
             end
             t = BCT_tree(T);
             tree = Tree(t);
@@ -161,25 +161,25 @@ classdef Tree < handle
             else
                 classical = 1;
             end
-            pc = [0 cumsum([1 - pel - pbr pel pbr])];
-            T = [0];
-            while sum(T == 0) > 0 && sum(T == -1) + sum(T == 0) < maxsize
-                idx = find(T == 0);
+            pc = [0, cumsum([1-pel-pbr, pel, pbr])];
+            T = 0;
+            while sum(T==0) > 0 && sum(T==-1)+sum(T==0) < maxsize
+                idx = find(T==0);
                 if classical
-                    T(T == 0) = -1;
+                    T(T==0) = -1;
                 end
                 for p=1:numel(idx)
                     i = find(histc(rand(), pc));
                     if i == 2
-                        T = [T(1:idx(p) - 1) 1 0 T(idx(p) + 1:end)];
+                        T = [T(1:idx(p) - 1), 1, 0, T(idx(p) + 1:end)];
                     elseif i == 3
-                        T = [T(1:idx(p) - 1) 2 0 0 T(idx(p) + 1:end)];
+                        T = [T(1:idx(p) - 1), 2, 0, 0, T(idx(p) + 1:end)];
                     else
                         T(idx(p)) = -1;
                     end
                 end
             end
-            T(T == -1) = 0;
+            T(T==-1) = 0;
             if length(T) == 1
                 t = struct();
                 t.X = 0;
@@ -523,10 +523,10 @@ classdef Tree < handle
             % trees = split_forest()
             % ------------------------------
             %
-            % Some operations on a tree (for example deleting nodes)
-            % can result in a splitting of a tree into several ones
-            % (a forest). Then the internal tree structure contains a
-            % collection of trees rather than a single one.
+            % Some operations on a tree (for example deleting nodes) can result
+            % in a splitting of a tree into several ones (a forest). Then the
+            % internal tree structure contains a collection of trees rather than
+            % a single one.
             %
             % Input
             % -----
@@ -698,21 +698,12 @@ classdef Tree < handle
            tree = self.strip_show(mask);
         end
 
-        function tree = strip_typeN(self, keep, split)
-           tn = typeN_tree(self.tree());
-           mask = zeros(size(tn));
-           for i=1:numel(keep)
-               mask = mask | tn == keep(i);
-           end
-           tree = self.strip(~mask, split);
-        end
-
         function tree = strip_region_axon(self, split)
-           tree = self.strip_region([2], split);
+           tree = self.strip_region(2, split);
         end
 
         function tree = strip_region_soma(self, split)
-           tree = self.strip_region([1], split);
+           tree = self.strip_region(1, split);
         end
 
         function tree = strip_region_soma_axon(self, split)
@@ -769,67 +760,9 @@ classdef Tree < handle
             end
         end
 
-        function successors = successor_nodes(self, inodes)
-           successors = cell(1,1);
-           dA = self.tree().dA;
-           for i=1:numel(inodes)
-               tdA = dA(:,inodes(i));
-               successors{i} = find(tdA);
-           end
-           if numel(successors) == 1
-               successors = successors{1};
-           end
-        end
-
         function n = subtree(self, inode)
            [~, s] = sub_tree(self.tree(), inode);
            n = self.make_tree_(s);
-        end
-
-        function r = rrank(self, varargin)
-           if numel(varargin) > 0
-               t = varargin{1};
-           else
-               t = self.strip_but_top();
-           end
-           n = t.mag();
-           if n == 1
-               % TODO what is end recursion?
-               r = 1;
-               return;
-           end
-           s = t.successor_nodes(1);
-           tl = t.subtree(s(1));
-           tr = t.subtree(s(2));
-           alpha = tl.mag();
-           beta = tr.mag();
-           if alpha >= beta
-               [beta, alpha] = deal(alpha, beta);
-               [tr, tl] = deal(tl, tr);
-           end
-           rl = self.rrank(tl) - 1;
-           rr = self.rrank(tr) - 1;
-           if alpha - 1 >= 1
-                z = @(n, k) sum(arrayfun(@(i) self.Z(i) * self.Z(n - i), 1:k));
-                zn = z(n, alpha - 1);
-           else
-                zn = 0;
-           end
-           if alpha < beta
-               r = zn + rl * self.Z(beta) + rr;
-           elseif alpha == beta
-               delta = @(m) m * (m + 1) / 2;
-               za = self.Z(alpha);
-               r = zn + delta(za) - delta(za - rl) + rr - rl;
-           else
-               disp('invalid sorting!');
-               r = 0;
-           end
-           r = r + 1;
-        end
-
-        function tree = strip_but_top(self)
-           tree = self.strip_typeN([0 2], false);
         end
 
         function tree = perform_tree_once(self, property, func, varargin)
@@ -884,7 +817,7 @@ classdef Tree < handle
                ent = 0;
            end
 
-           if strfind(options, '-s')
+           if contains(options, '-s')
                figure;
                bar(bins, h, 'histc');
                xlabel('segment length [um]');
@@ -922,7 +855,6 @@ classdef Tree < handle
            else
                options = '';
            end
-           eps = 1e-6;
            t = self.tree();
            if ~isstruct(t)
                l = [];
@@ -955,35 +887,7 @@ classdef Tree < handle
 
            ent = Tree.entropy_(h);
 
-           %if m < 0
-           %    perc = perc / 4;
-           %    has_neg = true;
-           %else
-           %    has_neg = false;
-           %end
-
-           if m < eps || M - m < eps
-               perc = perc / 2;
-               has_zero = true;
-           else
-               has_zero = false;
-           end
-
-           %if spread > 5
-           %    perc = perc / (spread - 4);
-           %    has_spread = true;
-           %else
-           %    has_spread = false;
-           %end
-
-           has_spread = false;
-
-           %numfilled = sum(h > 0);
-           %if numfilled < 10
-           %    perc = perc * (numfilled/10);
-           %end
-
-           if strfind(options, '-s')
+           if contains(options, '-s')
                figure;
                hist(d, bins);
                xlabel('segment diameter [um]');
@@ -1022,7 +926,7 @@ classdef Tree < handle
         function out = terminal_dist(self, varargin)
             t = self.tree();
             l =  Pvec_tree(t, len_tree(t));
-            out = l(find(T_tree(t)));
+            out = l(T_tree(t));
         end
 
         function out = branch_order(self, varargin)
@@ -1031,14 +935,11 @@ classdef Tree < handle
             try
                 sect = dissect_tree(t);
             catch
-                disp('error calling dissect_tree!');
+                disp('error calling dissect_tree!'); % TODO BASSEM make the error more explicit inside the dissect_tree function 
                 out = [];
                 return;
             end
             out = bo(sect(:, 2));
-            if numel(varargin) > 0
-                out = out(find(varargin{1}(t)));
-            end
         end
 
         function out = branch_lengths(self)
@@ -1067,10 +968,6 @@ classdef Tree < handle
                 return;
             end
             out = Plen(sect(:, 2));
-
-            if numel(varargin) > 0
-                out = out(find(varargin{1}(t)));
-            end
         end
 
 
@@ -1115,18 +1012,6 @@ classdef Tree < handle
             end
         end
 
-        function d = d_frac(self)
-            t = self.tree();
-            [x, y, z] = self.bbox();
-            raster = zeros(round(x(2) - x(1) + 1), round(y(2) - y(1) + 1), round(z(2) - z(1) + 1));
-            for i = 1:numel(t.X)
-                raster(round(t.X(i) - x(1)) + 1, round(t.Y(i) - y(1)) + 1, round(t.Z(i) - z(1))  + 1) = 1;
-            end
-            [n, r] = boxcount(raster);
-            p = polyfit(log(r), log(n), 1);
-            d = -p(1);
-        end
-
         function a = asym_vanpelt(self)
             a = asym_tree(self.tree(), [], '-vp');
         end
@@ -1137,14 +1022,14 @@ classdef Tree < handle
 
         function h = ext_path_len(self)
             t = self.tree();
-            terminals = find(T_tree(t));
+            terminals = T_tree(t);
             bo = BO_tree(t);
             h = sum(bo(terminals));
         end
 
         function h = total_height(self)
             t = self.tree();
-            bt = find(T_tree(t) | B_tree(t));
+            bt = T_tree(t) | B_tree(t);
             bo = BO_tree(t);
             h = sum(bo(bt));
         end
@@ -1179,7 +1064,7 @@ classdef Tree < handle
 
         function h = distsig(self, n)
             dists = pdist2(self.XYZ, self.XYZ);
-            dists = dists(find(~tril(ones(size(dists)))));
+            dists = dists(~tril(ones(size(dists))));
             if sum(size(dists)) < 1
                 h = zeros(n, 1);
                 return;
@@ -1195,7 +1080,7 @@ classdef Tree < handle
             t = self.tree();
             e = Pvec_tree(t, len_tree(t));
             dists = pdist2(e, e);
-            dists = dists(find(~tril(ones(size(dists)))));
+            dists = dists(~tril(ones(size(dists))));
             dists = dists ./ max(dists(:));
             bins = linspace(0, 1, n);
             h = histc(dists, bins);
