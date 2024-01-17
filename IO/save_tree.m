@@ -32,14 +32,7 @@
 
 function [tname, path]  = save_tree (intree, tname)
 
-% trees : contains the tree structures in the trees package
-global        trees
-
-if (nargin < 1) || isempty (intree)
-    tree      = trees; % {DEFAULT: save entire trees cell array}
-else
-    tree      = intree;
-end
+tree      = intree;
 
 % defining a name for the povray-tree
 if (nargin < 2) || isempty (tname)
@@ -60,7 +53,4 @@ if nstart (end) > 0
 end
 
 save          ([path tname], 'tree', '-v7.3');
-
-
-
 

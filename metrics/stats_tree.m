@@ -44,14 +44,6 @@
 
 function [stats, tname, tpath] = stats_tree (intrees, s, tname, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intrees)
-    % {DEFAULT trees: full trees cell array}
-    intrees  = trees;
-end
-
 % make intrees cell array convoluted to 2 depth:
 if ~iscell   (intrees)
     intrees  = {{intrees}};
@@ -230,7 +222,7 @@ for counter1     = 1 : lens % walk through tree groups
                 dsholl);
             
             % calculate convex hull area and put in "ahull"
-            if strfind (options, '-2d')
+            if contains (options, '-2d')
                 [~, ahull]                     = convhull  (  ...
                     double (intrees{counter1}{counter2}.X), ...
                     double (intrees{counter1}{counter2}.Y));
@@ -245,7 +237,7 @@ for counter1     = 1 : lens % walk through tree groups
             gstats (counter1).hull (counter2)  = ahull;
             
             % density calculation:
-            if strfind (options, '-2d')
+            if contains (options, '-2d')
                 dhull                          = hull_tree  ( ...
                     intrees{counter1}{counter2}, [], [], [], [], '-2d');
                 [Xt, Yt]                       = cpoints (dhull);
@@ -359,5 +351,4 @@ end
 if contains (options, '-s') % show option, see "dstats_tree"
     dstats_tree  (stats, [], '-d -c -g');
 end
-
 

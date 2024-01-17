@@ -40,14 +40,6 @@ function M   = loop_tree (intree, ...
     inodes1, inodes2, gelsyn, ...     % electrical synapses
     options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
-
 ver_tree     (intree); % verify that input is a tree structure
 
 M            = M_tree (intree);
@@ -150,6 +142,4 @@ if contains      (options, '-s')     % show option
     xlim         ([1 (size (M, 1))]);
     ylim         ([1 (size (M, 1))]);
 end
-
-
 

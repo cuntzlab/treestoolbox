@@ -33,23 +33,11 @@
 
 function ratio = ratio_tree (intree, v, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
-
 ver_tree     (intree);                 % verify that input is a tree
 
 if (nargin < 2) || isempty (v)
-    % {DEFAULT vector: diameter values from the tree} 
-    if ~isstruct(intree),
-        v = trees{intree}.D;
-    else
-        v = intree.D;
-    end
+    % {DEFAULT vector: diameter values from the tree}
+    v = intree.D;
 end
 
 if (nargin < 3) || isempty (options)
@@ -77,5 +65,4 @@ if contains (options, '-s')       % show option
     grid         on;
     axis         image;
 end
-
 

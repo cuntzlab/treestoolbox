@@ -659,7 +659,7 @@ if CutGrowth && isfield(BaseTree,'IncompleteTerminals')
     for ff = 1:NewNrnodes
         tempSameI = ones(1,NewNrnodes-1)*(EndNnode+ff);
         tempDiffI = EndNnode+1:1:NDIST;
-        tempDiffI(find(tempDiffI == (EndNnode+ff))) = [];
+        tempDiffI(tempDiffI == (EndNnode+ff)) = [];
         parentNodes = [parentNodes,tempSameI];
         NewNodes = [NewNodes,tempDiffI];
     end
@@ -806,7 +806,7 @@ if contains(options,'-Re')
     % 0 = TP, 1 = CP, 2 = BP :
     typeN = (ones (1, size (RepTree.dA, 1)) * RepTree.dA)';
     termptsAPtree = find(typeN == 0);
-    [prsect prvec] = dissect_tree(RepTree);
+    [prsect, prvec] = dissect_tree(RepTree);
     lenAPtree = len_tree(RepTree);
     FixTfinalI = length(BaseTree.X);
     NewNodesInd = FixTfinalI+1:1:length(RepTree.X);
@@ -823,7 +823,7 @@ if contains(options,'-Re')
             if isempty(FixTNodesCheck) & ~ismember(prsect(DoubleFixTBrPt(1),1),PrunedNodeMem)
                 if sum(lenAPtree(allsegnodes)) <= prunlen
                     prunInd = [prunInd;allsegnodes];
-                    if ~isempty(find(prsect(DoubleFixTBrPt,1) < FixTfinalI))
+                    if ~isempty(find(prsect(DoubleFixTBrPt,1) < FixTfinalI, 1))
                         PrunedNodeMem = [PrunedNodeMem,prsect(DoubleFixTBrPt(1),1)];
                     end
                 end
@@ -905,7 +905,7 @@ if contains(options,'-Re')
     RepTree.Z(TrueInd) = HypoTree.Z(TrueInd);
     % smooth hard corners by rounding them over
     changetree = RepTree;
-    [Corsect Corvec] = dissect_tree(changetree);
+    [Corsect, Corvec] = dissect_tree(changetree);
     newNodeSegs = Corvec(TrueInd,1);
     newNodeLper = Corvec(TrueInd,2);
     SegNr = unique(newNodeSegs);
@@ -949,7 +949,7 @@ if contains(options,'-Re')
         FinalInfoStr = strcat(FinalInfoStr,'\n','(-T not active) Tree is being tapered');
         getparent = idpar_tree(RepTree);
         NewParents = getparent(TrueInd);
-        ConParents = NewParents(find(~ismember(NewParents,TrueInd) == 1));
+        ConParents = NewParents(~ismember(NewParents,TrueInd) == 1);
         ConParents = unique(ConParents);
         HypoTree = quaddiameter_tree (RepTree,colapictaper_scale,... %colapictaper_scale
             colapictaper_offset);   %,[],[],[],taperthreshold(1);

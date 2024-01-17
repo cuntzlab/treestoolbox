@@ -48,10 +48,7 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2016  Hermann Cuntz
 
-function varargout = load_tree (tname, options)
-
-% trees : contains the tree structures in the trees package
-global       trees
+function [tree, tname, path] = load_tree (tname, options)
 
 if (nargin < 1) || isempty (tname)
     [tname, path] = uigetfile ( ...
@@ -445,15 +442,6 @@ end
 %         'Please check on yourself']);
 % end
 
-if (nargout > 0)
-    % if output is defined then it becomes the tree:
-    varargout{1} = tree;
-    varargout{2} = tname;
-    varargout{3} = path;
-else
-    % otherwise add to end of trees cell array:
-    trees{length (trees) + 1} = tree;
-end
 
 % function checkLoop (tree)
 % if iscell (tree)

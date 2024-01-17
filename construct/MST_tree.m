@@ -65,9 +65,6 @@
 function [tree, indx] = MST_tree (msttrees, X, Y, Z, bf, ...
     thr, mplen, DIST, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
 if (nargin < 1) || isempty (msttrees)
     % starting tree is just point (0,0,0)
     msttrees           = {};
@@ -411,7 +408,7 @@ while ~isempty (dplen) && (flag == 1)
                     disp('Chose a Cut Terminal...................');
                 end
             end
-            if ismember(itree,CutCheckNodes) & ~ismember(itree,usednodes)
+            if ismember(itree,CutCheckNodes) && ~ismember(itree,usednodes)
                 usednodes = [usednodes,itree];
             end
         end
@@ -649,16 +646,10 @@ end
 if contains             (options, '-t')
     msttrees           = timetrees;
 end
-if (nargout            > 0)
-    if lent            == 1
-        tree           = msttrees {1};
-    else
-        tree           = msttrees;
-    end
+
+if lent            == 1
+    tree           = msttrees {1};
 else
-    trees              = [trees msttrees];
+    tree           = msttrees;
 end
-
-
-
 

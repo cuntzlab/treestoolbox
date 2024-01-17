@@ -59,18 +59,10 @@
 
 function [tname, path, rpot] = pov_tree (intree, tname, v, ipart, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees); 
-end;
-
 % defining a name for the povray-tree
 if (nargin < 2) || isempty (tname)
     [tname, path] = uiputfile ('.pov', 'export to POV-Ray', 'tree.pov');
-    if tname  == 0,
+    if tname  == 0
         tname = [];
         return
     end
@@ -105,12 +97,12 @@ if (nargin < 5) || isempty (options)
     options  = '-b -w'; 
 end
 
-nextline     = [(char (13)), (char (10))];
+nextline     = [(char (13)), (newline)];
 
 % colour values in .dat file:
 if ... 
         isempty (v) && ...
-        isempty (strfind (options, '-c')) %&& ...
+        ~contains (options, '-c') %&& ...
 %         isempty (strfind (options, '-z'))
     iflag                      = 0;  % imaging is off, no colours.
 else
@@ -120,7 +112,7 @@ else
     % number of colormap entries:
     lenm                       = size  (map,    1);  
     povray                     = fopen (name2, 'w');     % .dat file
-    if strfind                 (options, '-c') % brainbow (random colours)
+    if contains                (options, '-c') % brainbow (random colours)
         if iscell              (intree)        % many cells
             % concatenate all values between 0 and 1:
             rpot               = cell (1, length (intree));
@@ -144,7 +136,7 @@ else
                     lenner     = length (looper);
                 end
                 R              = rand     (1, 3);
-                if strfind     (options, '-cmax') % brainbow high contrast
+                if contains    (options, '-cmax') % brainbow high contrast
                     R          = R -  min (R);
                     R          = R ./ max (R);
                 end
@@ -178,7 +170,7 @@ else
                 lenner         = length (looper);
             end
             R                  = rand     (1, 3);
-            if strfind         (options, '-cmax') % brainbow high contrast
+            if contains        (options, '-cmax') % brainbow high contrast
                 R              = R -  min (R);
                 R              = R ./ max (R);
             end
@@ -220,7 +212,7 @@ else
                     vt         = double (vt);
                 end
                 vt             = vt (len > 0.0001);
-                if isempty     (strfind (options, '-minmax'))
+                if ~contains (options, '-minmax')
                     irange     = [(min (vt)) (max (vt))];
                 else
                     irange     = [0 (max (vt))];
@@ -240,7 +232,7 @@ else
                     if max (vt) > irange (2)
                         irange (2) = max (vt);
                     end
-                    if strfind (options, '-minmax')
+                    if contains (options, '-minmax')
                         if min (vt) < irange (1)
                             irange (1) = min (vt);
                         end
@@ -290,7 +282,7 @@ else
                     v          = double (v);
                 end
                 v              = v (len > 0.0001);
-                if strfind     (options, '-minmax')
+                if contains    (options, '-minmax')
                     irange     = [(min (v)) (max (v))];
                 else
                     irange     = [0 (max (v))];
@@ -311,7 +303,7 @@ else
 end
 
 if iscell                      (intree)
-    if strfind                 (options, '-s')
+    if contains                (options, '-s')
         % show option - extra file:
         X                      = cell (length (intree), 1); 
         Y                      = cell (length (intree), 1);
@@ -330,14 +322,14 @@ if iscell                      (intree)
     % Writing the cylinders into a povray variable called 'name'
     fwrite                     (povray, ...
         ['#declare ' name  ' = union {', nextline], 'char');
-    if strfind                 (options, '-w')
+    if contains                (options, '-w')
         % waitbar option: initialization
         HW                     = waitbar (0, 'writing trees ...');
         set                    (HW, ...
             'Name',            '..PLEASE..WAIT..YEAH..');
     end
     for counterT                     = 1 : length (intree)
-        if strfind             (options, '-w') % waitbar option: update
+        if contains            (options, '-w') % waitbar option: update
             if mod (counterT, 500)   == 0
                 waitbar        (counterT ./ length (intree), HW);
             end
@@ -352,7 +344,7 @@ if iscell                      (intree)
             else
                 looper         = 1 : N;
             end
-            if strfind         (options, '-b')
+            if contains        (options, '-b')
                 % blob option:
                 % skin around bodies, faster but sloppier
                 if isempty     (ipart)
@@ -378,7 +370,7 @@ if iscell                      (intree)
                         (sprintf ('%.4f', cyl (counter,   4))), ',',    ...
                         (sprintf ('%.4f', cyl (counter,   6))), '>, ',  ...
                         (sprintf ('%.5f', D   (counter) / 2))], 'char');
-                    if strfind (options, '-b')
+                    if contains  (options, '-b')
                         % blob option:
                         % skin around bodies, faster but sloppier
                         fwrite (povray, ', 1', 'char');
@@ -391,7 +383,7 @@ if iscell                      (intree)
                             '#read (inning, B) ', ...
                             'pigment {color red R green G blue B}'], ...
                             'char');
-                        if strfind                     (options, '-s1')
+                        if contains                     (options, '-s1')
                              fwrite (povray, ...
                             ' finish  {ambient 1}', 'char');
                         end
@@ -401,7 +393,7 @@ if iscell                      (intree)
                 end
             end
         else % They are spheres
-            if strfind         (options, '-b')
+            if contains        (options, '-b')
                 % blob option:
                 % skin around bodies, faster but sloppier
                 if isempty     (ipart)
@@ -433,7 +425,7 @@ if iscell                      (intree)
                     '>, ', ...
                     (sprintf ('%.5f', intree{counterT} (counter, 4) / 2))], ...
                     'char');
-                if strfind     (options, '-b') % CHANGED FINDSTR
+                if contains    (options, '-b') % CHANGED FINDSTR
                     fwrite     (povray, ', 1', 'char');
                 end
                 if iflag
@@ -444,7 +436,7 @@ if iscell                      (intree)
                         '#read (inning, B) ', ...
                         'pigment {color red R green G blue B}'], ...
                         'char');
-                    if strfind                     (options, '-s1')
+                    if contains                    (options, '-s1')
                         fwrite (povray, ...
                             ' finish  {ambient 1}', 'char');
                     end
@@ -453,7 +445,7 @@ if iscell                      (intree)
                 fwrite         (povray, ['}', nextline], 'char');
             end
         end
-        if strfind             (options, '-b')
+        if contains            (options, '-b')
             % blob option:
             % skin around bodies, faster but sloppier
             if  isempty        (ipart)
@@ -467,7 +459,7 @@ if iscell                      (intree)
             end
         end
     end
-    if strfind                 (options, '-w') % waitbar option: close
+    if contains                (options, '-w') % waitbar option: close
         close                  (HW);
     end
     fwrite                     (povray, ['}', nextline], 'char');
@@ -475,24 +467,15 @@ if iscell                      (intree)
 else
     X                          = {};
     Y                          = {};
-    if ~isstruct               (intree),
-        if (numel (intree) == 1)
-            D                  = trees{intree}.D;
-            if strfind         (options, '-s')
-                % show option: extra file
-                X{1}           = trees{intree}.X;
-                Y{1}           = trees{intree}.Y;
-            end
-        else
-            if strfind         (options, '-s')
-                % show option: extra file
-                X{1}           = intree (:, 1);
-                Y{1}           = intree (:, 2);
-            end
+    if ~isstruct               (intree)
+        if contains            (options, '-s')
+            % show option: extra file
+            X{1}               = intree (:, 1);
+            Y{1}               = intree (:, 2);
         end
     else
         D                      = intree.D;
-        if strfind             (options, '-s')
+        if contains            (options, '-s')
             % show option: extra file
             X{1}               = intree.X;
             Y{1}               = intree.Y;
@@ -503,12 +486,12 @@ else
     % Writing the cylinders into a povray variable called 'name'
     fwrite                     (povray, ...
         ['#declare ' name ' = union {', nextline], 'char');
-    if strfind                 (options, '-w')
+    if contains                (options, '-w')
         % waitbar option: initialization
         HW                     = waitbar (0, 'writing cylinders ...');
         set                    (HW, 'Name', '..PLEASE..WAIT..YEAH..');
     end
-    if strfind (options, '-b')
+    if contains                (options, '-b')
         % blob option:
         % skin around bodies, faster but sloppier
         fwrite                 (povray, ...
@@ -524,7 +507,7 @@ else
             looper             = 1 : N;
         end
         for counter            = looper
-            if strfind         (options, '-w')
+            if contains        (options, '-w')
                 % waitbar option: update
                 if mod (counter, 500) == 0
                     waitbar    (counter / N, HW);
@@ -540,7 +523,7 @@ else
                     (sprintf ('%.4f', cyl (counter, 4))), ',',    ...
                     (sprintf ('%.4f', cyl (counter, 6))), '>, ',  ...
                     (sprintf ('%.5f', D   (counter) / 2))], 'char');
-                if strfind     (options, '-b')
+                if contains    (options, '-b')
                     % blob option:
                     % skin around bodies, faster but sloppier
                     fwrite     (povray, ', 1', 'char');
@@ -553,7 +536,7 @@ else
                         '#read (inning, B) ', ...
                         'pigment {color red R green G blue B}'], ...
                         'char');
-                    if strfind                     (options, '-s1')
+                    if contains                    (options, '-s1')
                         fwrite (povray, ...
                             ' finish  {ambient 1}', 'char');
                     end
@@ -570,7 +553,7 @@ else
             looper             = 1 : N;
         end
         for counter            = looper
-            if strfind         (options, '-w') % CHANGED FINDSTR
+            if contains        (options, '-w') % CHANGED FINDSTR
                 % waitbar option: update
                 if mod         (counter, 500) == 0
                     waitbar    (counter ./ size (intree, 1), HW);
@@ -582,7 +565,7 @@ else
                 (sprintf ('%.4f', intree (counter, 2))), ',',   ...
                 (sprintf ('%.4f', intree (counter, 3))), '>, ', ...
                 (sprintf ('%.5f', intree (counter, 4) / 2))], 'char');
-            if strfind         (options, '-b') % CHANGED FINDSTR
+            if contains        (options, '-b') % CHANGED FINDSTR
                 % blob option:
                 % skin around bodies, faster but sloppier
                 fwrite         (povray, ', 1', 'char');
@@ -595,7 +578,7 @@ else
                     '#read (inning, B) ', ...
                     'pigment {color red R green G blue B}'], ...
                     'char');
-                if strfind     (options, '-s1')
+                if contains    (options, '-s1')
                     fwrite     (povray, ...
                         ' finish  {ambient 1}', 'char');
                 end
@@ -604,12 +587,12 @@ else
             fwrite             (povray, ['}', nextline], 'char');
         end
     end
-    if strfind                 (options, '-w')
+    if contains                (options, '-w')
         % waitbar option: close
         close                  (HW);
     end
     fwrite                     (povray, ['}', nextline], 'char');
-    if strfind                 (options, '-b')
+    if contains                (options, '-b')
         % blob option:
         % skin around bodies, faster but sloppier
         fwrite                 (povray, ['}', nextline], 'char');
@@ -618,7 +601,7 @@ else
     fclose                     (povray);
 end
 
-if strfind                     (options, '-s')
+if contains                    (options, '-s')
     % show option: extra file
     a1                         = strfind (options, '-s');
     if length (options)        > a1 + 1
@@ -636,7 +619,7 @@ if strfind                     (options, '-s')
     mX                         = min (X) + (max (X) - min (X)) ./ 2;
     mY                         = min (Y) + (max (Y) - min (Y)) ./ 2;
     % camera positions:
-    if strfind                 (options, '-v')
+    if contains                (options, '-v')
         ax                     = get (gcf, 'CurrentAxes');
         if ~isempty            (ax)
             cpos               = get (ax, 'cameraposition');
@@ -689,7 +672,7 @@ if strfind                     (options, '-s')
                 nextline], 'char');
             fwrite             (povray, ...
                 ['camera               {', nextline], 'char');
-            if strfind         (options, '-v')
+            if contains        (options, '-v')
                 fwrite         (povray, ...
                     ['  sky                <', ...
                     (num2str (skyvec (1))), ', ', ...
@@ -833,7 +816,7 @@ if strfind                     (options, '-s')
                 nextline], 'char');
             fwrite             (povray, ...
                 ['camera               {', nextline], 'char');
-            if strfind         (options, '-v')
+            if contains        (options, '-v')
                 fwrite         (povray, ...
                     ['  sky                <', ...
                     (num2str (skyvec (1))), ', ', ...
@@ -921,7 +904,7 @@ if strfind                     (options, '-s')
                 nextline], 'char');
             fwrite             (povray, ...
                 ['camera               {', nextline], 'char');
-            if strfind         (options, '-v')
+            if contains        (options, '-v')
                 fwrite         (povray, ...
                     ['  sky                <', ...
                     (num2str   (skyvec (1))), ', ', ...
@@ -1097,13 +1080,11 @@ if strfind                     (options, '-s')
                 nextline], 'char');
             fclose             (povray);
     end
-    if  strfind                (options, '->')
+    if  contains               (options, '->')
         if  ispc
             % this even calls the file directly (only windows)
             winopen            (name3);
         end
     end
 end
-
-
 

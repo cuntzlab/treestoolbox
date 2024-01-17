@@ -42,24 +42,11 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2016  Hermann Cuntz
 
-function varargout = morph_tree (intree, v, options)
+function tree = morph_tree (intree, v, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees); 
-end
 
 ver_tree     (intree); % verify that input is a tree structure
-
-% use full tree for this function
-if ~isstruct (intree)
-    tree     = trees{intree};
-else
-    tree     = intree;
-end
+tree         = intree;
 
 if (nargin < 2) || isempty (v)
     % {DEFAULT vector: 10 um pieces between all nodes}
@@ -78,7 +65,7 @@ Z0               = tree.Z (1); % root coordinates
 tree             = tran_tree (tree); % center on root
 len              = len_tree  (tree); % length values of tree segments [um]
 
-if strfind       (options, '-m') % show movie option
+if contains      (options, '-m') % show movie option
     clf;
     HP           = plot_tree (tree);
     title        ('morph a tree');
@@ -90,14 +77,14 @@ if strfind       (options, '-m') % show movie option
     axis         image;
 end
 
-if strfind       (options, '-w') % waitbar option: initialization
+if contains      (options, '-w') % waitbar option: initialization
     if length    (tree.X) > 998
         HW       = waitbar (0, 'morphing ...');
         set      (HW, 'Name', '..PLEASE..WAIT..YEAH..');
     end
 end
 for counter      = 2 : length (tree.X)
-    if strfind   (options, '-w') % waitbar option: update
+    if contains  (options, '-w') % waitbar option: update
         if  (mod (counter, 1000) == 999)
             waitbar (counter ./ length (tree.X), HW);
         end
@@ -124,7 +111,7 @@ for counter      = 2 : length (tree.X)
         tree.X (sub) = tree.X (sub) - dX + v (counter) .* (dX ./ XYZ);
         tree.Y (sub) = tree.Y (sub) - dY + v (counter) .* (dY ./ XYZ);
         tree.Z (sub) = tree.Z (sub) - dZ + v (counter) .* (dZ ./ XYZ);
-        if strfind (options, '-m') % show movie option: update
+        if contains (options, '-m') % show movie option: update
             set  (HP, ...
                 'visible',     'off');
             HP   = plot_tree (tree);
@@ -133,7 +120,7 @@ for counter      = 2 : length (tree.X)
         end
     end
 end
-if strfind       (options, '-w') % waitbar option: close
+if contains       (options, '-w') % waitbar option: close
     if length    (tree.X) > 998
         close    (HW);
     end
@@ -141,7 +128,7 @@ end
 
 tree             = tran_tree (tree, [X0 Y0 Z0]); % move back the tree
 
-if strfind       (options, '-s') % show option
+if contains      (options, '-s') % show option
     clf;
     hold         on;
     HP           = plot_tree (intree);
@@ -165,8 +152,3 @@ if strfind       (options, '-s') % show option
     axis         image;
 end
 
-if (nargout > 0 || (isstruct (intree)))
-    varargout{1}   = tree; % if output is defined then it becomes the tree
-else
-    trees{intree}  = tree; % otherwise add to end of trees cell array
-end

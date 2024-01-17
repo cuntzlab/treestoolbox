@@ -29,22 +29,9 @@
 
 function gi  = gi_tree (intree, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT: last tree in trees}
-    intree   = length (trees);           
-end
-
 ver_tree     (intree);                   % verify that input is a tree
-
 % use only axial resistance vector/value for this function
-if ~isstruct (intree)
-    Ri       = trees{intree}.Ri;
-else
-    Ri       = intree.Ri;
-end
+Ri       = intree.Ri;
 
 if (nargin < 2) || isempty (options)
     % {DEFAULT: no option}
@@ -69,6 +56,4 @@ if contains (options, '-s')         % show option
     grid         on;
     axis         image;
 end
-
-
 

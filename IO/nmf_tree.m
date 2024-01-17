@@ -35,22 +35,8 @@
 
 function [tname, path] = nmf_tree (intree, tname)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end;
-
 ver_tree     (intree); % verify that input is a tree structure
-
-% use full tree for this function
-if ~isstruct (intree)
-    tree     = trees {intree};
-else
-    tree     = intree;
-end
+tree         = intree;
 
 % defining a name for saved file
 if (nargin < 2) || isempty (tname)
@@ -103,5 +89,4 @@ h5write          (nmffile, '/swc/y', tree.Y);
 h5create         (nmffile, ...
     '/swc/z',                  [N 1]);
 h5write          (nmffile, '/swc/z', tree.Z);
-
 

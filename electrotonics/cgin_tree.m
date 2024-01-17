@@ -32,26 +32,13 @@
 
 function cgin = cgin_tree (intree, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if nargin    < 1
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
-
 ver_tree     (intree); % verify that input is a tree structure
+% use only membrane conductance vector/value for this function:
+Gm           = intree.Gm;
 
 if (nargin < 2) || isempty (options)
     % {DEFAULT: no option}
     options  = '';
-end
-
-% use only membrane conductance vector/value for this function
-if ~isstruct (intree)
-    Gm       = trees{intree}.Gm;
-else
-    Gm       = intree.Gm;
 end
 
 cgin             = 1 / ...
@@ -78,6 +65,4 @@ if contains (options, '-s')
     grid         on;
     axis         image;
 end
-
-
 

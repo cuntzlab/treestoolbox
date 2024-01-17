@@ -40,21 +40,10 @@
 
 function HP = dA_tree (intree, color, DD, xyscale, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
-
 % use only directed adjacency for this function (obviously..)
 if ~isstruct (intree)
     if numel (intree) > 1
         dA   = intree;
-    else
-        ver_tree (intree); % verify that input is a tree structure
-        dA   = trees{intree}.dA;
     end
 else
     ver_tree (intree);     % verify that input is a tree structure
@@ -188,7 +177,4 @@ end
 if sum (get (gca, 'Dataaspectratio') == [1 1 1]) ~= 3
     axis         equal
 end
-
-
-
 

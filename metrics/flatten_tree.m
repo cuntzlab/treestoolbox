@@ -32,24 +32,10 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function varargout = flatten_tree (intree, options)
-
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees); 
-end
+function tree = flatten_tree (intree, options)
 
 ver_tree     (intree); % verify that input is a tree structure
-
-% use full tree for this function
-if ~isstruct (intree)
-    tree     = trees {intree};
-else
-    tree     = intree;
-end
+tree         = intree;
 
 if (nargin < 2) || isempty (options)
     % {DEFAULT: waitbar}
@@ -64,12 +50,7 @@ tree             = tran_tree (tree, [0 0 (-tree.Z (1))]);
 eps              = 1e-3;
 if all (tree.Z < eps)
     tree.Z (:)   = 0;
-    warning      ('tree already flat, nothing to do');
-    if (nargout > 0) || (isstruct (intree))
-        varargout{1}   = tree;
-    else
-        trees{intree}  = tree;
-    end
+    warning      ('tree already flat, nothing to do'); % TODO return the tree
     return;
 end
 
@@ -163,8 +144,3 @@ if contains (options, '-s') % show option
     axis         image;
 end
 
-if (nargout > 0) || (isstruct (intree))
-    varargout{1}   = tree; % if output is defined then it becomes the tree
-else
-    trees{intree}  = tree; % otherwise add to end of trees cell array
-end

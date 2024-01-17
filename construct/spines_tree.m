@@ -59,22 +59,8 @@ function [tree, indhead, indneck] = spines_tree (intree, XYZ, ...
     dneck, dhead, mlneck, stdlneck, ...
     ipart, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
-
 ver_tree     (intree);       % verify that input is a tree structure
-
-% use full tree for this function
-if ~isstruct (intree)
-    tree     = trees{intree};
-else
-    tree     = intree;
-end
+tree         = intree;
 
 X            = tree.X;       % X-locations of nodes on tree
 Y            = tree.Y;       % Y-locations of nodes on tree
@@ -213,11 +199,4 @@ if contains      (options, '-s')
     grid         on;
     axis         image;
 end
-
-if (nargout == 0) && (~isstruct (intree))
-   trees{intree} = tree; % otherwise the orginal tree in trees is replaced
-end
-
-
-
 

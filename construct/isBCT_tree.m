@@ -31,13 +31,6 @@
 
 function isBCT = isBCT_tree (intree)
 
-% trees : contains the tree structures in the trees package
-global trees
-
-if (nargin < 1) || isempty (intree)
-    intree   = length (trees);
-end
-
 if ~isstruct (intree)
     if (numel (intree) >= 1)
         BCT      = intree;
@@ -59,6 +52,4 @@ else
         isBCT    = 0;
     end    
 end
-
-
 

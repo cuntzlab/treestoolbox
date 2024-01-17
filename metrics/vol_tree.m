@@ -29,33 +29,17 @@
 
 function vol = vol_tree (intree, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
-
 ver_tree     (intree); % verify that input is a tree structure
 
 % use only local diameters vector for this function
 isfrustum    = 0;
-if ~isstruct (intree)
-    D        = trees{intree}.D;
-    if ...
-            (isfield (trees{intree}, 'frustum')) && ...
-            (trees{intree}.frustum == 1),
-        isfrustum  = 1;
-    end
-else
-    D        = intree.D;
-    if ...
-            (isfield (intree, 'frustum')) && ...
-            (intree.frustum == 1)
-        isfrustum  = 1;
-    end
+D            = intree.D;
+if ...
+        (isfield (intree, 'frustum')) && ...
+        (intree.frustum == 1)
+    isfrustum  = 1;
 end
+
 
 if (nargin < 2) || isempty (options)
     % {DEFAULT: no option}
@@ -94,5 +78,4 @@ end
 
 % in cm3 it would be:
 % vol = vol / 1000000000000; % astounding scaling factors from um3 to cm3
-
 

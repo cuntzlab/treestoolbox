@@ -46,13 +46,6 @@
 
 function sse = sse_tree (intree, I, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    intree   = length (trees);
-end
-
 ver_tree     (intree);
 
 if (nargin < 3) || isempty (options)
@@ -95,6 +88,4 @@ if contains      (options, '-s')
         axis     image;
     end
 end
-
-
 

@@ -46,13 +46,6 @@ function syn = syn_tree ( ...
     ge, gi, Ee, Ei, ...              % synaptic inputs
     I, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    intree   = length (trees);
-end
-
 ver_tree     (intree);
 
 M            = M_tree (intree);
@@ -127,6 +120,4 @@ if contains      (options, '-s')
     grid         on;
     axis         image;
 end
-
-
 

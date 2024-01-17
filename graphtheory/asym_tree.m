@@ -42,22 +42,9 @@
 
 function asym = asym_tree (intree, v, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: : last tree in trees cell array}
-    intree   = length (trees);
-end
-
 ver_tree     (intree); % verify that input is a tree structure
-
 % use only directed adjacency for this function
-if ~isstruct (intree)
-    dA       = trees{intree}.dA;
-else
-    dA       = intree.dA;
-end
+dA           = intree.dA;
 
 if (nargin < 2) || isempty (v)
     % {DEFAULT vector: count termination points}
@@ -146,7 +133,7 @@ if contains (options, '-s') % show option
     plot_tree    (intree, asym (iB), [], iB);
     title        ([...
         'asymmetry at branch points, mean: ' ...
-        (num2str (nanmean (asym)))]);
+        (num2str (mean (asym, 'omitnan')))]);
     xlabel       ('x [\mum]');
     ylabel       ('y [\mum]');
     zlabel       ('z [\mum]');
@@ -157,5 +144,4 @@ if contains (options, '-s') % show option
         'clim',                [0 0.5]);
     colorbar;
 end
-
 

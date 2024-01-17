@@ -47,14 +47,6 @@
 function [tname, path, minterf, tree] = ...
     neuron_template_tree (intree, tname, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
-
 if (nargin < 3) || isempty (options)
     % {DEFAULT: no option}
     options  = '';
@@ -92,13 +84,8 @@ if isfield       (intree, 'artificial')
 else
     artflag      = false;
     ver_tree     (intree); % verify that input is a tree structure
-    
-    % use full tree for this function
-    if ~isstruct (intree)
-        tree     = trees{intree};
-    else
-        tree     = intree;
-    end
+    tree         = intree;
+
     if (isfield (tree, 'frustum')) && (tree.frustum == 1)
         isfrustum  = 1;
     else
@@ -140,7 +127,7 @@ else
     end
 end
 
-nextline         = [(char (13)), (char (10))];
+nextline         = [(char (13)), (newline)];
 
 if ~strcmp       (format, '.hoc')
     warning      ('TREES:IO',  'format unknown');
@@ -185,7 +172,7 @@ else
     fwrite       (neuron, ['}',                         nextline], 'char');
     fwrite       (neuron, ['',                          nextline], 'char');
     % distribution of section regions:
-    H1           = histc (Rsect, uR); 
+    H1           = histax (Rsect, uR); 
     % making regions public
     for counterR = 1 : luR
         fwrite   (neuron, ['public ' rnames{counterR},  nextline], 'char');
@@ -352,20 +339,20 @@ fwrite           (neuron, ['endtemplate ', name,        nextline], 'char');
 fwrite           (neuron, ['',                          nextline], 'char');
 fclose           (neuron);
 
-if strfind       (options, '-s')
+if contains       (options, '-s')
     % file-pointer to the run-file
     neuron       = fopen (name2, 'w');
     fwrite       (neuron, ['load_file ("nrngui.hoc")',  nextline], 'char');
     fwrite       (neuron, ['xopen ("', name1, '")',     nextline], 'char');
     fclose       (neuron);
-    if strfind   (options, '->')
+    if contains   (options, '->')
         if ispc  % this even calls the file directly (only windows)
             winopen (name2);
         end
     end
 end
 
-if strfind       (options, '-m')
+if contains       (options, '-m')
     neuron       = fopen ( ...
         fullfile (path, sprintf ('%s_minterf.dat', name)), 'w');
     for m        = 1 : size (minterf, 1)
@@ -375,6 +362,4 @@ if strfind       (options, '-m')
     save         (fullfile (path, sprintf ('%s_minterf.mat', name)), ...
         'minterf')
 end
-
-
 

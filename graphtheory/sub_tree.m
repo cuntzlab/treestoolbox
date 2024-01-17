@@ -34,22 +34,8 @@
 
 function [sub, subtree] = sub_tree (intree, inode, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
-
 ver_tree     (intree); % verify that input is a tree structure
-
-% use full tree for this function
-if ~isstruct (intree)
-    tree     = trees{intree};
-else
-    tree     = intree;
-end
+tree         = intree;
 
 if (nargin < 2) || isempty (inode)
     % {DEFAULT index: second node in tree}
@@ -111,6 +97,4 @@ if (nargout > 1)
     end
     subtree      = tree;
 end
-
-
 

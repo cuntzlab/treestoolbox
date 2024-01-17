@@ -30,15 +30,7 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [rootangle] = rootangle_tree (intree, options)
-
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
+function rootangle = rootangle_tree (intree, options)
 
 if (nargin < 2) || isempty (options)
     % {DEFAULT: no option}
@@ -87,6 +79,4 @@ if strcmp (options, '-s')
     xlabel       ('Angle');
     ylabel       ('Density');
 end
-
-
 

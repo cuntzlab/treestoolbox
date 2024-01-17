@@ -46,16 +46,16 @@
 % the TREES toolbox: edit, visualize and analyze neuronal trees
 % Copyright (C) 2009  Hermann Cuntz
 
-function [tname path rpot] = pov_patch (p, tname, v, options)
+function [tname, path, rpot] = pov_patch (p, tname, v, options)
 
-if (nargin<1)||isempty(p),
+if (nargin<1)||isempty(p)
     error ('forgot the patch?');
-end;
+end
 
 % defining a name for the povray-tree
-if (nargin<2)||isempty(tname),
-    [tname path] = uiputfile ('.pov', 'export to POV-Ray', 'tree.pov');
-    if tname  == 0,
+if (nargin<2)||isempty(tname)
+    [tname, path] = uiputfile ('.pov', 'export to POV-Ray', 'tree.pov');
+    if tname  == 0
         tname = [];
         return
     end
@@ -65,18 +65,18 @@ end
 % extract a sensible name from the filename string:
 nstart = unique ([0 strfind(tname, '/') strfind(tname, '\')]);
 name = tname (nstart (end) + 1 : end - 4);
-if nstart (end) > 0,
+if nstart (end) > 0
     path = [path tname(1 : nstart (end))];
     tname (1 : nstart (end)) = '';
 end
 name2 = [path name '.dat']; % imaging file, if v not empty or '-c' option
 name3 = [path 'sh' name '.pov']; % show file, with '-s' option
 
-if (nargin<3)||isempty(v),
+if (nargin<3)||isempty(v)
     v = []; % {DEFAULT: no color mapping}
 end
 
-if (nargin<4)||isempty(options),
+if (nargin<4)||isempty(options)
     options = '-b -w'; % {DEFAULT: blobs and waitbar}
 end
 
@@ -87,7 +87,7 @@ else
     map    = jet (256);     % colormap, change if necessary
     lenm   = size (map, 1); % number of colormap entries
     povray = fopen (name2, 'w'); % open file
-    if size (v, 2) == 3,
+    if size (v, 2) == 3
         if islogical (v), v = double (v); end
         v = v (len > 0.0001, :);
         colorcode = reshape (v', length (v) * 3, 1);
@@ -96,7 +96,7 @@ else
     else
         if islogical (v), v = double (v); end
         v = v (len > 0.0001);
-        if strfind (options, '-minmax'),
+        if contains (options, '-minmax')
             irange = [min(v) max(v)];
         else
             irange = [0 max(v)];
@@ -114,31 +114,31 @@ end
 % file-pointer to the povray-file
 povray = fopen ([path tname], 'w');
 % Writing the cylinders into a povray variable called 'name'
-fwrite (povray, ['#declare ' name ' = union{', char(13), char(10)], 'char');
+fwrite (povray, ['#declare ' name ' = union{', char(13), newline], 'char');
 
-if strfind (options, '-w') % waitbar option: initialization
+if contains (options, '-w') % waitbar option: initialization
     HW = waitbar (0, 'writing vertices ...');
     set (HW, 'Name', '..PLEASE..WAIT..YEAH..');
 end
-if strfind (options, '-b'), % blob option: skin around bodies, faster but sloppier
-    fwrite (povray, ['blob { threshold .15', char(13), char(10)], 'char');
+if contains (options, '-b') % blob option: skin around bodies, faster but sloppier
+    fwrite (povray, ['blob { threshold .15', char(13), newline], 'char');
 end
-fwrite (povray, ['mesh2 {', char(13), char(10)], 'char');
-fwrite (povray, ['  vertex_vectors {', char(13), char(10)], 'char');
+fwrite (povray, ['mesh2 {', char(13), newline], 'char');
+fwrite (povray, ['  vertex_vectors {', char(13), newline], 'char');
 N   = size (p.vertices, 1);
 fwrite (povray, ['    ' num2str(N)], 'char');
-for ward = 1 : N,
-    if strfind (options, '-w') % waitbar option: update
-        if mod (ward, 500) == 0,
+for ward = 1 : N
+    if contains (options, '-w') % waitbar option: update
+        if mod (ward, 500) == 0
             waitbar (ward ./ N, HW);
         end
     end
-    fwrite (povray, [',', char(13), char(10)], 'char');
+    fwrite (povray, [',', char(13), newline], 'char');
     fwrite (povray ,['    <', ...
         num2str(p.vertices (ward, 1)), ',', ...
         num2str(p.vertices (ward, 2)), ',', ...
         num2str(p.vertices (ward, 3)), '>'], 'char');
-    if strfind (options, '-b'), % blob option: skin around bodies, faster but sloppier
+    if contains (options, '-b') % blob option: skin around bodies, faster but sloppier
         fwrite (povray, ', 1', 'char');
     end
     if iflag
@@ -147,30 +147,30 @@ for ward = 1 : N,
     end
     
 end
-fwrite (povray, ['}', char(13), char(10)], 'char');
-if strfind (options, '-w') % waitbar option: close
+fwrite (povray, ['}', char(13), newline], 'char');
+if contains (options, '-w') % waitbar option: close
     close (HW);
 end
 
-if strfind (options, '-w') % waitbar option: initialization
+if contains (options, '-w') % waitbar option: initialization
     HW = waitbar (0, 'writing faces ...');
     set (HW, 'Name', '..PLEASE..WAIT..YEAH..');
 end
-fwrite (povray, ['  face_indices {', char(13), char(10)], 'char');
+fwrite (povray, ['  face_indices {', char(13), newline], 'char');
 N   = size (p.faces, 1);
 fwrite (povray, ['    ' num2str(N)], 'char');
-for ward = 1 : N,
-    if strfind (options, '-w') % waitbar option: update
-        if mod (ward, 500) == 0,
+for ward = 1 : N
+    if contains (options, '-w') % waitbar option: update
+        if mod (ward, 500) == 0
             waitbar (ward ./ N, HW);
         end
     end
-    fwrite (povray, [',', char(13), char(10)], 'char');
+    fwrite (povray, [',', char(13), newline], 'char');
     fwrite (povray ,['    <', ...
         num2str(p.faces (ward, 1) - 1), ',', ...
         num2str(p.faces (ward, 2) - 1), ',', ...
         num2str(p.faces (ward, 3) - 1), '>'], 'char');
-    if strfind (options, '-b'), % blob option: skin around bodies, faster but sloppier
+    if contains (options, '-b') % blob option: skin around bodies, faster but sloppier
         fwrite (povray, ', 1', 'char');
     end
     if iflag
@@ -178,14 +178,14 @@ for ward = 1 : N,
             'pigment {color red R green G blue B}}'], 'char');
     end
 end
-fwrite (povray, ['}', char(13), char(10)], 'char');
-if strfind (options, '-w') % waitbar option: close
+fwrite (povray, ['}', char(13), newline], 'char');
+if contains (options, '-w') % waitbar option: close
     close (HW);
 end
-fwrite (povray, ['}', char(13), char(10)], 'char');
-fwrite (povray, ['}', char(13), char(10)], 'char');
-if strfind (options, '-b'), % blob option: skin around bodies, faster but sloppier
-    fwrite (povray, ['}', char(13), char(10)], 'char');
+fwrite (povray, ['}', char(13), newline], 'char');
+fwrite (povray, ['}', char(13), newline], 'char');
+if contains (options, '-b') % blob option: skin around bodies, faster but sloppier
+    fwrite (povray, ['}', char(13), newline], 'char');
 end
 fclose (povray);
 

@@ -44,14 +44,6 @@
 
 function ctrees = clone_tree (intrees, num, bf, options)
 
-% trees : contains the tree structures in the trees package
-global trees
-
-if (nargin < 1) || isempty (intrees)
-    % {DEFAULT tree: last tree in trees cell array}
-    intrees  = length (trees);
-end
-
 if (nargin < 2) || isempty (num)
     % {DEFAULT number of trees: one}
     num      = 1;
@@ -463,6 +455,4 @@ if contains      (options, '-s') % waitbar option: close
     grid         on;
     axis         image;
 end
-
-
 

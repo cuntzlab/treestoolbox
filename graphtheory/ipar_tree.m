@@ -36,22 +36,9 @@
 
 function ipar = ipar_tree (intree, options, ipart)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
-
 ver_tree     (intree);                 % verify that input is a tree
-
 % use only directed adjacency for this function
-if ~isstruct (intree)
-    dA       = trees{intree}.dA;
-else
-    dA       = intree.dA;
-end
+dA       = intree.dA;
 
 if (nargin < 2) || isempty (options)
     % {DEFAULT: no option}
@@ -115,6 +102,4 @@ end
 % for counter = 0 : N
 %     ipar = [ipar (dA^counter)*(1:N)'];
 % end
-
-
 

@@ -52,13 +52,6 @@ function sse = ssecat_tree ( ...
     inodes1, inodes2, gelsyn, ...        % electrical synapses
     I, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty(intrees)
-    intrees  = trees;
-end
-
 len          = length (intrees);
 
 for counter  = 1 : len
@@ -170,6 +163,4 @@ if contains      (options, '-s')
             'clim', [0 (full (1.2 * max (max (sse))))]);
     end
 end
-
-
 

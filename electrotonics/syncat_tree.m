@@ -57,13 +57,6 @@ function syn = syncat_tree (...
     ge, gi, Ee, Ei, ...                  % synaptic inputs
     I, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intrees)
-    intrees  = trees;
-end
-
 len          = length (intrees);
 
 for counter  = 1 : len
@@ -127,7 +120,7 @@ if numel (I) == 1
     I (dI)   = 1;
 end
 
-if (nargin < 10) || isempty (options),
+if (nargin < 10) || isempty (options)
     options  = '';
 end
 
@@ -226,6 +219,4 @@ if contains      (options, '-s')
     grid         on;
     axis         image;
 end
-
-
 

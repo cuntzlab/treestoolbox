@@ -37,25 +37,10 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function varargout = zcorr_tree (intree, tZ, options)
-
-% trees : contains the tree structures in the trees package
-global       trees
-
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees); 
-end
+function [tree, idZ] = zcorr_tree (intree, tZ, options)
 
 ver_tree     (intree); % verify that input is a tree structure
-
-% use full tree for this function
-if ~isstruct (intree)
-    tree     = trees{intree};
-else
-    tree     = intree;
-end
+tree         = intree;
 
 if (nargin < 2) || isempty (tZ)
     tZ       = 5;
@@ -133,14 +118,7 @@ if contains (options, '-s') % show option
     axis         image;
 end
 
-if (nargout > 0) || (isstruct (intree))
-    varargout{1}   = tree; % if output is defined then it becomes the tree
-else
-    trees{intree}  = tree; % otherwise add to end of trees cell array
-end
+idZ = idZ';
 
-if (nargout > 1)
-    varargout{2}   = idZ';
 end
-
 

@@ -33,19 +33,7 @@
 
 function no_error = ver_tree (intree, options)
 
-% trees : contains the tree structures in the trees package
-global trees
-
-% use full tree for this function
-if ...
-        (~isstruct (intree)) && ...
-        (isscalar  (intree)) && ...
-        (isinteger (intree)) && ...
-        (numel (trees) <= intree)
-    tree     = trees{intree};
-else
-    tree     = intree;
-end
+tree         = intree;
 no_error     = true;
 
 if isfield       (tree, 'dA')
@@ -71,7 +59,7 @@ if (nargin < 2) || isempty (options)
     options  = '';
 end
 
-if strfind       (options, '-q')
+if contains      (options, '-q')
     warning      ('OFF', 'Trees:NoTree');
 end
 
@@ -178,10 +166,7 @@ else
     end
 end
 
-if strfind       (options, '-q')
+if contains      (options, '-q')
     warning      ('ON', 'Trees:NoTree');
 end
-
-
-
 

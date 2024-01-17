@@ -37,20 +37,25 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [k, gof] = vonMises_tree (input, options)
+function [k, gof] = vonMises_tree (input, varargin)
 
-% trees : contains the tree structures in the trees package
-global       trees
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('Dim', '2D', @(x) ~isempty(validatestring(x, {'2D', '3D'})));
+p.addParameter('dim', false, @isBinary)
+p.addParameter('3d', true, @isBinary)
+p.addParameter('s', false, @isBinary)
 
-if (nargin < 1) || isempty (input)
-    % {DEFAULT tree: last tree in trees cell array}
-    input    = length (trees);
+numParams = numel(varargin);
+if (numParams > 0 && ~startsWith(varargin{1}, '-')) || numParams == 0
+    p.parse(varargin{:})
+else
+    args = parsePositionalArgs(varargin, {}, {'2d', '3d', 's'}, 1);
+    p.parse(args{:})
 end
+params = p.Results;
+%==============================================================================%
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: three dimensions}
-    options  = '-3d';
-end
 
 %==========================================================================
 %==========================================================================
@@ -95,7 +100,7 @@ pdf              = histcounts (rootangle, AngV);
 mAngV            = (AngV (2 : 25) + AngV (1 : 24)) / 2; % Get midpoints
 pdf              = pdf / trapz (mAngV, pdf); % Normalise
 [xData, yData]   = prepareCurveData (mAngV, pdf);
-if     contains (options, '-2d')
+if     params.twoDim
     ft           = fittype ( ...
         'exp(k*cos(x))/(pi*besseli(0,k))', ...
         'independent', 'x', ...
@@ -130,6 +135,4 @@ if contains (options, '-s') % Show root angle distribution and best fit
     ylabel       ('Density');
     xlim         ([0 pi]);
 end
-
-
 

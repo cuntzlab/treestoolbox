@@ -41,14 +41,6 @@
 
 function  genes = gene_tree (intrees, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intrees)
-    % {DEFAULT trees: trees cell array}
-    intrees  = {trees};
-end
-
 if (nargin < 2) || isempty (options)
     % {DEFAULT: no option}
     options  = '';
@@ -100,8 +92,11 @@ end
 if contains (options,'-w')        % waitbar option: close
     close        (HW);
 end
+
 end
 
+
+%===============================================================================
 function [gene, pathlen] = getgene (tree)
 % sort tree to be BCT conform, heavy parts left:
 tree             = sort_tree   (tree, '-LO');
@@ -129,6 +124,4 @@ M                = [pathlen typer];
 reshape          (M', numel (M), 1);
 gene             = M;
 end
-
-
-
+%===============================================================================

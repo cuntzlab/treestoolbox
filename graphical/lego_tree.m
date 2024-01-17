@@ -36,14 +36,6 @@
 
 function [HP, M] = lego_tree (intree, sr, thr, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
-
 ver_tree     (intree); % verify that input is a tree structure
 
 if (nargin < 2) || isempty (sr)
@@ -178,6 +170,4 @@ end
 if sum   (get (gca, 'Dataaspectratio') == [1 1 1]) ~= 3
     axis         equal;
 end
-
-
 

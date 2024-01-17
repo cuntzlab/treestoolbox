@@ -45,35 +45,21 @@
 
 function HP = vtext_tree (intree, v, color, DD, crange, ipart, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
 if (nargin < 7) || isempty (options)
     % {DEFAULT: no option}
     options  = '';
 end
 
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT last tree in trees}
-    intree   = length (trees);
-end
-
 ver_tree     (intree);                 % verify that input is a tree
 
 % use only node position for this function
-if ~isstruct (intree)
-    X        = trees{intree}.X;
-    Y        = trees{intree}.Y;
-    if ~contains (options, '-2d')
-        Z    = trees{intree}.Z;
-    end
-else
-    X        = intree.X;
-    Y        = intree.Y;
-    if ~contains (options, '-2d')
-        Z    = intree.Z;
-    end
+
+X            = intree.X;
+Y            = intree.Y;
+if ~contains (options, '-2d')
+    Z        = intree.Z;
 end
+
 
 N            = size (X, 1); % number of nodes in tree
 
@@ -169,6 +155,4 @@ if contains (options, '-sc')
         zlim         ([(min (Z)) (max (Z))]);
     end
 end
-
-
 

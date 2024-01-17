@@ -102,10 +102,10 @@ if nargin    < 8 || isempty (options)
 end
 
 if (epsilon > 0) % volume exclusion (epsilon is the minimum distance between points)
-	X                    = [0];
-	Y                    = [0];
+	X                    = 0;
+	Y                    = 0;
 	if contains           (options, '-3d')
-		Z                = [0];
+		Z                = 0;
 	end
 	counter              = 1;
 	while                (counter < N)
@@ -394,6 +394,4 @@ if contains      (options, '-s')
     drawnow;
 end
 end
-
-
 

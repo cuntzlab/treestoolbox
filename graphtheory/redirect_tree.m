@@ -34,24 +34,10 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function varargout = redirect_tree (intree, istart, options)
-
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
+function [tree, order] = redirect_tree (intree, istart, options)
 
 ver_tree     (intree);                 % verify that input is a tree
-
-% use full tree for this function
-if ~isstruct (intree)
-    tree     = trees{intree};
-else
-    tree     = intree;
-end
+tree         = intree;
 
 if (nargin < 2) || isempty (istart)
     % {DEFAULT index: last node in tree}
@@ -84,17 +70,17 @@ while ((sum (sum (resW == 1)) ~= 0) && (counter <= maxPL))
     PL           = PL + counter .* (resW == 1);
 end
 PL (istart)      = 0;
-[~, ii]          = sort (PL);
+[~, order]          = sort (PL);
 
 % change the trees-structure according to the new order:
-tree.dA          = tril (A (ii, ii));
+tree.dA          = tril (A (order, order));
 % in all vectors of form Nx1
 S                = fieldnames (tree);
 for counter      = 1 : length (S)
     if ~strcmp   (S{counter}, 'dA')
         vec      = tree.(S{counter});
         if  (isvector (vec)) && (numel(vec) == size (tree.dA, 1))
-            tree.(S{counter}) = tree.(S{counter}) (ii);
+            tree.(S{counter}) = tree.(S{counter}) (order);
         end
     end
 end
@@ -127,19 +113,4 @@ if contains (options,'-s') % show option
     grid         on;
     axis         image;
 end
-
-if (nargout > 0 || (isstruct (intree)))
-    % if output is defined then it becomes the tree:
-    varargout{1}     = tree;
-else
-    % otherwise add to end of trees cell array:
-    trees{intree}    = tree;
-end
-
-if (nargout > 1)
-    varargout{2} = ii;
-end
-
-
-
 

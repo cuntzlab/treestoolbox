@@ -40,25 +40,10 @@
 
 function csyns = peters_tree (intree1, intree2, spinedis, synapsedis, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
 ver_tree     (intree1); % verify that input 1 is a tree structure
+tree1    = intree1;
 ver_tree     (intree2); % verify that input 2 is a tree structure
-
-% use full tree 1 for this function
-if ~isstruct (intree1)
-    tree1    = trees{intree1};
-else
-    tree1    = intree1;
-end
-
-% use full tree 2 for this function
-if ~isstruct (intree2)
-    tree2    = trees{intree2};
-else
-    tree2    = intree2;
-end
+tree2    = intree2;
 
 if (nargin < 3) || isempty (spinedis)
     % {DEFAULT: 3}
@@ -119,5 +104,4 @@ while ~isempty (syns1)
 end
 
 format           short g
-
 

@@ -30,22 +30,9 @@
 
 function rindex = rindex_tree (intree, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end;
-
 ver_tree     (intree); % verify that input is a tree structure
-
 % use only region vector for this function
-if ~isstruct (intree)
-    R        = trees{intree}.R;
-else
-    R        = intree.R;
-end
+R            = intree.R;
 
 if (nargin < 2) || isempty (options)
     % {DEFAULT: no option}
@@ -82,5 +69,4 @@ if contains (options, '-s') % show option
     grid         on;
     axis         image;
 end
-
 

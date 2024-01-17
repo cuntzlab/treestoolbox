@@ -34,14 +34,6 @@
 
 function c = convexity_tree (intree, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
-
 ver_tree     (intree); % verify that input is a tree structure
 
 warning      ('off', 'all');
@@ -178,6 +170,4 @@ else % 2d case
     c=nnz(Inds)/(nS1*nS2); 
 end
 warning          ('on', 'all')
-
-
 

@@ -38,14 +38,6 @@
 
 function [xdend, tree] = xdend_tree (intree, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
-
 ver_tree     (intree);                 % verify that input is a tree
 
 if (nargin < 2) || isempty (options)
@@ -73,11 +65,7 @@ xdend            = (maxT + minT) ./ 2;     % there you go
 % Now if you want to build a standard tree that disregards the existing
 % spatial embedding use this, but this doesn't seem to work...
 if (nargout > 1) || contains (options, '-s')
-    if ~isstruct (intree)
-        tree     = trees{intree};
-    else
-        tree     = intree;
-    end
+    tree         = intree;
     angle        = pi - 2 * pi * xdend ./ max (xdend);
     N            = length (xdend);
     PL           = PL_tree (tree);
@@ -122,6 +110,4 @@ if contains (options, '-s') % show option
     axis         image;
     title        ('equivalent tree');
 end
-
-
 

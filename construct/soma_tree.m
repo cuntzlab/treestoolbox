@@ -39,23 +39,10 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function varargout = soma_tree (intree, maxD, l, options)
-
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
+function tree = soma_tree (intree, maxD, l, options)
 
 ver_tree     (intree);
-
-if ~isstruct (intree)
-    tree     = trees{intree};
-else
-    tree     = intree;
-end
+tree         = intree;
 
 if (nargin < 2) || isempty (maxD)
     maxD     = 30;
@@ -130,12 +117,4 @@ if contains      (options, '-s')
     grid         on;
     axis         image;
 end
-
-if (nargout == 1) || (isstruct (intree))
-    varargout{1}  = tree;
-else
-    trees{intree} = tree;
-end
-
-
 

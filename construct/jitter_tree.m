@@ -38,22 +38,10 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function  varargout = jitter_tree (intree, stde, lambda, options, ipart)
-
-% trees : contains the tree structures in the trees package
-global trees
-
-if (nargin < 1) || isempty (intree)
-    intree   = length (trees);
-end
+function  tree = jitter_tree (intree, stde, lambda, options, ipart)
 
 ver_tree     (intree);
-
-if ~isstruct (intree)
-    tree     = trees {intree};
-else
-    tree     = intree;
-end
+tree         = intree;
 
 if (nargin < 2) || isempty (stde)
     stde     = 1;
@@ -150,12 +138,4 @@ if contains      (options, '-s')
     grid         on;
     axis         image;
 end
-
-if (nargout == 1) || (isstruct (intree))
-    varargout {1} = tree;
-else
-    trees {intree} = tree;
-end
-
-
 

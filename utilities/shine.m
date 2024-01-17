@@ -45,27 +45,27 @@ set          (gcf, ...
     'color',                   [1 1 1]);
 axs          = get (gcf, 'children');
 
-if strfind   (options, '-p')   % sunshine option
+if contains  (options, '-p')   % sunshine option
     camlight;
     camlight;
     lighting gouraud;
 end
 
-if strfind   (options, '-s')   % add a scalebar
+if contains  (options, '-s')   % add a scalebar
     scalebar ('\mum');
 end
 
-if strfind   (options, '-a')   % set all axes to off
+if contains  (options, '-a')   % set all axes to off
     set      (axs, ...
         'visible',             'off');
 end
 
-if strfind   (options, '-f')   % fill the figure with the axes
+if contains  (options, '-f')   % fill the figure with the axes
     set      (axs, ...
         'position',            [0 0 1 1]);
 end
 
-if strfind   (options, '-b')   % larger axis than usual
+if contains  (options, '-b')   % larger axis than usual
     for counter      = 1 : length (axs)
         bset         = get (axs (counter), 'position');
         bset (3 : 4) = bset (3 : 4) * 1.5;
@@ -74,8 +74,7 @@ if strfind   (options, '-b')   % larger axis than usual
     end
 end
 
-if strfind (options, '-3d')    % a 3D view
+if contains (options, '-3d')    % a 3D view
     view     ([-5 55]);
 end
-
 

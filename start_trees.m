@@ -55,9 +55,6 @@
 %     You should have received a copy of the GNU General Public License
 %     along with the TREES toolbox. If not, see <http://www.gnu.org/licenses/>.
 
-% trees : contains the tree structures in the trees package
-global       trees
-trees        = {};
 
 % matlab apparently doesn't have a function to determine the directory in
 % which a function is located:
@@ -67,7 +64,7 @@ PPPP         = PPPP  (1 : strfind (PPPP, 'start_trees.m') - 1);
 addpath      (genpath (PPPP));
 clear        PPPP
 
-display      ('the TREES toolbox  Copyright (C) 2009 - 2018  Hermann Cuntz');
-display      ('This program comes with ABSOLUTELY NO WARRANTY.');
-display      ('This is free software, and you are welcome to redistribute it');
-display      ('under certain conditions. Type "type(''license.txt'')" for details.');
+disp      ('the TREES toolbox  Copyright (C) 2009 - 2018  Hermann Cuntz');
+disp      ('This program comes with ABSOLUTELY NO WARRANTY.');
+disp      ('This is free software, and you are welcome to redistribute it');
+disp      ('under certain conditions. Type "type(''license.txt'')" for details.');

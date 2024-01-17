@@ -48,14 +48,6 @@
 
 function [s, dd, sd, XP, YP, ZP, iD] = sholl_tree (intree, dd, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
-
 ver_tree (intree); % verify that input is a tree structure
 
 if (nargin < 2) || isempty (dd)
@@ -210,7 +202,7 @@ if contains (options, '-3s') % 3D show option
     HP           = plot3 (XP, YP , ZP, 'r.');
     set          (HP, ...
         'markersize',          24);
-    for counter  = 1 : length (dd),
+    for counter  = 1 : length (dd)
         [XS, YS, ZS] = sphere (20);
         p        = patch (surf2patch ( ...
             X1 (1) + (XS .* dd (counter) / 2), ...
@@ -248,5 +240,4 @@ if contains (options, '-3s') % 3D show option
     grid         on;
     axis         image;
 end
-
 

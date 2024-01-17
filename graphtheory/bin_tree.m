@@ -45,14 +45,6 @@
 
 function [bi, bins, bh] = bin_tree (intree, v, bins, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree = length (trees);
-end;
-
 if (nargin < 2) || isempty (v)
     % {DEFAULT vector: vector of euclidean distances to root}
     v = eucl_tree (intree);
@@ -73,7 +65,7 @@ if numel (bins)  == 1
         min (v) : (max (v) * 1.0001 - min (v)) / bins : max (v) * 1.0001;
 end
 
-[bh, bi]         = histc (v, bins);
+[bh, bi]         = histax (v, bins);
 
 if contains (options, '-s') % show option
     clf;
@@ -88,5 +80,4 @@ if contains (options, '-s') % show option
     axis         image;
     colorbar;
 end
-
 

@@ -32,24 +32,12 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function varargout = cap_tree (intree, options)
+function [tree, idpar] = cap_tree (intree, options)
 % INACT-so : define soma???
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
-
 ver_tree     (intree);
+tree         = intree;
 
-if ~isstruct (intree)
-    tree     = trees{intree};
-else
-    tree     = intree;
-end
 if (nargin < 2) || isempty (options)
     % {DEFAULT: 1 node each 1 µm}
     options  = '-i1';
@@ -58,7 +46,7 @@ end
 direction        = direction_tree (tree, '-n');
 width            = tree.D (1);
 fun1             = @(x, y) (real (sqrt (x.^2 - 2 * y.^2)));
-if ~isempty (strfind (options, '-a'))
+if contains (options, '-a')
     len2         = 1350;
     axondiam     = normrnd (0.45, 0);
     scale        = normrnd (-0.2, 0.02);
@@ -70,7 +58,7 @@ else
 end
 
 
-if ~isempty (strfind (options, '-i'))  % std is 1 node each µm
+if contains (options, '-i')  % std is 1 node each µm
     ind          = cell2mat (textscan (options, '-i%f'));
     if isempty   (ind)
         ind      = 1;
@@ -79,7 +67,7 @@ if ~isempty (strfind (options, '-i'))  % std is 1 node each µm
 else
     lin          = linspace (0, width, ...
         ceil (width / mean (len_tree (tree))));
-    if ~isempty (strfind (options, '-a'))
+    if contains (options, '-a')
         lin (end + 1) = 1350;
     end
     
@@ -104,7 +92,7 @@ for l            = lin (2 : end)
 end
 tree.R (idpar)   = tree.R (idpar (1)); % give region same as root
 pl               = Pvec_tree (tree);
-if ~isempty (strfind (options, '-a'))
+if contains (options, '-a')
    if ~any (strcmp (tree.rnames, 'axon'))
        tree.rnames = [tree.rnames, 'axon'];
    end
@@ -117,7 +105,7 @@ if ~isempty (strfind (options, '-a'))
    tree.R (idpar (indaxon)) = find (strcmp (tree.rnames, 'axon'));
 end
 
-if strfind       (options, '-s')
+if contain       (options, '-s')
     clf; hold on;
     HP           = plot_tree (intree);
     set          (HP, 'facealpha', .5);
@@ -135,15 +123,4 @@ if strfind       (options, '-s')
     grid         on;
     axis         image;
 end
-
-if (nargout == 1) || (isstruct (intree))
-    varargout{1}  = tree;
-else
-    trees{intree} = tree;
-end
-if (nargout >= 2)
-    varargout{2}  = idpar;
-end
-
-
 

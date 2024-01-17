@@ -29,14 +29,6 @@
 
 function elen = elen_tree (intree, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if nargin    < 1
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end;
-
 ver_tree     (intree); % verify that input is a tree structure
 
 if (nargin < 2) || isempty (options)
@@ -48,7 +40,7 @@ elen             = len_tree (intree) ./ lambda_tree (intree) / 10000;
 % conversion here from [um] length to [cm] since electrotonic properties
 % are per cm
 
-if strfind       (options, '-s')
+if contains      (options, '-s')
     ipart        = find (elen ~= 0); % single out non-0-length segments
     clf; hold on;
     plot_tree    (intree, elen, [], ipart);
@@ -64,6 +56,4 @@ if strfind       (options, '-s')
     grid         on;
     axis         image;
 end
-
-
 

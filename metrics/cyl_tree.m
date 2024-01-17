@@ -42,22 +42,8 @@
 
 function  [X1, X2, Y1, Y2, Z1, Z2] = cyl_tree (intree, options)
 
-% trees : contains the dendrites in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
-
 ver_tree     (intree); % verify that input is a tree structure
-
-% use full tree for this function
-if ~isstruct (intree)
-    tree     = trees {intree};
-else
-    tree     = intree;
-end
+tree         = intree;
 
 if (nargin < 2) || isempty (options)
     % {DEFAULT: no option}
@@ -109,5 +95,4 @@ else
     % Y1         = Y1 * ones (N, 1);
     % Y2         = Y2 * ones (N, 1);
 end
-
 

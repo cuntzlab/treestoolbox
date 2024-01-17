@@ -41,14 +41,6 @@
 
 function [DD, outtrees] = spread_tree (intrees, dX, dY, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intrees)
-    % {DEFAULT: trees cell array}
-    intrees  = trees;
-end
-
 if (nargin < 2) || isempty (dX)
     % {DEFAULT: trees are 50 um apart horizontally}
     dX       = 50;

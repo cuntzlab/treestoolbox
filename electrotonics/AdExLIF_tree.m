@@ -1,7 +1,7 @@
 % AdExLIF_tree   Adaptive exponential LIF in full morphology
 % (trees package)
 %
-% [[v, sp, w] = AdExLIF_tree (intree, time, I, ge, gi, options)
+% [v, sp, w] = AdExLIF_tree (intree, time, I, ge, gi, options)
 % -----------------------------------------------------------------
 %
 % Calculates passive or spiking responses to synaptic inputs with dynamic
@@ -50,21 +50,8 @@
 
 function [v, sp, w] = AdExLIF_tree (intree, time, I, ge, gi, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1)  || isempty (intree)
-    intree   = length (trees);
-end
-
 ver_tree     (intree);
-
-% use full tree for this function
-if ~isstruct (intree)
-    tree     = trees{intree};
-else
-    tree     = intree;
-end
+tree         = intree;
 
 if (nargin < 2)  || isempty (time)
     time     = 0 : 0.1 : 1000;
@@ -206,8 +193,4 @@ for counterT     = 1 : T - 1
 end
 
 v                = v (1, :);
-
-
-
-
 

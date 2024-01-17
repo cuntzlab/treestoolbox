@@ -49,14 +49,6 @@ function [HP,  hull] = chull_tree ( ...
     intree, ...
     ipart, color, DD, alpha, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
-
 % use only node position for this function
 if isnumeric (intree) && numel (intree) > 1
     X        = intree (:, 1);
@@ -64,15 +56,10 @@ if isnumeric (intree) && numel (intree) > 1
     Z        = intree (:, 3);
 else
     ver_tree (intree); % verify that input is a tree structure
-    if ~isstruct (intree)
-        X    = trees{intree}.X;
-        Y    = trees{intree}.Y;
-        Z    = trees{intree}.Z;
-    else
-        X    = intree.X;
-        Y    = intree.Y;
-        Z    = intree.Z;
-    end
+    X        = intree.X;
+    Y        = intree.Y;
+    Z        = intree.Z;
+
 end
 
 if (nargin < 2) || isempty (ipart)
@@ -180,7 +167,4 @@ if (nargout > 1)
     end
     hull.ch      = ch;
 end
-
-
-
 

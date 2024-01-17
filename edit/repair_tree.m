@@ -1,7 +1,7 @@
 % REPAIR_TREE   Rectify tree format to complete BCT conformity.
 % (trees package)
 % 
-% tree = repair_tree (intree, options)
+% [tree, errtri] = repair_tree (intree, options)
 % ------------------------------------
 %
 % Repairs a tree. This means removing trifurcations by adding small
@@ -36,24 +36,10 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function varargout = repair_tree (intree, options)
-
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end;
+function [tree, errtri] = repair_tree (intree, options)
 
 ver_tree     (intree); % verify that input is a tree structure
-
-% use full tree for this function
-if ~isstruct (intree)
-    tree     = trees {intree};
-else
-    tree     = intree;
-end
+tree         = intree;
 
 if (nargin < 2) || isempty (options)
     % {DEFAULT: no option}
@@ -64,7 +50,7 @@ if islogical     (tree.dA)
     tree.dA      = double (tree.dA);
 end
 
-if strfind (options, '-0')
+if contains (options, '-0')
     % eliminate trifurcations by adding short segments (except root):
     [tree, errtri] = elimt_tree (tree,'-0 -e');
 else
@@ -104,14 +90,4 @@ if contains (options, '-s') % show option
     grid         on;
     axis         image;
 end
-
-if (nargout == 1) || (isstruct (intree))
-    varargout{1}   = tree; % if output is defined then it becomes the tree
-else
-    trees{intree}  = tree; % otherwise original tree in trees is replaced
-end
-if (nargout >= 2)
-    varargout{2}   = errtri;
-end
-
 

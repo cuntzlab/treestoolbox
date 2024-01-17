@@ -37,24 +37,10 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function varargout = scale_tree (intree, fac, options)
-
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1)||isempty(intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
+function tree = scale_tree (intree, fac, options)
 
 ver_tree     (intree); % verify that input is a tree structure
-
-% use full tree for this function
-if ~isstruct (intree)
-    tree     = trees{intree};
-else
-    tree     = intree;
-end
+tree         = intree;
 
 if (nargin < 2) || isempty (fac)
     % {DEFAULT: 2x}
@@ -119,11 +105,4 @@ if contains (options, '-s') % show option
     grid         on;
     axis         image;
 end
-
-if (nargout == 1) || (isstruct (intree))
-    varargout {1}  = tree; % if output is defined then it becomes the tree
-else
-    trees {intree} = tree; % otherwise add to end of trees cell array
-end
-
 

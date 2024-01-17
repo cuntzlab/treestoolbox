@@ -30,29 +30,15 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function varargout = flip_tree (intree, DIM, options)
-
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees); 
-end;
+function tree = flip_tree (intree, DIM, options)
 
 ver_tree     (intree); % verify that input is a tree structure
-
-% use full tree for this function
-if ~isstruct (intree)
-    tree     = trees{intree};
-else
-    tree     = intree;
-end
+tree         = intree;
 
 if (nargin < 2) || isempty (DIM)
     % {DEFAULT: flip over x dimension}
     DIM      = 1; 
-end;
+end
 
 if (nargin < 3) || isempty (options)
     % {DEFAULT: no option}
@@ -72,7 +58,7 @@ switch DIM
             'DIM not the right number');
 end
 
-if strfind       (options, '-s') % show option
+if contains      (options, '-s') % show option
     clf;
     hold         on;
     HP           = plot_tree (intree);
@@ -99,11 +85,4 @@ if strfind       (options, '-s') % show option
     grid         on;
     axis         image;
 end
-
-if (nargout > 0 || (isstruct (intree)))
-    varargout{1}   = tree; % if output is defined then it becomes the tree
-else
-    trees{intree}  = tree; % otherwise add to end of trees cell array
-end
-
 

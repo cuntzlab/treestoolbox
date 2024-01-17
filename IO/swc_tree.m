@@ -34,22 +34,8 @@
 
 function [tname, path] = swc_tree (intree, tname)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end;
-
 ver_tree     (intree); % verify that input is a tree structure
-
-% use full tree for this function
-if ~isstruct (intree)
-    tree     = trees {intree};
-else
-    tree     = intree;
-end
+tree         = intree;
 
 % defining a name for saved file
 if (nargin < 2) || isempty (tname)
@@ -84,22 +70,19 @@ idpar0 (idpar0 == 0) = -1;
 swc              = [(1 : N)' R tree.X tree.Y tree.Z tree.D/2 idpar0];
 swcfile          = fopen([path tname],'w'); % open file
 fwrite           (swcfile, ...
-    ['# TREES toolbox tree - ' name,   char(13), char(10)],'char');
+    ['# TREES toolbox tree - ' name,   char(13), newline],'char');
 fwrite           (swcfile, ...
     ['# written by an automatic procedure "swc_tree" ' ...
-    'part of the TREES package',       char(13), char(10)], 'char');
+    'part of the TREES package',       char(13), newline], 'char');
 fwrite           (swcfile, ...
-    ['# in MATLAB',                    char(13), char(10)], 'char');
+    ['# in MATLAB',                    char(13), newline], 'char');
 fwrite           (swcfile, ...
-    ['# copyright 2009 Hermann Cuntz', char(13), char(10)], 'char');
+    ['# copyright 2009 Hermann Cuntz', char(13), newline], 'char');
 fwrite           (swcfile, ...
-    ['#',                              char(13), char(10)], 'char');
+    ['#',                              char(13), newline], 'char');
 fwrite           (swcfile, ...
-    ['# inode R X Y Z D/2 idpar',      char(13), char(10)], 'char');
+    ['# inode R X Y Z D/2 idpar',      char(13), newline], 'char');
 fprintf          (swcfile, ...
     '%d %d %12.8f %12.8f %12.8f %12.8f %d\n', swc');
 fclose           (swcfile);
-
-
-
 

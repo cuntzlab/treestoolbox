@@ -47,11 +47,11 @@ end
 if (nargin < 2) || isempty (thr)
     minM     = min (min (min (iM)));
     maxM     = max (max (max (iM)));
-    c        = histc ( ...
+    c        = histax ( ...
         reshape (double (iM), numel (iM), 1), ...
         [minM ((maxM - minM) / 99) maxM]);
     cc       = cumsum (flipud (c));
-    ic       = min (find (cc > 30000));
+    ic       = find(cc > 30000, 1 );
     thr      = (99 - ic) * double ((maxM - minM) / 99) + minM;
 end
 

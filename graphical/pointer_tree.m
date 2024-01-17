@@ -42,25 +42,11 @@
 
 function HP = pointer_tree (intree, inodes, llen, color, DD, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
-
 % use only node position for this function
 if ~isstruct (intree)
-    if numel (intree) == 1
-        X    = trees{intree}.X;
-        Y    = trees{intree}.Y;
-        Z    = trees{intree}.Z;
-    else
-        X    = intree (:, 1);
-        Y    = intree (:, 2);
-        Z    = intree (:, 3);
-    end
+    X        = intree (:, 1);
+    Y        = intree (:, 2);
+    Z        = intree (:, 3);
 else
     X        = intree.X;
     Y        = intree.Y;
@@ -169,7 +155,4 @@ switch           options
             'color',           color);
 end
 axis             equal
-
-
-
 

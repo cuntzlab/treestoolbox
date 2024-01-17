@@ -44,24 +44,10 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function varargout = insert_tree (intree, swc, options)
-
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
+function [tree, ind] = insert_tree (intree, swc, options)
 
 ver_tree     (intree); % verify that input is a tree structure
-
-% use full tree for this function
-if ~isstruct (intree)
-    tree     = trees{intree};
-else
-    tree     = intree;
-end
+tree         = intree;
 
 N            = size (tree.dA, 1);
 
@@ -150,15 +136,4 @@ if contains      (options, '-e')   % echo changes
     warning      ('TREES:notetreechange', ...
         ['added ' (num2str (size (swc, 1))) ' node(s)']);
 end
-
-if (nargout == 1) || (isstruct (intree))
-    varargout{1}   = tree;  % if output is defined: tree
-    if nargout >= 2
-        varargout{2} = ind; % second output: index of the inserted node
-    end    
-else
-    trees{intree}  = tree;  % otherwise original tree in trees is replaced
-end
-
-
 

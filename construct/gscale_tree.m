@@ -41,14 +41,6 @@
 
 function [spanning, ctrees] = gscale_tree (intrees, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intrees)
-    % {DEFAULT tree: last tree in trees cell array}
-    intrees  = length (trees);
-end
-
 if (nargin < 2) || isempty (options)
     options  = 'none';
 end
@@ -82,7 +74,7 @@ if contains      (options, '-w') % waitbar option: initialization
     set          (HW, ...
         'Name',                '..PLEASE..WAIT..YEAH..');
 end
-for counterR     = 1 : length (spanning.regions);
+for counterR     = 1 : length (spanning.regions)
     if contains  (options, '-w') % waitbar option: update
         waitbar  (counterR / length (spanning.regions), HW);
     end
@@ -197,7 +189,7 @@ end
 % (can be expanded):
 spanning.wriggles = zeros (length (intrees), 2);
 for counterT     = 1 : length (intrees)
-    if contains  (options, '-w'), % waitbar option: update
+    if contains  (options, '-w') % waitbar option: update
         waitbar  (counterT / length (intrees), HW);
     end
     tree         = intrees{counterT};
@@ -260,12 +252,12 @@ spanning.X       = cell (1, 1);
 spanning.Y       = cell (1, 1);
 spanning.Z       = cell (1, 1);
 spanning.qdiam   = cell (1, 1);
-for counterR     = 1 : length (spanning.regions);
+for counterR     = 1 : length (spanning.regions)
     if contains  (options, '-w') % waitbar option: update
         waitbar  (counterR / length (spanning.regions), HW);
     end
     spanning.qdiam{counterR} = [];
-    for counterT = 1 : size (spanning.xlims {counterR}, 1),
+    for counterT = 1 : size (spanning.xlims {counterR}, 1)
         BT       = ~C_tree (intrees{counterT});
         iBT      = logical (BT (spanning.iR{counterR}{counterT}));
         % branch and termination points in that region
@@ -419,6 +411,4 @@ if contains      (options, '-s')
     grid         on;
     axis         image;
 end
-
-
 

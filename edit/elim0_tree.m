@@ -35,15 +35,7 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function varargout = elim0_tree (intree, options)
-
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
+function tree = elim0_tree (intree, options)
 
 ver_tree     (intree); % verify that input is a tree structure
 
@@ -63,11 +55,7 @@ if length (ilen) > 1
     end
 else
     % leave tree unchanged
-    if ~isstruct (intree)
-        tree = trees{intree};
-    else
-        tree = intree;
-    end
+    tree     = intree;
 end
 
 if contains (options, '-e')
@@ -92,13 +80,4 @@ if contains (options, '-s')
     grid         on;
     axis         image;
 end
-
-if (nargout == 1) || (isstruct (intree))
-    varargout {1}  = tree;
-else
-    trees {intree} = tree;
-end
-
-
-
 

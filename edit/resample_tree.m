@@ -47,24 +47,10 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2017  Hermann Cuntz
 
-function varargout = resample_tree (intree, sr, options)
-
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
+function tree = resample_tree (intree, sr, options)
 
 ver_tree     (intree); % verify that input is a tree structure
-
-% use full tree for this function:
-if ~isstruct (intree)
-    tree     = trees{intree};
-else
-    tree     = intree;
-end
+tree         = intree;
 
 if (nargin < 2) || isempty (sr)
     % {DEFAULT: 10 um spacing between the nodes}
@@ -322,12 +308,4 @@ end
 if contains (options, '-e')
     disp  ('resample_tree: added some nodes');
 end
-
-if (nargout > 0) || (isstruct (intree))
-    varargout{1}   = tree;
-else
-    trees{intree}  = tree;
-end
-
-
 

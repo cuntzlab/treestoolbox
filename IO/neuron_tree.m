@@ -44,22 +44,8 @@
 
 function [tname, path] = neuron_tree (intree, tname, res, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
-
 ver_tree     (intree); % verify that input is a tree structure
-
-% use full tree for this function
-if ~isstruct (intree)
-    tree     = trees{intree};
-else
-    tree     = intree;
-end
+tree         = intree;
 
 if (nargin < 4) || isempty (options)
     % {DEFAULT: no option}
@@ -127,10 +113,10 @@ else
     end
 end
 
-nextline         = [(char (13)), (char (10))];
+nextline         = [(char (13)), (newline)];
 switch           format
     case             '.nrn' % save file in the NEURON .nrn format
-        H1           = histc (R, uR); % histogram of regions
+        H1           = histax (R, uR); % histogram of regions
         H1 (R (1))   = H1 (R (1)) - 1;
         [~, i2]      = sort (R); % i2 : index of sorted regions...
         iR           = ones (N, 1);
@@ -231,7 +217,7 @@ switch           format
             fwrite   (neuron, [ ...
                 '         pt3dadd(fscan(),fscan(),fscan(),fscan())', ...
                 nextline], 'char');
-            if strfind (options, '-e')
+            if contains (options, '-e')
                 % passive properties :
                 if isfield (tree, 'Ri')
                     fwrite (neuron, [ ...
@@ -263,7 +249,7 @@ switch           format
             fwrite (neuron, ['   }',    nextline], 'char');
         end
         
-        if strfind   (options, '-e')
+        if contains   (options, '-e')
             % global passive properties if needed:
             fwrite   (neuron, ['forall insert pas', ...
                 nextline], 'char');
@@ -311,7 +297,7 @@ switch           format
         fclose       (neuron);
     case             '.hoc' % save file in the NEURON .hoc format
         % distribution of section regions in H1:
-        H1           = histc (Rsect, uR);
+        H1           = histax (Rsect, uR);
         % file-pointer to the neuron-file
         neuron       = fopen ([path tname], 'w');
         % HEADER of the file
@@ -372,9 +358,9 @@ switch           format
                 ipe  = find (ipsect   == find (Rsect == R (ip)));
                 fwrite (neuron, [ ...
                     '  connect ', ...
-                    rnames{find(uR == R (e))}  ...
+                    rnames{uR == R (e)}  ...
                     '[' num2str(ie  - 1) '](0),' ...
-                    rnames{find(uR == R (ip))} ...
+                    rnames{uR == R (ip)} ...
                     '[' num2str(ipe - 1) '](1)', ...
                     nextline], 'char');
                 countero = countero + 1;
@@ -414,7 +400,7 @@ switch           format
             e        = sect (counter, 2); % end compartment of section
             ie       = find (counter == find (Rsect == R (e)));
             fwrite   (neuron, [ ...
-                '  ' rnames{find(uR == R(e))} ...
+                '  ' rnames{uR == R(e)} ...
                 '[' num2str(ie - 1) '] {pt3dclear()', nextline], 'char');
             indy     = fliplr (ipar (e, 1 : find (ipar (e, :) == s)));
             for counter1 = 1 : length (indy)
@@ -437,7 +423,7 @@ switch           format
                         'proc shape3d_' num2str(counteri) '() {', ...
                         nextline], 'char');
                     fwrite (neuron, [ ...
-                        '  ' (rnames{find(uR == R(e))}) ...
+                        '  ' (rnames{uR == R(e)}) ...
                         '[' (num2str (ie - 1)) '] {', ...
                         nextline], 'char');
                 end
@@ -513,7 +499,7 @@ switch           format
             '',                    nextline], 'char');
         fwrite       (neuron, [ ...
             '',                    nextline], 'char');
-        if strfind   (options, '-e')
+        if contains   (options, '-e')
             fwrite   (neuron, [ ...
                 'forsec reg_' name '_all insert pas', ...
                 nextline], 'char');
@@ -541,7 +527,7 @@ switch           format
         return
 end
 
-if strfind       (options, '-s')
+if contains       (options, '-s')
     % file-pointer to the run-file
     neuron       = fopen (name2, 'w');
     fwrite       (neuron, [ ...
@@ -549,7 +535,7 @@ if strfind       (options, '-s')
     fwrite       (neuron, [ ...
         'xopen ("' name1 '")',      nextline], 'char');
     fclose       (neuron);
-    if strfind   (options, '->')
+    if contains   (options, '->')
         if ispc  % this even calls the file directly (only windows)
             winopen  (name2);
         end

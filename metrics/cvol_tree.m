@@ -29,39 +29,29 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function cvol = cvol_tree (intree, options)
-
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
+function cvol = cvol_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('s', false, @isBinary)
+
+numParams = numel(varargin);
+if (numParams > 0 && ~startsWith(varargin{1}, '-')) || numParams == 0
+    p.parse(varargin{:})
+else
+    args = parsePositionalArgs(varargin, {}, {'s'}, 1);
+    p.parse(args{:})
+end
+params = p.Results;
+%==============================================================================%
+
 % use only local diameters vector for this function
 isfrustum    = 0;
-if ~isstruct (intree)
-    D        = trees{intree}.D;
-    if ...
-            (isfield (trees{intree}, 'frustum')) && ...
-            (trees{intree}.frustum == 1)
-        isfrustum  = 1;
-    end
-else
-    D        = intree.D;
-    if ...
-            (isfield (intree, 'frustum')) && ...
-            (intree.frustum == 1)
-        isfrustum  = 1;
-    end
-end
-
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: no option}
-    options  = ''; 
+D            = intree.D;
+if isfield (intree, 'frustum') && intree.frustum == 1
+    isfrustum  = 1;
 end
 
 % vector containing length values of tree segments:
@@ -81,7 +71,7 @@ else
     cvol (cvol == 0) = 0.0001; % !!!!!!!! necessary numeric correction
 end
 
-if contains (options, '-s') % show option
+if params.s % show option
     clf;
     hold         on; 
     HP           = plot_tree (intree, cvol, [], [], [], '-b');
@@ -99,6 +89,4 @@ end
 
 % in 1/cm it would be:
 % cvol = cvol * 10000; % astounding scaling factors from um to cm
-
-
 

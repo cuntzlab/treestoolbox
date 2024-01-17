@@ -66,22 +66,8 @@
 
 function HP  = plot_tree (intree, color, DD, ipart, res, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
-
 ver_tree     (intree); % verify that input is a tree structure
-
-% use full tree for this function
-if ~isstruct (intree)
-    tree     = trees{intree};
-else
-    tree     = intree;
-end
+tree         = intree;
 
 if (~isfield (tree, 'X')) || (~isfield (tree, 'Y'))
     % if metrics are missing replace by equivalent tree:
@@ -523,6 +509,4 @@ end
 if ~(sum (get (gca, 'DataAspectRatio') == [1 1 1]) == 3)
     axis         equal
 end
-
-
 

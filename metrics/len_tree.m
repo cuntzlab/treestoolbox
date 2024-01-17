@@ -31,14 +31,6 @@
 
 function len = len_tree (intree, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
-
 ver_tree     (intree); % verify that input is a tree structure
 
 if (nargin < 2) || isempty (options)
@@ -81,5 +73,4 @@ end
 
 % in cm it would be:
 % len = len / 10000; % astounding scaling factors from um to cm
-
 

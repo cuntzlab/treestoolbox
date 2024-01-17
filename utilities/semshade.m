@@ -17,17 +17,20 @@ if ne(size(steps,1),1)
     steps=steps';
 end
 
-amean=nanmean(signal);
-astd=nanstd(signal)/sqrt(size(signal,1)); % to get sem shading
+amean = mean(signal, 'omitnan');
+astd  = std(signal, 'omitnan') / sqrt(size(signal,1)); % to get sem shading
 
 if exist('opacity','var')==0 || isempty(opacity) 
     fill([steps fliplr(steps)],[amean+astd fliplr(amean-astd)],acolor,'linestyle','none');
     acolor='k';
-else fill([steps fliplr(steps)],[amean+astd fliplr(amean-astd)],acolor, 'FaceAlpha', opacity,'linestyle','none');    
+else 
+    fill([steps fliplr(steps)], [amean+astd fliplr(amean-astd)], acolor, 'FaceAlpha', opacity, 'linestyle', 'none');    
 end
 
 if ishold==0
-    check=true; else check=false;
+    check=true;
+else 
+    check=false;
 end
 
 hold on;plot(steps,amean,acolor,'linewidth',1.5); %% change color or linewidth to adjust mean line
@@ -37,6 +40,4 @@ if check
 end
 
 end
-
-
 

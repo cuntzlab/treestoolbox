@@ -50,22 +50,9 @@
 function  varargout = quaddiameter_tree (intree, scale, offset, options, ...
     P, ldend)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
-
 ver_tree     (intree); % verify that input is a tree structure
-
 % use full tree for this function
-if ~isstruct (intree)
-    tree     = trees{intree};
-else
-    tree     = intree;
-end
+tree         = intree;
 
 if (nargin < 2) || isempty (scale)
     % {DEFAULT: 50 % of if the branch was on its own}
@@ -135,7 +122,7 @@ end
 % average the diameters for overloaded nodes (there might be a better way
 % to do this than averaging):
 for counter      = 1 : N
-    iR           = find (ipariT == counter);
+    iR           = ipariT == counter;
     tree.D (counter)   = mean (Ds (iR));
 end
 
@@ -154,8 +141,3 @@ if contains      (options, '-s') % show option
     axis         equal;
 end
 
-if (nargout == 1) || (isstruct (intree))
-    varargout{1}  = tree; % if output is defined then it becomes the tree
-else
-    trees{intree} = tree; % otherwise the orginal tree in trees is replaced
-end

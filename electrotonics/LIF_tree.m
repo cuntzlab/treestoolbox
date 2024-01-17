@@ -53,21 +53,8 @@
 function [v, time, sp] = LIF_tree (intree, time, options, ...
     Vzone, ge, gi, Ee, Ei, I, iroot, thr, vreset, Aspike)
 
-% trees : contains the tree structures in the trees package
-global           trees
-
-if (nargin < 1)  || isempty (intree)
-    intree       = length (trees);
-end
-
 ver_tree         (intree);
-
-% use full tree for this function
-if ~isstruct     (intree)
-    tree         = trees{intree};
-else
-    tree         = intree;
-end
+tree             = intree;
 
 if (nargin < 2)  || isempty (time)
     time         = 0 : 0.1 : 1000;
@@ -201,5 +188,4 @@ for counterT     = 1 : T - 1
         sp       =   [sp; (counterT * dt)];
     end
 end
-
 

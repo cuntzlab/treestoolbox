@@ -29,22 +29,8 @@
 
 function lambda = lambda_tree (intree, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees}
-    intree   = length (trees);
-end
-
 ver_tree     (intree);                   % verify that input is a tree
-
-% use full tree for this function
-if ~isstruct (intree)
-    tree     = trees{intree};
-else
-    tree     = intree;
-end
+tree         = intree;
 
 if (nargin < 2) || isempty (options)
     % {DEFAULT: no option}
@@ -66,6 +52,4 @@ if contains      (options, '-s')         % show option
     grid         on;
     axis         image;
 end
-
-
 

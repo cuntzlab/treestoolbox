@@ -29,7 +29,7 @@ view(3); axis off tight;
 tprint ('DEMO_show_stack','-tif -HR',[20 20]);
 
 %% skel_stack
-[X Y Z] = skel_stack (stack.M{1}, 100);
+[X, Y, Z] = skel_stack (stack.M{1}, 100);
 %%
 clf; shine; hold on;
 HP = show_stack (stack); colormap gray

@@ -39,14 +39,6 @@
 function [HP, indy] = plotsect_tree ( ...
     intree, sect, color, DD, options, ipar)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
-
 ver_tree     (intree); % verify that input is a tree structure
 
 if (nargin < 3) || isempty (color)
@@ -76,15 +68,10 @@ if nargin < 6
 end
 
 % use only node position for this function
-if ~isstruct     (intree)
-    X            = trees{intree}.X;
-    Y            = trees{intree}.Y;
-    Z            = trees{intree}.Z;
-else
-    X            = intree.X;
-    Y            = intree.Y;
-    Z            = intree.Z;
-end
+X                = intree.X;
+Y                = intree.Y;
+Z                = intree.Z;
+
 
 hold             on;
 indy             = ipar  ( ...
@@ -96,7 +83,4 @@ HP               = plot3 ( ...
     Z (indy) + DD (3), 'k-');
 set              (HP, ...
     'color',                   color);
-
-
-
 

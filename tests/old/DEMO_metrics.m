@@ -3,7 +3,7 @@
 
 %% scale1_tree
 clf; shine;
-for ward = 1:5,
+for ward = 1:5
     HP = plot_tree(scale_tree(sample2_tree,[1+(ward-1)/8 1 1]),[],[],[],32);
     set(HP,'facealpha',ward/10);
 end
@@ -33,7 +33,7 @@ axis off tight
 tprint ('DEMO_surf_tree','-tif -HR',[20 20]);
 %% tran_tree
 clf; shine;
-for ward = 1:5,
+for ward = 1:5
     HP = plot_tree(tran_tree(sample2_tree,[(ward-1)*10 0 0]),[],[],[],32);
     set(HP,'facealpha',ward/10);
 end

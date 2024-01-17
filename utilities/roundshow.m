@@ -44,7 +44,7 @@ if (nargin < 2) || isempty (options)
     % {DEFAULT: none}
     options      = '';
 end
-if strfind   (options, '-v')
+if contains    (options, '-v')
     if ~exist('vidObj','var')
         vidObj = VideoWriter('roundshow.avi');
         vidObj.Quality = 100;
@@ -59,14 +59,15 @@ for counter         = 0 : 5 : 360
         pause    (speed);
     end
     drawnow;
-    if strfind   (options, '-p')
+    if contains  (options, '-p')
         tprint   ( ...
             sprintf ('roundshow%0.3d.png', counter), ...
             '-HR-png', [], '-a');
-    elseif strfind   (options, '-v')
+    elseif contains  (options, '-v')
         writeVideo(vidObj,getframe);
     end
 end
-if strfind   (options, '-v')
+if contains  (options, '-v')
     close(vidObj);
 end
+

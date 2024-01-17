@@ -33,22 +33,8 @@
 
 function angleB = angleB_tree (intree, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
-
 ver_tree     (intree); % verify that input is a tree structure
-
-% use full tree for this function
-if ~isstruct (intree)
-    tree     = trees{intree};
-else
-    tree     = intree;
-end
+tree         = intree;
 
 if (nargin < 2) || isempty (options)
     % {DEFAULT: no option}
@@ -85,8 +71,9 @@ for counter      = 1 : length (iB)      % walk through all branch points:
     else
         angleB (counter) = acos (dot (nV1, nV2));
     end    
-    if strfind   (options, '-m') % show movie option
-        clf; hold on;
+    if contains   (options, '-m') % show movie option
+        clf;
+        hold on;
         HP       = plot_tree (intree, [], [], [], [], '-b');
         set      (HP, ...
             'facealpha',     0.2, ...
@@ -133,7 +120,7 @@ if contains (options, '-s') % show option
     plot_tree    (intree, angleB (iB), [], iB);
     title        ([ ...
         'angle at BP, mean: ' ...
-        (num2str (nanmean (angleB)))]);
+        (num2str (mean (angleB, 'omitnan')))]);
     xlabel       ('x [\mum]');
     ylabel       ('y [\mum]');
     zlabel       ('z [\mum]');
@@ -142,5 +129,4 @@ if contains (options, '-s') % show option
     axis         equal;
     colorbar;
 end
-
 

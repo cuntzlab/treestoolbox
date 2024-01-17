@@ -52,17 +52,9 @@
 
 function [c, M, HP] = hull_tree (intree, thr, bx, by, bz, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
 if (nargin < 6) || isempty (options)
     % {DEFAULT: waitbar, show result and output full distance matrix}
     options  = '-w -s -F';
-end
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT last tree in trees}
-    intree   = length (trees);
 end
 
 % use node position for this function
@@ -72,18 +64,10 @@ if isnumeric (intree) && numel (intree) > 1
     Z        = intree (:, 3);
 else
     ver_tree (intree);                   % verify that input is a tree
-    if ~isstruct (intree)
-        X        = trees{intree}.X;
-        Y        = trees{intree}.Y;
-        if ~contains (options, '-2d')
-            Z    = trees{intree}.Z;
-        end
-    else
-        X    = intree.X;
-        Y    = intree.Y;
-        if ~contains (options, '-2d')
-            Z    = intree.Z;
-        end
+    X        = intree.X;
+    Y        = intree.Y;
+    if ~contains (options, '-2d')
+        Z    = intree.Z;
     end
 end
 
@@ -297,6 +281,4 @@ end
 if ~contains (options, '-F') % threshold distance matrix
     M            = M < thr;
 end
-
-
 

@@ -31,39 +31,34 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function direction = direction_tree (intree, options)
-
-
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array} 
-    intree   = length (trees); 
-end
+function direction = direction_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
+tree         = intree;
 
-% use full tree for this function
-if ~isstruct (intree)
-    tree     = trees{intree};
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('n', true, @isBinary)
+p.addParameter('s', false, @isBinary)
+
+numParams = numel(varargin);
+if (numParams > 0 && ~startsWith(varargin{1}, '-')) || numParams == 0
+    p.parse(varargin{:})
 else
-    tree     = intree;
+    args = parsePositionalArgs(varargin, {}, {'n', 's'}, 1);
+    p.parse(args{:})
 end
-
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: normalise vector length to unit}
-    options  = '-n'; 
-end
+params = p.Results;
+%==============================================================================%
 
 idpar            = idpar_tree (tree);
-direction        =  zeros (numel (tree.X), 3);
+direction        = zeros (numel (tree.X), 3);
 for counter      = 1 : numel (tree.X)
      % node to parent node differences:
     direction (counter, 1)  = tree.X (counter) - tree.X (idpar (counter));
     direction (counter, 2)  = tree.Y (counter) - tree.Y (idpar (counter));
     direction (counter, 3)  = tree.Z (counter) - tree.Z (idpar (counter));
-    if contains (options, '-n')
+    if params.n
         direction (counter, :) = ...
             direction (counter, :) / norm (direction (counter, :));
     end
@@ -71,7 +66,7 @@ end
 direction (1, :) = direction (2, :);
 
 
-if contains (options, '-s') % show option
+if params.s % show option
     clf;
     hold         on;
     HP           = plot_tree (intree, direction (:, 1), [], [], [], '-b');
@@ -86,6 +81,4 @@ if contains (options, '-s') % show option
     grid         on;
     axis         image;
 end
-
-
 

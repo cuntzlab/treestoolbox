@@ -35,23 +35,9 @@
 
 function idchild = idchild_tree (intree, ipart, options)
 
-% trees : contains the tree structures in the trees package
-global       trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length (trees);
-end
-
 ver_tree     (intree);                 % verify that input is a tree
-
 % use only directed adjacency for this function
-if ~isstruct (intree)
-    dA       = trees{intree}.dA;
-else
-    dA       = intree.dA;
-end
-
+dA           = intree.dA;
 N            = size (dA, 1);
 
 if (nargin < 2) || isempty (ipart)
@@ -102,6 +88,4 @@ if contains (options, '-s')            % show option
     grid         on;
     axis         image;
 end
-
-
 

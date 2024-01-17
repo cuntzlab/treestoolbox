@@ -38,13 +38,6 @@
 
 function tree = clean_tree (intree, radius, options)
 
-% trees : contains the tree structures in the trees package
-global trees
-
-if (nargin < 1) || isempty (intree)
-    % {DEFAULT tree: last tree in trees cell array}
-    intree   = length(trees);
-end
 ver_tree (intree); % verify that input is a tree structure
 
 if (nargin < 2) || isempty (radius)
@@ -125,11 +118,4 @@ if contains       (options, '-s')
     grid         on;
     axis         image;
 end
-
-if (nargout == 0) && ~(isstruct (intree))
-    % otherwise the original tree in trees is replaced
-    trees {intree} = tree;
-end
-
-
 

@@ -34,10 +34,7 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function varargout = BCT_tree (BCT, options)
-
-% trees : contains the tree structures in the trees package
-global       trees
+function tree = BCT_tree (BCT, options)
 
 if (nargin < 1) || isempty (BCT)
     BCT      = [1 2 1 0 2 0 0];
@@ -90,7 +87,7 @@ end
 if contains      (options, '-s') % show option
     clf;
     hold         on;
-    if contains  (options, '-dA'),
+    if contains  (options, '-dA')
         dendrogram_tree (tree, [], PL_tree (tree));
         axis     off;
     else
@@ -102,14 +99,4 @@ if contains      (options, '-s') % show option
     end
     title        ('BCT tree');
 end
-
-if (nargout > 0)
-    % if output is defined then it becomes the tree
-    varargout{1} = tree;
-else
-    % otherwise add to end of trees cell array
-    trees{(length (trees) + 1)} = tree;
-end
-
-
 
