@@ -28,16 +28,17 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function rindex = rindex_tree (intree, options)
+function rindex = rindex_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 % use only region vector for this function
 R            = intree.R;
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {}, {'s'});
+%==============================================================================%
 
 uR               = unique (R);  % sorted regions
 luR              = length (uR); % number of regions
@@ -50,7 +51,7 @@ for counter      = 1 : luR
     rindex (G)   = 1 : sum (G);
 end
 
-if contains (options, '-s') % show option
+if pars.s % show option
     clf;
     hold         on;
     colorbar;

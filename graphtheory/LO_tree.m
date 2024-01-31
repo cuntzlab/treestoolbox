@@ -29,17 +29,17 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function  LO = LO_tree (intree, options)
+function  LO = LO_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
-
 % use only directed adjacency for this function
 dA           = intree.dA;
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {}, {'s'});
+%==============================================================================%
 
 N                = size    (dA, 1);            % number of nodes in tree
 PL               = PL_tree (intree);           % path length away from node
@@ -58,7 +58,7 @@ end
 LO               = LO + PL;
 LO               = full (LO);
 
-if contains (options, '-s') % show option
+if pars.s % show option
     clf;
     hold         on; 
     HP           = plot_tree (intree, LO, [], [], [], '-b');

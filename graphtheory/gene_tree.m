@@ -18,6 +18,7 @@
 %     {DEFAULT: {trees}}
 % - options  ::string:
 %     '-s'   : show
+%     '-w'   : waitbar
 %     {DEFAULT: ''}
 %
 % Output
@@ -39,23 +40,25 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function  genes = gene_tree (intrees, options)
+function  genes = gene_tree (intrees, varargin)
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('s', false, @isBinary)
+p.addParameter('w', false, @isBinary)
+pars = parseArgs(p, varargin, {}, {'s', 'w'});
+%==============================================================================%
 
 genes            = cell (1, 1);
 names            = cell (1, 1);
 counterG         = 0;
-if contains (options, '-w') % waitbar option: initialization
+if pars.w % waitbar option: initialization
     HW           = waitbar (0, 'sequencing trees...');
     set          (HW, 'Name', '..PLEASE..WAIT..YEAH..');
 end
 for counter1                   = 1 : length (intrees)
     for counter2               = 1 : length (intrees{counter1})
-        if contains       (options, '-w') % waitbar option: update
+        if pars.w % waitbar option: update
             waitbar            (counter2 / length (intrees{counter1}), HW);
         end
         counterG               = counterG + 1;
@@ -63,7 +66,7 @@ for counter1                   = 1 : length (intrees)
         names{counterG}        = name;
         [gene, pathlen]        = getgene (intrees{counter1}{counter2});
         genes{counterG}        = gene;
-        if contains       (options, '-s') % show option
+        if pars.s % show option
             clen               = cumsum (pathlen + 5);
             HL                 = line ( ...
                 [[0; (clen (1 : end - 1))], (clen - 5)]', ...
@@ -89,14 +92,15 @@ for counter1                   = 1 : length (intrees)
         end
     end
 end
-if contains (options,'-w')        % waitbar option: close
+if pars.w        % waitbar option: close
     close        (HW);
 end
 
 end
 
 
-%===============================================================================
+%==============================================================================%
+%==============================================================================%
 function [gene, pathlen] = getgene (tree)
 % sort tree to be BCT conform, heavy parts left:
 tree             = sort_tree   (tree, '-LO');
@@ -124,4 +128,4 @@ M                = [pathlen typer];
 reshape          (M', numel (M), 1);
 gene             = M;
 end
-%===============================================================================
+%==============================================================================%

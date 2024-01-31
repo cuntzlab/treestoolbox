@@ -1,7 +1,7 @@
 % FLIP_TREE   Flips a tree around one axis.
 % (trees package)
 %
-% tree = flip_tree (intree, DIM, options)
+% tree = flip_tree (intree, dim, options)
 % ---------------------------------------
 %
 % Flips tree around dimension DIM.
@@ -9,7 +9,7 @@
 % Input
 % -----
 % - intree  ::integer:   index of tree in trees or structured tree
-% - DIM     ::1, 2 or 3: dimension to be flipped
+% - dim     ::1, 2 or 3: dimension to be flipped
 %     {DEFAULT: 1, x-axis}
 % - options ::string:
 %     '-s' : show before and after
@@ -30,35 +30,32 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function tree = flip_tree (intree, DIM, options)
+function tree = flip_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 tree         = intree;
 
-if (nargin < 2) || isempty (DIM)
-    % {DEFAULT: flip over x dimension}
-    DIM      = 1; 
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('dim', 1, @isnumeric) % TODO check the size of the fac input
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {'dim'}, {'s'});
+%==============================================================================%
 
-if (nargin < 3) || isempty (options)
-    % {DEFAULT: no option}
-    options  = ''; 
-end
-
-switch DIM
+switch pars.dim
     case 1
         tree.X   = 2 * tree.X (1) - tree.X;
     case 2
         tree.Y   = 2 * tree.Y (1) - tree.Y;
     case 3
         tree.Z   = 2 * tree.Z (1) - tree.Z;
-    otherwise
+    otherwise % TODO remove the otherwise condition as dim is checked earlier
         warning  ( ...
             'TREES:wronginputs', ...
             'DIM not the right number');
 end
 
-if contains      (options, '-s') % show option
+if pars.s % show option
     clf;
     hold         on;
     HP           = plot_tree (intree);
@@ -77,7 +74,7 @@ if contains      (options, '-s') % show option
     xlabel       ('x [\mum]');
     ylabel       ('y [\mum]'); 
     zlabel       ('z [\mum]');
-    if DIM       == 3
+    if pars.dim  == 3
         view     ([0 0]);
     else
         view     (2);

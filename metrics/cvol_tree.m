@@ -36,15 +36,7 @@ ver_tree     (intree); % verify that input is a tree structure
 %=============================== Parsing inputs ===============================%
 p = inputParser;
 p.addParameter('s', false, @isBinary)
-
-numParams = numel(varargin);
-if (numParams > 0 && ~startsWith(varargin{1}, '-')) || numParams == 0
-    p.parse(varargin{:})
-else
-    args = parsePositionalArgs(varargin, {}, {'s'}, 1);
-    p.parse(args{:})
-end
-params = p.Results;
+pars = parseArgs(p, varargin, {}, {'s'});
 %==============================================================================%
 
 % use only local diameters vector for this function
@@ -71,7 +63,7 @@ else
     cvol (cvol == 0) = 0.0001; % !!!!!!!! necessary numeric correction
 end
 
-if params.s % show option
+if pars.s % show option
     clf;
     hold         on; 
     HP           = plot_tree (intree, cvol, [], [], [], '-b');

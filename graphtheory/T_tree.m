@@ -28,22 +28,23 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function T = T_tree (intree, options)
+function T = T_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 % use only directed adjacency for this function
 dA           = intree.dA;
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {}, {'s'});
+%==============================================================================%
 
 % sum(dA) (actually faster than sum(dA)) ;-):
 T                = ((ones (1, size (dA, 1)) * dA) == 0)';
 % (termination points have zero entries in dA)
 
-if contains (options, '-s') % show option
+if pars.s % show option
     clf;
     hold         on; 
     plot_tree    (intree, [], [], [], [], '-b');

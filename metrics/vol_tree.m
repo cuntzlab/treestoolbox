@@ -27,9 +27,15 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function vol = vol_tree (intree, options)
+function vol = vol_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
+
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {}, {'s'});
+%==============================================================================%
 
 % use only local diameters vector for this function
 isfrustum    = 0;
@@ -38,12 +44,6 @@ if ...
         (isfield (intree, 'frustum')) && ...
         (intree.frustum == 1)
     isfrustum  = 1;
-end
-
-
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: no option}
-    options = '';
 end
 
 len              = len_tree   (intree); % length values of tree segments
@@ -58,7 +58,7 @@ else
         (D.^2)) / 4;
 end
 
-if contains (options, '-s') % show option
+if pars.s % show option
     ipart        = find (vol ~= 0); % single out non-0-length segments
     clf;
     hold         on;

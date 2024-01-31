@@ -1,11 +1,11 @@
 % ASYM_TREE   Branch point asymmetry.
 % (trees package)
 %
-% asym = asym_tree (intree, v, options)
+% asym = asym_tree (intree, vec, options)
 % -------------------------------------
 %
 % Calculates for each branching point the ratio of the sums of the two
-% daughter branches. The summed values are given by v which attributes a
+% daughter branches. The summed values are given by vec which attributes a
 % value to each node. Typically this can be the count of terminals
 % (default) or the cable length etc... For v1 is smaller summed value of
 % sub-trees and v2 the other one: v1/(v1 + v2). Reports NaN where there is
@@ -15,8 +15,8 @@
 % Input
 % -----
 % - intree   ::integer:      index of tree in trees or structured tree
-% - v        ::vertical vector: values to be summed and ratioed
-%     {DEFAULT: count child terminals (== "T_tree")}
+% - vec      ::vertical vector: values to be summed and ratioed
+%     {DEFAULT: count child terminals (== "T_tree")} (Used to be called v)
 % - options  ::string:
 %     '-s'   : show
 %     '-m'   : explanatory movie
@@ -40,27 +40,20 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function asym = asym_tree (intree, v, options)
+function asym = asym_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 % use only directed adjacency for this function
 dA           = intree.dA;
 
-if (nargin < 2) || isempty (v)
-    % {DEFAULT vector: count termination points}
-    v        = T_tree (intree);
-end
-
-if (nargin < 3) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
-
-if contains (options, '-v')
-    vanpelt = true;
-else
-    vanpelt = false;
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('vec', T_tree (intree)) % TODO check the size and type of vec
+p.addParameter('s', false, @isBinary)
+p.addParameter('m', false, @isBinary)
+p.addParameter('v', false, @isBinary)
+pars = parseArgs(p, varargin, {'vec'}, {'s', 'm', 'v'});
+%==============================================================================%
 
 % index of branching points:
 iB               = find      (B_tree (intree));
@@ -76,10 +69,10 @@ for counter      = 1 : length (iB)
     % sub-tree2:
     [sub2, ~]    = ind2sub   (size (ipar), find (ipar == BB (2)));
     % summed values for sub-trees:
-    v1           = sum       (v (sub1));
-    v2           = sum       (v (sub2));
+    v1           = sum       (pars.vec (sub1));
+    v2           = sum       (pars.vec (sub2));
     % calculation of asymmetry:
-    if vanpelt
+    if pars.v
         if v1 + v2 > 2
             asym(counter) = abs(v1 - v2) / (v1 + v2 - 2);
         else
@@ -92,7 +85,7 @@ for counter      = 1 : length (iB)
             asym (counter) = v2 / (v1 + v2);
         end
     end
-    if contains (options, '-m')       % movie option
+    if pars.m       % movie option
         clf;
         hold     on;
         HP       = plot_tree (intree);
@@ -123,7 +116,7 @@ tasym            = asym;
 asym             = NaN (size (dA, 1), 1);
 asym (iB)        = tasym;
 
-if contains (options, '-s') % show option
+if pars.s % show option
     clf;
     hold         on;
     HP           = plot_tree (intree, [], [], find (~B_tree (intree)));

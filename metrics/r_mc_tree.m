@@ -31,7 +31,7 @@
 %     	'-bt' : R value for branch points and termination points
 %     	'-b' : R value for branch points
 %     	'-t' : R value for termination points
-%     	'-2d' : 2D tree
+%     	'-dim2' : 2D tree (Careful, it used to be '-2d')
 %     	{DEFAULT: ''}
 %
 % Output
@@ -63,45 +63,31 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [R, Rmin, Rmax, r0, rE, rEmin, rEmax, rEstd, n, rEs] = ...
-    r_mc_tree (tree, alpha, n_mc, level, options)
+function out = r_mc_tree (tree, varargin)
 
-if nargin    < 2 || isempty (alpha)
-    alpha    = 0.5;
-end
-
-if nargin    < 3 || isempty (n_mc)
-    n_mc     = 100;
-end
-
-if nargin    < 4 || isempty (level)
-    level    = 0.05;
-end
-
-if nargin    < 5  || isempty (options)
-    options  = '';
-end
-
-if contains (options, '-nv') % no volume correction
-    volcorrect = false;
-else
-    volcorrect = true;
-end
-
-if contains (options, '-c') % compute confidence intervals
-    confintervals = true;
-else
-    confintervals = false;
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('alpha', 0.5, @isnumeric) % TODO check for the size adn type of alpha
+p.addParameter('n_mc', 100, @isnumeric) % TODO check for the size adn type of n_mc
+p.addParameter('level', 0.05, @isnumeric) % TODO check for the size adn type of level
+p.addParameter('nv', false, @isBinary)
+p.addParameter('c', false, @isBinary)
+p.addParameter('bt', false, @isBinary)
+p.addParameter('b', false, @isBinary)
+p.addParameter('t', false, @isBinary)
+p.addParameter('dim2', false, @isBinary)
+pars = parseArgs(p, varargin, {'alpha', 'n_mc', 'level'}, ...
+    {'nv', 'c', 'bt', 'b', 't', 'dim2'});
+%==============================================================================%
 
 X            = tree.X;
 Y            = tree.Y;
 Z            = tree.Z;
-if contains  (options, '-bt')
+if pars.bt
     idx      = find (B_tree (tree) | T_tree (tree));
-elseif contains (options, '-b')
+elseif pars.b
     idx      = find (B_tree (tree));
-elseif contains (options, '-t')
+elseif pars.t
     idx      = find (T_tree (tree));
 else
     idx      = 1 : numel (X);
@@ -110,7 +96,7 @@ end
 X            = X (idx);
 Y            = Y (idx);
 Z            = Z (idx);
-n            = numel (idx);
+out.n        = numel (idx);
 bb           = [ ...
     (min (X)) (max (X)); ...
     (min (Y)) (max (Y)); ...
@@ -119,96 +105,95 @@ bb           = [ ...
 %bdRef: vector of point indices representing a single conforming 2D boundary around the points X Y
 %	or triangulation representing a single conforming 3D boundary around the points X Y Z
 %vRef: area (2D) or volume (3D) which boundary bdRef encloses
-if contains (options, '-2d')
-    [bdRef, vRef] = boundary(X, Y, alpha);
+if pars.dim2
+    [bdRef, vRef] = boundary(X, Y, pars.alpha);
     XYZ      = [X, Y];
-    is2d     = 1;
 else
-    [bdRef, vRef] = boundary(X, Y, Z, alpha);
+    [bdRef, vRef] = boundary(X, Y, Z, pars.alpha);
     XYZ      = [X, Y, Z];
-    is2d     = 0;
 end
 
 % r0 from tree
 [~, d]           = knnsearch (XYZ, XYZ, 'k', 2);
 distsRef         = d (:, 2)';
-r0               = mean (distsRef);
+out.r0           = mean (distsRef);
 
 % estimate rE via mc
 n_bs             = 1000;
-rEs              = zeros (n_mc, 1);
-rEcis            = nan   (n_mc, 2);
+out.rEs          = zeros (pars.n_mc, 1);
+rEcis            = nan   (pars.n_mc, 2);
 pts              = random_in_boundary (X, Y, Z, ...
-    bb, bdRef, vRef, n * n_mc, is2d);
-for counter      = 1 : n_mc
-    s            = (counter - 1) * n + 1 : counter * n;
+    bb, bdRef, vRef, out.n * pars.n_mc, pars.dim2);
+for counter      = 1 : pars.n_mc
+    s            = (counter - 1) * out.n + 1 : counter * out.n;
     p            = pts (s, :);
-    if volcorrect % volume correction
-        if is2d
-            [~, vMc] = boundary (p (:, 1), p (:, 2), alpha);
+    if pars.nv % volume correction
+        if pars.dim2
+            [~, vMc] = boundary (p (:, 1), p (:, 2), pars.alpha);
             volscale = sqrt(vRef / vMc);
         else
-            [~, vMc] = boundary (p (:, 1), p (:, 2), p (:, 3), alpha);
+            [~, vMc] = boundary (p (:, 1), p (:, 2), p (:, 3), pars.alpha);
             volscale = (vRef / vMc) ^ (1 / 3);
         end
         p        = p * volscale;
     end
     [~, d]       = knnsearch (p, p, 'k', 2);
     mu           = mean (d (:, 2));
-    rEs (counter) = mu;
-    if confintervals % confidence intervals
-        muci     = bootci (n_bs, {@mean, d(:, 2)}, 'alpha', level);
+    out.rEs (counter) = mu;
+    if pars.c % confidence intervals
+        muci     = bootci (n_bs, {@mean, d(:, 2)}, 'alpha', pars.level);
         rEcis (counter, :) = muci;
     end
 end
-rE               = mean (rEs);
-rEstd            = std  (rEs);
-rEmin            = mean (rEcis (:, 1));
-rEmax            = mean (rEcis (:, 2));
-R                = r0 / rE;
-Rmin             = r0 / rEmax;
-Rmax             = r0 / rEmin;
+out.rE           = mean (out.rEs);
+out.rEstd        = std  (out.rEs);
+out.rEmin        = mean (rEcis (:, 1));
+out.rEmax        = mean (rEcis (:, 2));
+out.R            = out.r0 / out.rE;
+out.Rmin         = out.r0 / out.rEmax;
+out.Rmax         = out.r0 / out.rEmin;
 
-    function points  = random_in_boundary (X, Y, Z, bb, bd, v, n, is2d)
-        if is2d
-            bbvol    = prod (bb (1 : 2, 2) - bb (1 : 2, 1));
-            bdX      = X (bd);
-            bdY      = Y (bd);
-        else
-            bbvol    = prod (bb (:, 2)     - bb (:, 1));
-            XYZ      = [X, Y, Z];
-            fv       = struct ('vertices', XYZ, 'faces', bd);
-        end
-        volfrac      = bbvol / v;
-        points       = [];
-        while (size (points, 1) < n)
-            if size (points, 1) == 0
-                ntilde = max (round (n * volfrac * 1.2), 1);
-            else
-                ntilde = max (round (n * volfrac * 0.1), 1);
-            end
-            pX       = bb (1, 1) + ...
-                rand (ntilde, 1) * (bb (1, 2) - bb (1, 1));
-            pY       = bb (2, 1) + ...
-                rand (ntilde, 1) * (bb (2, 2) - bb (2, 1));
-            if is2d
-                pXYZ = [pX, pY];
-                ds   = p_poly_dist(pX, pY, bdX, bdY, true);
-                inside = ds <= 0 + (-1) * ds > 0;
-            else
-                pZ   = bb (3, 1) + ...
-                    rand (ntilde, 1) * (bb (3, 2) - bb (3, 1));
-                pXYZ = [pX, pY, pZ];
-                inside = inpolyhedron (fv, pXYZ);
-            end
-            idx      = find (inside == 1);
-            if numel (idx) + size (points, 1) > n
-                idx  = idx (1 : n - size (points, 1));
-            end
-            points   = [points; (pXYZ (idx, :))];
-        end
-    end
 end
 
-
-
+%==============================================================================%
+%==============================================================================%
+function points  = random_in_boundary (X, Y, Z, bb, bd, v, n, is2d)
+if is2d
+    bbvol    = prod (bb (1 : 2, 2) - bb (1 : 2, 1));
+    bdX      = X (bd);
+    bdY      = Y (bd);
+else
+    bbvol    = prod (bb (:, 2)     - bb (:, 1));
+    XYZ      = [X, Y, Z];
+    fv       = struct ('vertices', XYZ, 'faces', bd);
+end
+volfrac      = bbvol / v;
+points       = [];
+while (size (points, 1) < n)
+    if size (points, 1) == 0
+        ntilde = max (round (n * volfrac * 1.2), 1);
+    else
+        ntilde = max (round (n * volfrac * 0.1), 1);
+    end
+    pX       = bb (1, 1) + ...
+        rand (ntilde, 1) * (bb (1, 2) - bb (1, 1));
+    pY       = bb (2, 1) + ...
+        rand (ntilde, 1) * (bb (2, 2) - bb (2, 1));
+    if is2d
+        pXYZ = [pX, pY];
+        ds   = p_poly_dist(pX, pY, bdX, bdY, true);
+        inside = ds <= 0 + (-1) * ds > 0;
+    else
+        pZ   = bb (3, 1) + ...
+            rand (ntilde, 1) * (bb (3, 2) - bb (3, 1));
+        pXYZ = [pX, pY, pZ];
+        inside = inpolyhedron (fv, pXYZ);
+    end
+    idx      = find (inside == 1);
+    if numel (idx) + size (points, 1) > n
+        idx  = idx (1 : n - size (points, 1));
+    end
+    points   = [points; (pXYZ (idx, :))];
+end
+end
+%==============================================================================%

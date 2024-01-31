@@ -11,7 +11,7 @@
 % -----
 % - intree   ::integer:  index of tree in trees or structured tree
 % - options  ::string:
-%     '-2d'  : 2-dimensional lengths
+%     '-dim2'  : 2-dimensional lengths (Careful, it used to be '-2d')
 %     '-s'   : show
 %     {DEFAULT: ''}
 %
@@ -29,18 +29,20 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2016  Hermann Cuntz
 
-function len = len_tree (intree, options)
+function len = len_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('dim2', false, @isBinary)
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {}, {'dim2', 's'});
+%==============================================================================%
 
-if contains       (options, '-2d')
+if pars.dim2
     % segments 2D start and end coordinates:
-    [X1, X2, Y1, Y2]         = cyl_tree (intree, '-2d');
+    [X1, X2, Y1, Y2]         = cyl_tree (intree, 'dim2', true);
     len          = sqrt ( ...
         (X2 - X1).^2 + ...
         (Y2 - Y1).^2);
@@ -53,7 +55,7 @@ else
         (Z2 - Z1).^2);
 end
 
-if contains       (options, '-s') % show option
+if pars.s % show option
     ipart        = find (len ~= 0); % single out non-0-length segments
     clf;
     hold         on;

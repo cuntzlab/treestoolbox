@@ -40,15 +40,7 @@ tree         = intree;
 p = inputParser;
 p.addParameter('n', true, @isBinary)
 p.addParameter('s', false, @isBinary)
-
-numParams = numel(varargin);
-if (numParams > 0 && ~startsWith(varargin{1}, '-')) || numParams == 0
-    p.parse(varargin{:})
-else
-    args = parsePositionalArgs(varargin, {}, {'n', 's'}, 1);
-    p.parse(args{:})
-end
-params = p.Results;
+pars = parseArgs(p, varargin, {}, {'n', 's'});
 %==============================================================================%
 
 idpar            = idpar_tree (tree);
@@ -58,7 +50,7 @@ for counter      = 1 : numel (tree.X)
     direction (counter, 1)  = tree.X (counter) - tree.X (idpar (counter));
     direction (counter, 2)  = tree.Y (counter) - tree.Y (idpar (counter));
     direction (counter, 3)  = tree.Z (counter) - tree.Z (idpar (counter));
-    if params.n
+    if pars.n
         direction (counter, :) = ...
             direction (counter, :) / norm (direction (counter, :));
     end
@@ -66,7 +58,7 @@ end
 direction (1, :) = direction (2, :);
 
 
-if params.s % show option
+if pars.s % show option
     clf;
     hold         on;
     HP           = plot_tree (intree, direction (:, 1), [], [], [], '-b');

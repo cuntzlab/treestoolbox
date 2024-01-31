@@ -31,7 +31,7 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function child = child_tree (intree, v, options)
+function child = child_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 
@@ -40,30 +40,27 @@ ipar         = ipar_tree (intree);
 % number of nodes in tree:
 N            = size      (ipar, 1);
 
-if (nargin < 2) || isempty (v)
-    % {DEFAULT vector: ones, results in counting child nodes}
-    v        = ones (N, 1);
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('v', ones (N, 1), @isnumeric) % TODO check the size and type of v
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {'v'}, {'s'});
+%==============================================================================%
 
-if (nargin < 3) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
-
-v                = [0; v];
+pars.v           = [0; pars.v];
 ipar2            = [ ...
     (zeros (1, size (ipar, 2) - 1)) ; ...
     (ipar  (:, 2 : end))];
 % accumulate along parent paths:
 child            = accumarray ( ...
     reshape (ipar2 + 1, numel (ipar2), 1), ...
-    repmat  (v, size (ipar2, 2), 1));
+    repmat  (pars.v, size (ipar2, 2), 1));
 child            = child (2 : end);
 if size          (child, 1) < N
     child (N)    = 0;
 end
 
-if contains (options,'-s') % show option
+if pars.s % show option
     clf;
     hold         on; 
     plot_tree    (intree, child);

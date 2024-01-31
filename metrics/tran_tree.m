@@ -33,36 +33,34 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function tree = tran_tree (intree, DD, options)
+function tree = tran_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 tree         = intree;
 
-if (nargin < 2) || isempty (DD)
-    % {DEFAULT: center to root}
-    DD       = 1; 
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('DD', 1, @isnumeric) %TODO check for the size of DD
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {'DD'}, {'s'});
+%==============================================================================%
+
+if length (pars.DD) == 2
+    pars.DD       = [pars.DD 0]; % add z = 0 if not defined
 end
 
-if length (DD) == 2
-    DD       = [DD 0]; % add z = 0 if not defined
-end
 
-if (nargin < 3) || isempty (options)
-    % {DEFAULT: no option}
-    options  = ''; 
-end
-
-if numel (DD)    > 1
-    tree.X       = tree.X + DD (1);      % center root to coordinates DD:
-    tree.Y       = tree.Y + DD (2);
-    tree.Z       = tree.Z + DD (3);
+if numel (pars.DD)    > 1
+    tree.X       = tree.X + pars.DD (1);      % center root to coordinates DD:
+    tree.Y       = tree.Y + pars.DD (2);
+    tree.Z       = tree.Z + pars.DD (3);
 else
-    tree.X       = tree.X - tree.X (DD); % center around node DD:
-    tree.Y       = tree.Y - tree.Y (DD);
-    tree.Z       = tree.Z - tree.Z (DD);
+    tree.X       = tree.X - tree.X (pars.DD); % center around node DD:
+    tree.Y       = tree.Y - tree.Y (pars.DD);
+    tree.Z       = tree.Z - tree.Z (pars.DD);
 end
 
-if contains (options, '-s') % show option
+if pars.s % show option
     clf;
     hold         on;
     HP           = plot_tree (intree, [], [], [], [], '-b');

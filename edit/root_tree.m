@@ -29,15 +29,16 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function tree = root_tree (intree, options)
+function tree = root_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 tree         = intree;
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {}, {'s'});
+%==============================================================================%
 
 N                = size (tree.dA, 1); % number of nodes in tree
 % expand directed adjacency matrix:
@@ -66,7 +67,7 @@ if isfield       (tree, 'X')
     tree.X (1)   = tree.X (1) - 0.0001;
 end
 
-if contains (options, '-s') % show option
+if pars.s % show option
     clf;
     hold         on;
     pointer_tree (tree, 1);

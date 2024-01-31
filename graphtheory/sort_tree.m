@@ -41,19 +41,22 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [tree, order] = sort_tree (intree, options)
+function [tree, order] = sort_tree (intree, varargin)
 
 ver_tree     (intree);       % verify that input is a tree structure
 tree         = intree;
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('s', false, @isBinary)
+p.addParameter('LO', false, @isBinary)
+p.addParameter('LEX', false, @isBinary)
+pars = parseArgs(p, varargin, {}, {'s', 'LO', 'LEX'});
+%==============================================================================%
 
 N                = size (tree.dA, 1); % number of nodes in tree
 
-if     contains (options, '-LO')
+if  pars.LO
     % path length away from node:
     PL           = PL_tree (intree);
     % level order for each node (see "LO_tree"):
@@ -75,7 +78,7 @@ if     contains (options, '-LO')
             end
         end
     end
-elseif contains (options, '-LEX')
+elseif pars.LEX
     % order indices first according to number of daughters:
     % this means that T comes first then C then B
     typeN        = full (sum (tree.dA)');
@@ -151,7 +154,7 @@ for counter      = 1 : length (S)
     end
 end
 
-if contains (options, '-s') % show option
+if pars.s % show option
     clf;
     hold         on;
     HP           = plot_tree  (intree, [], [], [], [], '-b');

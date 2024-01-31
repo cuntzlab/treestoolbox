@@ -37,55 +37,53 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function tree = scale_tree (intree, fac, options)
+function tree = scale_tree(tree, varargin)
 
-ver_tree     (intree); % verify that input is a tree structure
-tree         = intree;
+ver_tree(tree); % verify that input is a tree structure
 
-if (nargin < 2) || isempty (fac)
-    % {DEFAULT: 2x}
-    fac      = 2; 
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('fac', 2, @isnumeric) % TODO check the size and type of fac
+p.addParameter('o', false, @isBinary)
+p.addParameter('d', false, @isBinary)
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {'fac'}, {'o', 'd', 's'});
+%==============================================================================%
 
-if (nargin < 3) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
-
-if ~contains (options, '-o')
-    ORI          = [tree.X(1) tree.Y(1) tree.Z(1)];
-    tree.X       = tree.X - ORI (1);
-    tree.Y       = tree.Y - ORI (2);
-    tree.Z       = tree.Z - ORI (3);
+if ~pars.o
+    ORI     = [tree.X(1) tree.Y(1) tree.Z(1)];
+    tree.X  = tree.X - ORI(1);
+    tree.Y  = tree.Y - ORI(2);
+    tree.Z  = tree.Z - ORI(3);
 end
 
 % scaling:
-if numel (fac) > 1
-    tree.X       = tree.X * fac (1);
-    tree.Y       = tree.Y * fac (2);
-    tree.Z       = tree.Z * fac (3);
-    if ~contains (options, '-d')
-        tree.D   = tree.D * mean (fac (1 : 2));
+if numel(pars.fac) > 1
+    tree.X       = tree.X * pars.fac(1);
+    tree.Y       = tree.Y * pars.fac(2);
+    tree.Z       = tree.Z * pars.fac(3);
+    if ~pars.d
+        tree.D   = tree.D * mean(pars.fac(1 : 2));
     end    
 else
-    tree.X       = tree.X * fac;
-    tree.Y       = tree.Y * fac;
-    tree.Z       = tree.Z * fac;
-    if ~contains (options, '-d')
-        tree.D   = tree.D * fac;
+    tree.X       = tree.X * pars.fac;
+    tree.Y       = tree.Y * pars.fac;
+    tree.Z       = tree.Z * pars.fac;
+    if ~pars.d
+        tree.D   = tree.D * pars.fac;
     end
 end
 
-if ~contains (options, '-o')
-    tree.X       = tree.X + ORI (1);
-    tree.Y       = tree.Y + ORI (2);
-    tree.Z       = tree.Z + ORI (3);
+if ~pars.o
+    tree.X       = tree.X + ORI(1);
+    tree.Y       = tree.Y + ORI(2);
+    tree.Z       = tree.Z + ORI(3);
 end
 
-if contains (options, '-s') % show option
+if pars.s % show option
     clf;
     hold         on;
-    HP           = plot_tree (intree, [], [], [], [], '-b');
+    HP           = plot_tree (tree, [], [], [], [], '-b');
     set          (HP, ...
         'edgecolor',           'none');
     HP           = plot_tree (tree, [1 0 0], [], [], [], '-b');

@@ -35,20 +35,23 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function tree = elim0_tree (intree, options)
+function tree = elim0_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: nothing}
-    options  = '';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('e', false, @isBinary)
+p.addParameter('r', false, @isBinary)
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {}, {'e', 'r', 's'});
+%==============================================================================%
 
 len          = len_tree (intree);
 ilen         = find     (len == 0);
 
 if length (ilen) > 1
-    if contains (options, '-r')
+    if pars.r
         tree = delete_tree (intree, ilen (2 : end));
     else
         tree = delete_tree (intree, ilen (2 : end), '-r');
@@ -58,14 +61,14 @@ else
     tree     = intree;
 end
 
-if contains (options, '-e')
+if pars.e
     disp  ([ ...
         'elim0_tree: deleted ' ...
         (num2str (length (ilen) - 1)) ...
         ' nodes']);
 end
 
-if contains (options, '-s')
+if pars.s
     clf;
     hold         on;
     xplore_tree  (tree);

@@ -15,6 +15,8 @@
 %     or node index
 %     {DEFAULT: root, i.e. index 1}
 % - options  ::string:
+%     '-dim3'  : three-dimensional option
+%     '-dim2'  : two-dimensional option
 %     '-s'   : show
 %     {DEFAULT: ''}
 %
@@ -32,12 +34,16 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function eucl = eucl_tree (intree, point, options)
+function eucl = eucl_tree (intree, varargin)
 
-if (nargin < 3) || isempty (options)
-    % {DEFAULT: no option}
-    options  = ''; 
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('point', 1, @isnumeric) %TODO check for the size of point
+p.addParameter('dim2', false, @isBinary)
+p.addParameter('dim3', true, @isBinary)
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {'point'}, {'dim2', 'dim3', 's'});
+%==============================================================================%
 
 % use only node position for this function
 if isnumeric (intree) && numel (intree) > 1
@@ -48,33 +54,28 @@ else
     ver_tree (intree); % verify that input is a tree structure
     X    =   intree.X;
     Y    =   intree.Y;
-    if ~contains (options, '-2d')
+    if pars.dim3
         Z  = intree.Z;
     end
 end
 
-if (nargin <2) || isempty (point)
-    % {DEFAULT: comparison point is the root}
-    point    = 1; 
-end
-
-if numel (point) == 1
+if numel (pars.point) == 1
     % coordinates for selected node:
-    point        = [(X (point)) (Y (point)) (Z (point))];
+    pars.point        = [(X (pars.point)) (Y (pars.point)) (Z (pars.point))];
 end
 
-if ~contains (options, '-2d') % 3D option
+if pars.dim3 % 3D option
     eucl         = sqrt ( ...
-        (X - point (1)).^2 + ...
-        (Y - point (2)).^2 + ...
-        (Z - point (3)).^2);
+        (X - pars.point (1)).^2 + ...
+        (Y - pars.point (2)).^2 + ...
+        (Z - pars.point (3)).^2);
 else
     eucl         = sqrt ( ...
-        (X - point (1)).^2 + ...
-        (Y - point (2)).^2);
+        (X - pars.point (1)).^2 + ...
+        (Y - pars.point (2)).^2);
 end
 
-if contains (options, '-s') % show option
+if pars.s % show option
     clf;
     hold         on;
     HP           = plot_tree (intree, eucl, [], [], [], '-b');

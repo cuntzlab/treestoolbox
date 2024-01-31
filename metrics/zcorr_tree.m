@@ -37,19 +37,19 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [tree, idZ] = zcorr_tree (intree, tZ, options)
+function [tree, idZ] = zcorr_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 tree         = intree;
 
-if (nargin < 2) || isempty (tZ)
-    tZ       = 5;
-end
-
-if (nargin < 3) || isempty (options)
-    % {DEFAULT: no option}
-    options  = ''; 
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('tZ', 5, @isnumeric) %TODO check for the size of DD
+p.addParameter('s', false, @isBinary)
+p.addParameter('w', false, @isBinary)
+p.addParameter('m', false, @isBinary)
+pars = parseArgs(p, varargin, {'tZ'}, {'s', 'w', 'm'});
+%==============================================================================%
 
 ipar             = ipar_tree (tree);
 idpar            = ipar (:, 2);
@@ -58,9 +58,9 @@ idpar (idpar == 0) = 1;
 % compare z to direct parent z:
 dZ               = tree.Z (idpar) - tree.Z;
 % and index to the nodes at which dZ is bigger than a threshold tZ
-idZ              = find (abs (dZ) > tZ);
+idZ              = find (abs (dZ) > pars.tZ);
 
-if contains (options, '-m') % show movie option: initialization
+if pars.m % show movie option: initialization
     clf;
     shine;
     hold on;
@@ -70,19 +70,19 @@ if contains (options, '-m') % show movie option: initialization
     axis         image;
 end
 
-if contains (options, '-w') % waitbar option: initialization
+if pars.w % waitbar option: initialization
     HW           = waitbar (0, 'finding jumps in z node by node...');
     set          (HW, 'Name', '..PLEASE..WAIT..YEAH..');
 end
 
 for counter      = 1 : length (idZ)
-    if contains (options, '-w') % waitbar option: update
+    if pars.w % waitbar option: update
         waitbar  (counter / length (idZ), HW);
     end
     isub         = sub_tree (tree, idZ (counter));
     tree.Z (find (isub)) = ...
         tree.Z (find (isub)) + dZ (idZ (counter));
-    if contains (options, '-m') % show movie option: update
+    if pars.m % show movie option: update
         set      (HP, ...
             'visible',         'off');
         HP       = plot_tree (tree);
@@ -90,11 +90,11 @@ for counter      = 1 : length (idZ)
     end
 end
 
-if contains (options, '-w') % waitbar option: close
+if pars.w % waitbar option: close
     close        (HW);
 end
 
-if contains (options, '-s') % show option
+if pars.s % show option
     clf;
     hold         on;
     HP           = plot_tree (intree);

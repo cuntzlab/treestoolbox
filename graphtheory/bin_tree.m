@@ -43,34 +43,29 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [bi, bins, bh] = bin_tree (intree, v, bins, options)
+function [bi, bins, bh] = bin_tree (intree, varargin)
 
-if (nargin < 2) || isempty (v)
-    % {DEFAULT vector: vector of euclidean distances to root}
-    v = eucl_tree (intree);
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('v', eucl_tree (intree)) % TODO check the size and type of v
+p.addParameter('bins', 10, @isnumeric) % TODO check the size and type of bins
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {'v', 'bins'}, {'s'});
+%==============================================================================%
 
-if (nargin < 3) || isempty (bins)
-    % {DEFAULT number of bins}
-    bins = 10;
-end
-
-if (nargin < 4) || isempty (options)
-    % {DEFAULT: no option}
-    options = '';
-end
-
+bins = pars.bins;
 if numel (bins)  == 1
-    bins         = ...
-        min (v) : (max (v) * 1.0001 - min (v)) / bins : max (v) * 1.0001;
+    bins         =  min (pars.v) : ...
+                    (max (pars.v) * 1.0001 - min (pars.v)) / bins : ...
+                    max (pars.v) * 1.0001;
 end
 
-[bh, bi]         = histax (v, bins);
+[bh, bi]         = histc (pars.v, bins);
 
-if contains (options, '-s') % show option
+if pars.s % show option
     clf;
     hold         on;
-    plot_tree    (intree,bi);
+    plot_tree    (intree, bi);
     title        ('bin index');
     xlabel       ('x [\mum]');
     ylabel       ('y [\mum]');

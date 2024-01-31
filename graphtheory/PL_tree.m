@@ -29,16 +29,17 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function  PL = PL_tree (intree, options)
+function  PL = PL_tree (intree, varargin)
 
 ver_tree     (intree);                 % verify that input is a tree
 % use only directed adjacency for this function
 dA           = intree.dA;
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {}, {'s'});
+%==============================================================================%
 
 % calculating weighted path length:
 counter      = 1;
@@ -52,7 +53,7 @@ while sum (resPL == 1) ~= 0
 end
 PL           = full (PL);
 
-if contains (options, '-s')           % show option
+if pars.s           % show option
     clf;
     hold         on; 
     HP           = plot_tree (intree, PL, [], [], [], '-b');

@@ -30,12 +30,13 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function rootangle = rootangle_tree (intree, options)
+function rootangle = rootangle_tree (intree, varargin)
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {}, {'s'});
+%==============================================================================%
 
 ver_tree     (intree); % verify that input is a tree structure
 
@@ -68,7 +69,7 @@ end
 rootangle (isnan (rootangle)) = 0;
 rootangle        = real (rootangle);
 
-if strcmp (options, '-s')
+if pars.s
     AngV         = linspace   (0, pi, 25);
     pdf          = histcounts (rootangle, AngV);
     mAngV        = (AngV (2 : 25) + AngV (1 : 24)) / 2; % Get midpoints

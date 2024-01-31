@@ -32,15 +32,18 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function tree = flatten_tree (intree, options)
+function tree = flatten_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 tree         = intree;
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: waitbar}
-    options  = ''; 
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('s', false, @isBinary)
+p.addParameter('w', false, @isBinary)
+p.addParameter('m', false, @isBinary)
+pars = parseArgs(p, varargin, {}, {'s', 'w', 'm'});
+%==============================================================================%
 
 % parent index structure (see "ipar_tree"):
 ipar             = ipar_tree (tree); 
@@ -54,7 +57,7 @@ if all (tree.Z < eps)
     return;
 end
 
-if contains      (options, '-m') % show movie option
+if pars.m % show movie option
     clf;
     HP           = plot_tree (tree);
     title        ('flatten a tree');
@@ -66,18 +69,15 @@ if contains      (options, '-m') % show movie option
     axis         image;
 end
 
-if contains      (options, '-w') % waitbar option: initialization
+if pars.w % waitbar option: initialization
     if length    (tree.X) > 998
         HW       = waitbar (0, 'flattening ...');
         set      (HW, 'Name', '..PLEASE..WAIT..YEAH..');
     end
 end
 
-domovie          = contains   (options, '-m');
-dowaitbar        = contains   (options, '-w');
-
 for counter      = 2 : length (tree.X) % walk through tree
-    if dowaitbar % waitbar option: update
+    if pars.w % waitbar option: update
         if  (mod (counter, 1000) == 999)
             waitbar  (counter ./ length (tree.X), HW);
         end
@@ -107,20 +107,20 @@ for counter      = 2 : length (tree.X) % walk through tree
         tree.Z (sub) = tree.Z (sub) - dZ;
         tree.Z (counter) = 0;
     end
-    if domovie % show movie option: update
+    if pars.m % show movie option: update
         set      (HP, ...
             'visible',         'off');
         HP       = plot_tree (tree);
         drawnow;
     end
 end
-if contains (options, '-w') % waitbar option: close
+if pars.w % waitbar option: close
     if length    (tree.X) > 998
         close    (HW);
     end
 end
 
-if contains (options, '-s') % show option
+if pars.s % show option
     clf;
     hold         on;
     HP           = plot_tree (intree);

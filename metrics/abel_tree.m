@@ -28,14 +28,15 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function abel = abel_tree (intree, options)
+function abel = abel_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {}, {'s'});
+%==============================================================================%
 
 iC               = C_tree (intree);
 iC (1)           = 0;
@@ -43,7 +44,7 @@ dtree            = delete_tree (intree, find (iC));
 len              = len_tree (dtree);
 abel             = mean (len);
 
-if contains       (options, '-s') % show option
+if pars.s % show option
     clf;
     hold         on;
     clf;
@@ -60,6 +61,4 @@ if contains       (options, '-s') % show option
     grid         on;
     axis         image;
 end
-
-
 

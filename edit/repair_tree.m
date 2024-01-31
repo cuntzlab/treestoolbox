@@ -16,7 +16,7 @@
 % - intree   ::integer:  index of tree in trees or structured tree
 % - options  ::string:
 %     '-s'   : show
-%     '-0' : do not eliminate trifurcation at root
+%     '-z' : do not eliminate trifurcation at root (Careful, used to be called '-0')
 %     {DEFAULT: ''}
 %
 % Output
@@ -36,23 +36,25 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [tree, errtri] = repair_tree (intree, options)
+function [tree, errtri] = repair_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 tree         = intree;
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('z', false, @isBinary)
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {}, {'z', 's'});
+%==============================================================================%
 
 if islogical     (tree.dA)
     tree.dA      = double (tree.dA);
 end
 
-if contains (options, '-0')
+if pars.z
     % eliminate trifurcations by adding short segments (except root):
-    [tree, errtri] = elimt_tree (tree,'-0 -e');
+    [tree, errtri] = elimt_tree (tree,'-z -e');
 else
     % eliminate trifurcations by adding short segments:
     [tree, errtri] = elimt_tree (tree);
@@ -71,7 +73,7 @@ end
  % sort tree to be BCT conform, heavy parts left:
 tree         = sort_tree  (tree, '-LO');
 
-if contains (options, '-s') % show option
+if pars.s % show option
     clf;
     hold         on; 
     xplore_tree  (intree, [], [], -20);

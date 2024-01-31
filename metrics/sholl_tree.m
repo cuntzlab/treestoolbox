@@ -19,7 +19,7 @@
 %     {DEFAULT: 50}
 % - options  ::string:
 %     '-s'   : show intersections
-%     '-3s'  : show 3D-intersections
+%     '-s3'  : show 3D-intersections (Careful, it used to be '-3s')
 %     '-e'   : echo how many double intersections are counted
 %     '-o'   : count only single intersections
 %     {DEFAULT: '-e'}
@@ -46,20 +46,21 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [s, dd, sd, XP, YP, ZP, iD] = sholl_tree (intree, dd, options)
+function [s, dd, sd, XP, YP, ZP, iD] = sholl_tree (intree, varargin)
 
 ver_tree (intree); % verify that input is a tree structure
 
-if (nargin < 2) || isempty (dd)
-    % {DEFAULT diameter difference: every 50 um}
-    dd       = 50;
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('dd', 50, @isnumeric) %TODO check for the size and type of dd
+p.addParameter('o', false, @isBinary)
+p.addParameter('e', true, @isBinary)
+p.addParameter('s', false, @isBinary)
+p.addParameter('s3', false, @isBinary)
+pars = parseArgs(p, varargin, {'dd'}, {'o', 'e', 's', 's3'});
+%==============================================================================%
 
-if (nargin < 3) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
-
+dd = pars.dd;
 if numel (dd)    == 1
     % if dd is a single value make a vector
     eucl         = eucl_tree (intree);
@@ -133,18 +134,18 @@ end
 s  (dd == 0)     = 1;
 sd (dd == 0)     = 0;
 
-if contains       (options, '-o')
+if pars.o
     s            = s - sd;
 end
 
-if contains       (options, '-e')
+if pars.e
     if sum (sd)  > 0
         warning  ('TREES:wrongcounts', ...
             [(num2str (sum (sd))) ' segments were counted twice']);
     end
 end
 
-if contains       (options, '-s') % show option
+if pars.s % show option
     clf;
     hold on;
     shine;
@@ -195,7 +196,7 @@ if contains       (options, '-s') % show option
     set          (HT, 'color', [0 1 0]);
 end
 
-if contains (options, '-3s') % 3D show option
+if pars.s3 % 3D show option
     clf;
     hold         on;
     plot_tree    (intree);

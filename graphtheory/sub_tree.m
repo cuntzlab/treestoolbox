@@ -32,32 +32,29 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [sub, subtree] = sub_tree (intree, inode, options)
+function [sub, subtree] = sub_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 tree         = intree;
 
-if (nargin < 2) || isempty (inode)
-    % {DEFAULT index: second node in tree}
-    inode    = 2;
-end
-
-if (nargin < 3) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('inode', 2, @isnumeric) % TODO check the size and type of inode
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {'inode'}, {'s'});
+%==============================================================================%
 
 dA               = tree.dA; % directed adjacency matrix of tree
 sub              = false (size (dA, 1), 1);
-tdA              = dA (:, inode);
-sub (inode)      = 1;
+tdA              = dA (:, pars.inode);
+sub (pars.inode) = 1;
 while sum (tdA)
     sub          = sub + tdA;
     tdA          = dA *  tdA;  % use adjacency matrix to walk through tree
 end
 sub              = logical (sub);
 
-if contains (options, '-s') % show option
+if pars.s % show option
     clf;
     hold         on;
     HP           = plot_tree (intree, [],      [], ~sub, [], '-b');

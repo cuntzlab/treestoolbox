@@ -43,34 +43,35 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function tree = cat_tree (intree1, intree2, inode1, inode2, options)
+function tree = cat_tree (intree1, intree2, varargin)
 
 ver_tree     (intree1); % verify that input 1 is a tree structure
 ver_tree     (intree2); % verify that input 2 is a tree structure
+
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('inode1', [], @isnumeric)
+p.addParameter('inode2', 1, @isnumeric)
+p.addParameter('e', true, @isBinary)
+p.addParameter('r', false, @isBinary)
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {'inode1', 'inode2'}, {'e', 'r', 's'});
+%==============================================================================%
+
 tree1        = intree1;
 tree2        = intree2;
 
-if (nargin < 4) || isempty (inode2)
-    % {DEFAULT: root node of second tree}
-    inode2   = 1;
-end
-
-if (nargin < 3) || isempty (inode1)
+if isempty (pars.inode1)
      % {DEFAULT: connect to node on first tree which is closest to inode2
      % of tree 2}
     [~, inode1]  = min (eucl_tree (tree1, [ ...
-        (tree2.X (inode2)), ...
-        (tree2.Y (inode2)), ...
-        (tree2.Z (inode2))]));
-end
-
-if (nargin < 5) || isempty (options)
-    % {DEFAULT: echo changes}
-    options  = '-e';
+        (tree2.X (pars.inode2)), ...
+        (tree2.Y (pars.inode2)), ...
+        (tree2.Z (pars.inode2))]));
 end
 
 % if inode2 is not root on tree2 set it to root:
-tree2            = redirect_tree (tree2, inode2);
+tree2            = redirect_tree (tree2, pars.inode2);
 dA1              = tree1.dA;        % directed adjacency matrix of tree 1
 dA2              = tree2.dA;        % directed adjacency matrix of tree 2
 N1               = size   (dA1, 1); % number of nodes in tree 1
@@ -95,7 +96,7 @@ for counter      = 1 : length (S)
                         tree1.(S{counter}); ...
                         tree2.(S{counter})];
                 else
-                    if contains (options, '-e')
+                    if pars.e
                         warning ( ...
                             'TREES:treeinconsistency', ...
                             ['degenerating field: ' S{counter}]);
@@ -107,7 +108,7 @@ for counter      = 1 : length (S)
 end
 
 % eliminate obsolete regions (only if everything is correct)
-if ~contains (options, '-r')
+if ~pars.r
     if isfield (tree1,'R') && isfield (tree2, 'R')
         if      isfield (tree1, 'rnames') && ...
                 isfield (tree2, 'rnames')
@@ -134,7 +135,7 @@ end
 
 tree             = sort_tree (tree, '-LO');
 
-if contains      (options, '-s')
+if pars.s
     clf;
     hold         on;
     plot_tree    (intree1);

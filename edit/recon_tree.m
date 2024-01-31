@@ -36,28 +36,32 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function tree = recon_tree (intree, ichilds, ipars, options)
+function tree = recon_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 tree         = intree;
 
-if (nargin < 4) || isempty (options)
-    % {DEFAULT: shift tree}
-    options  = '-h';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('ichilds', [])
+p.addParameter('ipars', [])
+p.addParameter('h', true, @isBinary)
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {'ichilds', 'ipars'}, {'h', 's'});
+%==============================================================================%
 
-if contains (options, '-h')
-    for counter  = 1 : length (ichilds) % move subtrees:
-        isub     = find (sub_tree (tree, ichilds (counter)));
+if pars.h
+    for counter  = 1 : length (pars.ichilds) % move subtrees:
+        isub     = find (sub_tree (tree, pars.ichilds (counter)));
         dX       = ...
-            tree.X (ichilds (counter)) - ...
-            tree.X (ipars (counter));
+            tree.X (pars.ichilds (counter)) - ...
+            tree.X (pars.ipars (counter));
         dY       = ...
-            tree.Y (ichilds (counter)) - ...
-            tree.Y (ipars (counter));
+            tree.Y (pars.ichilds (counter)) - ...
+            tree.Y (pars.ipars (counter));
         dZ       = ...
-            tree.Z (ichilds (counter)) - ...
-            tree.Z (ipars (counter));
+            tree.Z (pars.ichilds (counter)) - ...
+            tree.Z (pars.ipars (counter));
         tree.X (isub) = tree.X (isub) - dX;
         tree.Y (isub) = tree.Y (isub) - dY;
         tree.Z (isub) = tree.Z (isub) - dZ;
@@ -66,12 +70,12 @@ end
 
 % vector containing index to direct parents:
 idpar        = idpar_tree (tree);
-for counter  = 1 : length (ichilds)
-    tree.dA  (ichilds (counter), idpar (ichilds (counter))) = 0;
-    tree.dA  (ichilds (counter), ipars (counter))           = 1;
+for counter  = 1 : length (pars.ichilds)
+    tree.dA  (pars.ichilds (counter), idpar (pars.ichilds (counter))) = 0;
+    tree.dA  (pars.ichilds (counter), pars.ipars (counter))           = 1;
 end
 
-if contains (options, '-s') % show option
+if pars.s % show option
     clf;
     hold         on; 
     plot_tree    (intree, [0 0 0], -20);

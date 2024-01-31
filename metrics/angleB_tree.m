@@ -31,15 +31,19 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function angleB = angleB_tree (intree, options)
+function angleB = angleB_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
-tree         = intree;
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
+% use full tree for this function
+tree     = intree;
+
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('s', false, @isBinary)
+p.addParameter('m', false, @isBinary)
+pars = parseArgs(p, varargin, {}, {'s', 'm'});
+%==============================================================================%
 
 iB               = find  (B_tree (intree));  % branch point indices
 angleB           = zeros (length (iB), 1);   % angle values for each BP
@@ -71,9 +75,8 @@ for counter      = 1 : length (iB)      % walk through all branch points:
     else
         angleB (counter) = acos (dot (nV1, nV2));
     end    
-    if contains   (options, '-m') % show movie option
-        clf;
-        hold on;
+    if pars.m % show movie option
+        clf; hold on;
         HP       = plot_tree (intree, [], [], [], [], '-b');
         set      (HP, ...
             'facealpha',     0.2, ...
@@ -108,7 +111,7 @@ tangleB          = angleB;
 angleB           = NaN (size (tree.dA, 1), 1);
 angleB (iB)      = tangleB;
 
-if contains (options, '-s') % show option
+if pars.s % show option
     clf;
     hold         on;
     HP           = plot_tree ( ...

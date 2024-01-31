@@ -42,21 +42,20 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2016  Hermann Cuntz
 
-function tree = morph_tree (intree, v, options)
+function tree = morph_tree (intree, varargin)
 
 
 ver_tree     (intree); % verify that input is a tree structure
 tree         = intree;
 
-if (nargin < 2) || isempty (v)
-    % {DEFAULT vector: 10 um pieces between all nodes}
-    v        = ones (size (tree.dA, 1), 1) .* 10; 
-end
-
-if (nargin < 3) || isempty(options)
-    % {DEFAULT: waitbar}
-    options  = '-w'; 
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('v', ones (size (tree.dA, 1), 1) .* 10, @isnumeric) % TODO check for the size of v
+p.addParameter('s', false, @isBinary)
+p.addParameter('w', true, @isBinary)
+p.addParameter('m', false, @isBinary)
+pars = parseArgs(p, varargin, {'v'}, {'s', 'w', 'm'});
+%==============================================================================%
 
 ipar             = ipar_tree (tree); % parent index structure
 X0               = tree.X (1);
@@ -65,7 +64,7 @@ Z0               = tree.Z (1); % root coordinates
 tree             = tran_tree (tree); % center on root
 len              = len_tree  (tree); % length values of tree segments [um]
 
-if contains      (options, '-m') % show movie option
+if pars.m % show movie option
     clf;
     HP           = plot_tree (tree);
     title        ('morph a tree');
@@ -77,19 +76,19 @@ if contains      (options, '-m') % show movie option
     axis         image;
 end
 
-if contains      (options, '-w') % waitbar option: initialization
+if pars.w % waitbar option: initialization
     if length    (tree.X) > 998
         HW       = waitbar (0, 'morphing ...');
         set      (HW, 'Name', '..PLEASE..WAIT..YEAH..');
     end
 end
 for counter      = 2 : length (tree.X)
-    if contains  (options, '-w') % waitbar option: update
+    if pars.w % waitbar option: update
         if  (mod (counter, 1000) == 999)
             waitbar (counter ./ length (tree.X), HW);
         end
     end
-    if len (counter) ~= v (counter)
+    if len (counter) ~= pars.v (counter)
         % node to parent node differences:
         dX       = tree.X (counter) - tree.X (ipar (counter, 2));
         dY       = tree.Y (counter) - tree.Y (ipar (counter, 2));
@@ -108,10 +107,10 @@ for counter      = 2 : length (tree.X)
             dZ   = R (1, 3);
             XYZ  = 1;
         end
-        tree.X (sub) = tree.X (sub) - dX + v (counter) .* (dX ./ XYZ);
-        tree.Y (sub) = tree.Y (sub) - dY + v (counter) .* (dY ./ XYZ);
-        tree.Z (sub) = tree.Z (sub) - dZ + v (counter) .* (dZ ./ XYZ);
-        if contains (options, '-m') % show movie option: update
+        tree.X (sub) = tree.X (sub) - dX + pars.v (counter) .* (dX ./ XYZ);
+        tree.Y (sub) = tree.Y (sub) - dY + pars.v (counter) .* (dY ./ XYZ);
+        tree.Z (sub) = tree.Z (sub) - dZ + pars.v (counter) .* (dZ ./ XYZ);
+        if pars.m % show movie option: update
             set  (HP, ...
                 'visible',     'off');
             HP   = plot_tree (tree);
@@ -120,7 +119,7 @@ for counter      = 2 : length (tree.X)
         end
     end
 end
-if contains       (options, '-w') % waitbar option: close
+if pars.w % waitbar option: close
     if length    (tree.X) > 998
         close    (HW);
     end
@@ -128,7 +127,7 @@ end
 
 tree             = tran_tree (tree, [X0 Y0 Z0]); % move back the tree
 
-if contains      (options, '-s') % show option
+if pars.s % show option
     clf;
     hold         on;
     HP           = plot_tree (intree);

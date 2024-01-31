@@ -33,28 +33,30 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function  typeN = typeN_tree (intree, options)
+function  typeN = typeN_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 % use only directed adjacency for this function
 dA           = intree.dA;
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('s', false, @isBinary)
+p.addParameter('bct', false, @isBinary)
+pars = parseArgs(p, varargin, {}, {'s', 'bct'});
+%==============================================================================%
 
 % sum(dA) (actually faster than sum(dA)) ;-):
 typeN            = (ones (1, size (dA, 1)) * dA)';
 typeN (typeN > 2) = 2;
 
-if contains (options, '-bct') % give a string output
+if pars.bct % give a string output
     typeN        = 68 - typeN;
     typeN (typeN == 68) = 84;
     typeN        = char (typeN);
 end
 
-if contains (options,'-s') % show option
+if pars.s % show option
     clf;
     hold         on;
     HP           = plot_tree   (intree, [0 0 0], [], [], [], '-b');

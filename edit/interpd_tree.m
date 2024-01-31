@@ -21,7 +21,7 @@
 % -------
 % tree        = sample_tree;
 % tree.D (1)  = 20;
-% treeD       = interpd_tree (tree, [1 10], '-s');
+% treeD       = interpd_tree (tree, [1 10]);
 %
 % contributed function by Marcel Beining, 2017
 %
@@ -30,29 +30,35 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function tree = interpd_tree (tree, ind)
+function tree = interpd_tree (tree, varargin)
 
 ver_tree         (tree)
+
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('ind', [], @isnumeric)
+pars = parseArgs(p, varargin, {'ind'}, {});
+%==============================================================================%
 
 PL               = Pvec_tree (tree);
 ipar             = ipar_tree (tree);
 
-if     any (ipar (ind (1), :) == ind (2))
-    ind          = ipar (ind (1), 1 : find (ipar (ind (1), :) == ind (2)));
-elseif any (ipar (ind (2), :) == ind (1))
-    ind          = ipar (ind (2), 1 : find (ipar (ind (2), :) == ind (1)));
+if     any (ipar (pars.ind (1), :) == pars.ind (2))
+    pars.ind          = ipar (pars.ind (1), 1 : find (ipar (pars.ind (1), :) == pars.ind (2)));
+elseif any (ipar (pars.ind (2), :) == pars.ind (1))
+    pars.ind          = ipar (pars.ind (2), 1 : find (ipar (pars.ind (2), :) == pars.ind (1)));
 else
     errordlg     ('Indices do not lie on the same path to the root');
     return
 end
 
 m                =  ...
-    (tree.D (ind (end)) - tree.D (ind (1)))/ ...
-    (    PL (ind (end)) -     PL (ind (1)));
+    (tree.D (pars.ind (end)) - tree.D (pars.ind (1)))/ ...
+    (    PL (pars.ind (end)) -     PL (pars.ind (1)));
 
-tree.D(ind)      = ...
-    m * (PL (ind) - PL (ind (1))) + ...
-    tree.D (ind (1));
+tree.D(pars.ind)      = ...
+    m * (PL (pars.ind) - PL (pars.ind (1))) + ...
+    tree.D (pars.ind (1));
 
 
 

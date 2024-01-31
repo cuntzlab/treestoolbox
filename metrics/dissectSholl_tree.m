@@ -10,15 +10,16 @@
 % Input
 % -----
 % - intree   ::integer:  index of tree in trees or structured tree
-% - options  ::string: {DEFAULT: '-3d -a}
-%     '-3d'  : three-dimensional dendrite
-%     '-2d'  : two-dimensional (planar) dendrite
+% - c        ::convexity of intree:
+%      {DEFAULT: calculated using convexity_tree}
+% - options  ::string: {DEFAULT (three dimensional with centripetal bias 
+%                       correction): '-dim3 -a'}
+%     '-dim3'  : three-dimensional dendrite (Careful, it used to be '-3d')
+%     '-dim2'  : two-dimensional (planar) dendrite (Careful, it used to be '-2d')
 %      '-a'  : using correction for centripetal bias
 %      '-d'  : spanning domain only
 %      '-n'  : spanning domain and non-uniform density
 %      '-s'  : plot dissected SIPs
-% - c        ::convexity of intree:
-%      {DEFAULT: calculated using convexity_tree}
 %
 % Output
 % ------
@@ -44,7 +45,7 @@
 %
 % Example
 % -------
-% Output = dissectSholl_tree (sample_tree, '-3d -a')
+% Output = dissectSholl_tree (sample_tree, '-dim3 -a')
 %
 % This function was contributed by Alex D Bird, 2018
 %
@@ -56,40 +57,49 @@
 % the TREES toolbox: edit, visualize and analyze neuronal trees
 % Copyright (C) 2009 - 2023 Hermann Cuntz
 
-function Output = dissectSholl_tree(intree, options, c)
+function Output = dissectSholl_tree(intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 
-if (nargin < 2) || isempty(options)
-    % {DEFAULT: three dimensional with centripetal bias correction}
-    options = '-3d -a';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('c', []) %TODO check for the size and type of c
+p.addParameter('dim2', false, @isBinary)
+p.addParameter('dim3', true, @isBinary)
+p.addParameter('a', true, @isBinary)
+p.addParameter('d', false, @isBinary)
+p.addParameter('n', false, @isBinary)
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {'c'}, {'dim2', 'dim3', 'a', 'd', 'n', 's'});
+%==============================================================================%
 
-if (nargin < 3) || isempty(c)
+if  isempty(pars.c)
     % {DEFAULT: convexity unknown}
-    c = convexity_tree(intree, options);
-    Output.c = c;
+    pars.c   = convexity_tree (intree, 'dim2', pars.dim2, 'dim3', pars.dim3);
+    Output.c = pars.c;
+else
+    Output.c = pars.c;
 end
 
 thetRes = 1000000; % Test points along each radius
-RRes = 25; % Radial resolution of SIP
+RRes    = 25; % Radial resolution of SIP
 Ls               = len_tree (intree);
-tL = sum(Ls(:)); % Get total length of tree
+tL      = sum(Ls(:)); % Get total length of tree
 Output.TotalLength = tL;
 sf = 1;
 ttree = tran_tree(intree); % Move tree to have root at origin
 
-if contains(options, '-2d')
+if pars.dim2
     %==========================================================================
     %==========================================================================
     % Planar neuron
     %==========================================================================
     %==========================================================================
 
-    bound = boundary_tree(ttree, '-2d', c);
+    bound = boundary_tree(ttree, 'c', pars.c, 'dim2', true);
     xv = bound.xv;
     yv = bound.yv;
-    V = bound.V;
+    V  = bound.V;
 
     %--------------- True Sholl -----------------------
 
@@ -110,84 +120,84 @@ if contains(options, '-2d')
         Is = inpolygon(x, y, xv, yv);
         SDom(i) = 2 * pi * R * nnz(Is(:)) / thetRes;
     end
-    SDom(isnan(SDom)) = 0;
+    SDom(isnan(SDom))   = 0;
     Strue(isnan(Strue)) = 0;
 
-    scale = trapz(RVec, Strue);
-    SDomNorm = SDom / trapz(RVec, SDom);
+    scale     = trapz(RVec, Strue);
+    SDomNorm  = SDom / trapz(RVec, SDom);
     StrueNorm = Strue / trapz(RVec, Strue);
 
-    Output.V = V;
+    Output.V      = V;
     Output.tScale = scale;
-    Output.STrue = StrueNorm;
-    Output.RVec = RVec;
-    Output.SDom = SDomNorm;
+    Output.STrue  = StrueNorm;
+    Output.RVec   = RVec;
+    Output.SDom   = SDomNorm;
 
-    if contains(options, '-a')
+    if pars.a
         %==========================================================================
         %==========================================================================
         % Account for centripetal bias
         %==========================================================================
         %==========================================================================
 
-        [rootangle] = rootangle_tree(intree, '-2d'); % Calculate root angles
-        [bf, k] = bf_tree(rootangle, '-2d'); % Estimate centripetal bias and balancing factor
+        rootangle = rootangle_tree(intree); % Calculate root angles
+        [bf, k]   = bf_tree(rootangle, 'dim2', true); % Estimate centripetal bias and balancing factor
         Output.bf = bf;
 
-        bp = sqrt(tL^3*4/(3 * pi * V)); % Estimated number of branch points
-        S = tL / (bp); % Estimated branch length
+        bp        = sqrt(tL^3*4/(3 * pi * V)); % Estimated number of branch points
+        S         = tL / (bp); % Estimated branch length
 
-        x = RVec;
-        y = SDomNorm;
+        x         = RVec;
+        y         = SDomNorm;
 
-        tV = linspace(0, pi, 25);
-        rVraw = hist(rootangle, tV);
-        rVraw(1) = rVraw(2) + (rVraw(2) - rVraw(3));
-        rV = rVraw / trapz(tV, rVraw);
-        S = S * max(rV(:));
+        tV        = linspace(0, pi, 25);
+        rVraw     = histax(rootangle, tV);
+        rVraw(1)  = rVraw(2) + (rVraw(2) - rVraw(3));
+        rV        = rVraw / trapz(tV, rVraw);
+        S         = S * max(rV(:));
 
-        tVi = tV(rV > 0);
-        rVi = rV(rV > 0);
+        tVi       = tV(rV > 0);
+        rVi       = rV(rV > 0);
 
-        [X, Y] = pol2cart(tVi, S*rVi);
+        [X, Y]    = pol2cart(tVi, S*rVi);
 
-        X = X(end:(-1):1);
-        Y = Y(end:(-1):1);
-        Xmin = min(X(:));
-        Xmax = max(X(:));
+        X         = X(end:(-1):1);
+        Y         = Y(end:(-1):1);
+        Xmin      = min(X(:));
+        Xmax      = max(X(:));
 
 
-        X2 = linspace(Xmin(1), Xmax(1), 1000);
-        Y2 = interp1(X, Y, X2); % Smooth out values
+        X2        = linspace(Xmin(1), Xmax(1), 1000);
+        Y2        = interp1(X, Y, X2); % Smooth out values
 
-        N = length(x);
-        z = zeros(N, 1);
+        N         = length(x);
+        z         = zeros(N, 1);
         for i = 1:N
             rRange = linspace(x(i)+Xmin, x(i)+Xmax, 1000);
 
             zRange = interp1(x, y, rRange, 'spline', 0);
             iGrand = trapz(X2, zRange.*Y2);
 
-            z(i) = iGrand;
+            z(i)   = iGrand;
         end
-        z(N) = y(N);
+        z(N)      = y(N);
 
-        z = z / trapz(x, z);
-        z = z + y;
-        SAngNorm = z / trapz(x, z);
+        z         = z / trapz(x, z);
+        z         = z + y;
+        SAngNorm  = z / trapz(x, z);
 
-        Output.SDom = SDomNorm;
-        Output.SAng = SAngNorm;
+        Output.SDom      = SDomNorm;
+        Output.SAng      = SAngNorm;
         Output.rootangle = rootangle;
-        Output.k = k;
+        Output.k         = k;
     end
-elseif contains(options, '-3d')
+elseif pars.dim3
     %==========================================================================
     %==========================================================================
     % 3D neuron
     %==========================================================================
     %==========================================================================
-    bound = boundary_tree(ttree, '-3d', c); % Get boundary
+    bound = boundary_tree(ttree, 'c', pars.c, 'dim3', true); % Get boundary
 
     %--------------- True Sholl -----------------------
     eucs = eucl_tree(ttree);
@@ -208,28 +218,28 @@ elseif contains(options, '-3d')
         Is = intriangulation(bound.Vertices, bound.Faces, [x, y, z]);
         SDom(i) = R^2 * 4 * pi * nnz(Is(:)) / thetRes;
     end
-    SDom(isnan(SDom)) = 0;
+    SDom(isnan(SDom))   = 0;
     Strue(isnan(Strue)) = 0;
-    scale = trapz(RVec, Strue);
+    scale               = trapz(RVec, Strue);
 
-    SDomNorm = SDom / trapz(RVec, SDom);
+    SDomNorm  = SDom / trapz(RVec, SDom);
     StrueNorm = Strue / trapz(RVec, Strue);
 
 
-    Output.V = bound.V;
+    Output.V      = bound.V;
     Output.tScale = scale;
-    Output.STrue = StrueNorm;
-    Output.RVec = RVec;
-    Output.SDom = SDomNorm;
+    Output.STrue  = StrueNorm;
+    Output.RVec   = RVec;
+    Output.SDom   = SDomNorm;
 
-    if contains(options, '-a')
+    if pars.a
         %==========================================================================
         %==========================================================================
         % Account for centripetal bias
         %==========================================================================
         %==========================================================================
-        [rootangle] = rootangle_tree(intree, '-3d'); % Calculate root angles
-        [bf, k] = bf_tree(rootangle, '-3d'); % Estimate centripetal bias and balancing factor
+        rootangle = rootangle_tree(intree); % Calculate root angles
+        [bf, k]   = bf_tree(rootangle, 'dim3', true); % Estimate centripetal bias and balancing factor
         Output.bf = bf;
 
 
@@ -239,9 +249,9 @@ elseif contains(options, '-3d')
         x = RVec;
         y = SDomNorm;
 
-        tV = linspace(0, pi, 25);
-        rVraw = hist(rootangle, tV);
-        rV = rVraw / trapz(tV, rVraw);
+        tV    = linspace(0, pi, 25);
+        rVraw = histax(rootangle, tV);
+        rV    = rVraw / trapz(tV, rVraw);
 
         tVi = tV(rV > 0);
         rVi = rV(rV > 0);
@@ -274,22 +284,22 @@ elseif contains(options, '-3d')
         SAngNorm = z / trapz(x, z);
 
 
-        Output.SDom = SDomNorm;
-        Output.SAng = SAngNorm;
+        Output.SDom      = SDomNorm;
+        Output.SAng      = SAngNorm;
         Output.rootangle = rootangle;
-        Output.k = k;
+        Output.k         = k;
     end
 else
     error('Incorrect options')
 end
 
-if contains(options, '-n') % Nonuniform density
+if pars.n % Nonuniform density
     [bDens] = density_tree(ttree, RVec);
     SDensNorm = 0.5 * (bDens / trapz(RVec, bDens) + SDomNorm');
     Output.SDens = SDensNorm;
 end
 
-if contains(options, '-a')
+if pars.a
     estScale = Estscale(rootangle, tL); % Estimate scale of SIP
     Output.EstScale = estScale;
 end
@@ -297,17 +307,17 @@ end
 ErrDom = sqrt(trapz(RVec(:), (SDomNorm(:) - StrueNorm(:)).^2));
 Output.ErrDom = ErrDom;
 
-if contains(options, '-a')
+if pars.a
     ErrAng = sqrt(trapz(RVec(:), (SAngNorm(:) - StrueNorm(:)).^2));
     Output.ErrAng = ErrAng;
 end
 
-if contains(options, '-n') % Nonuniform density
+if pars.n % Nonuniform density
     ErrDens = sqrt(trapz(RVec(:), (SDensNorm(:) - StrueNorm(:)).^2));
     Output.ErrDens = ErrDens;
 end
 
-if contains(options, '-s') % Plot results
+if pars.s % Plot results
     figure
     hold
     plot(RVec, scale*StrueNorm, 'black') % Plot true Sholl
@@ -318,11 +328,11 @@ if contains(options, '-s') % Plot results
         plot(RVec, scale*SDomNorm, 'cyan') % Plot possibly non-fitted boundary
     end
     strleg = [strleg, "Spanning domain"];
-    if contains(options, '-a')
+    if pars.a
         plot(RVec, scale*SAngNorm, 'magenta') % Plot correction for centripetal bias
         strleg = [strleg, "Centripetal bias"];
     end
-    if contains(options, '-n')
+    if pars.n
         plot(RVec, scale*SDensNorm, 'green') % Plot non-uniform density
         strleg = [strleg, "Nonuniform density"];
     end
@@ -445,18 +455,18 @@ end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function[tDens] = density_tree(intree, RVec)
-% Gets density profile of branch points as afunction of radius
+% Gets density profile of branch points as a function of radius
 Tops = B_tree(intree);
 Tops = Tops == 1;
 
 eucl = eucl_tree(intree); % Euclidean distances to root
-tDens = hist(eucl(Tops), RVec); % Density profile
+tDens = histax(eucl(Tops), RVec); % Density profile
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function[estScale] = Estscale(rootangle, tL)
 % Estimates magnitude of SIP from total length and rootangle distribution.
 AngVec = linspace(0, pi, 25);
-rVraw = hist(rootangle, AngVec);
+rVraw = histax(rootangle, AngVec);
 rVraw(1) = rVraw(2) + (rVraw(2) - rVraw(3));
 rV = rVraw / trapz(AngVec, rVraw);
 

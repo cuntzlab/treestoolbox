@@ -37,14 +37,16 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [sect, vec] = dissect_tree (intree, options)
+function [sect, vec] = dissect_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('s', false, @isBinary)
+p.addParameter('r', false, @isBinary)
+pars = parseArgs(p, varargin, {}, {'s', 'r'});
+%==============================================================================%
 
 % add an empty compartment in the root:
 tree             = root_tree (intree);
@@ -55,8 +57,8 @@ ipar             = ipar + 1;
 % iBT: positions at which to cut the tree (branch and terminal nodes):
 iBT              = T_tree (tree) | B_tree (tree);
 if ...
-        (~contains (options, '-r')) && ...
-        (isfield (tree,'R')) && ...
+        (~pars.r) && ...
+        (isfield (tree, 'R')) && ...
         (numel   (tree.R) == numel (tree.X))
     idpar        = idpar_tree (tree);      % indices to direct parents
     % detect region changes:
@@ -106,7 +108,7 @@ if nargout       > 1
     vec (1, 2)   = 0;
 end
 
-if contains (options, '-s')       % show option
+if pars.s       % show option
     clf;
     hold         on;
     if ~isempty  (vec)

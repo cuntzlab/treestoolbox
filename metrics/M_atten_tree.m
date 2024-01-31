@@ -1,12 +1,18 @@
-function Matten = M_atten_tree (tree, thres)
+function Matten = M_atten_tree (tree, varargin)
 
-if (nargin < 2) || isempty (thres)
-    thres    = 0.13995;
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('thr', 0.13995, @isnumeric) % TODO check the size of thr
+pars = parseArgs(p, varargin, {'thr'}, {});
+%==============================================================================%
+
+% if (nargin < 2) || isempty (thr)
+%     thr    = 0.13995;
+% end
 
 N                = length (tree.X);
 sse              = sse_tree (tree);
-sseC             = sse > thres * max (max (sse));
+sseC             = sse > pars.thr * max (max (sse));
 sseCM            = sseC * 0;
 for counter      = 1 : N
     sseCM    ( ...

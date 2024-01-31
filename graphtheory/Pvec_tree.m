@@ -31,32 +31,29 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function Pvec = Pvec_tree (intree, v, options)
+function Pvec = Pvec_tree (intree, varargin)
 
 ver_tree     (intree);                 % verify that input is a tree
 
-if (nargin < 2) || isempty (v)
-    % {DEFAULT vector: lengths of segments}
-    v        = len_tree (intree);
-end
-
-if (nargin < 3) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('v', len_tree (intree), @isnumeric) % TODO check the size and type of v
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {'v'}, {'s'});
+%==============================================================================%
 
 % parent index structure (see "ipar_tree"):
 ipar             = ipar_tree (intree);
-v0               = [0; v];
+v0               = [0; pars.v];
 v0 (isnan (v0))  = 0;
 
 if size (ipar, 1) == 1
-    Pvec         = v;
+    Pvec         = pars.v;
 else
     Pvec         = sum (v0 (ipar + 1), 2);
 end
 
-if contains (options, '-s')       % show option
+if pars.s       % show option
     clf;
     hold         on; 
     HP           = plot_tree (intree, Pvec, [], [], [], '-b');

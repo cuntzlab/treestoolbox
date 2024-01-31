@@ -1,7 +1,7 @@
 % DELETE_TREE   Delete nodes from a tree.
 % (trees package)
 %
-% tree = delete_tree (intree, inodes, options)
+% tree = delete_tree (intree, pars.inodes, options)
 % --------------------------------------------
 %
 % Deletes nodes in a tree. Trifurcations occur when deleting any branching
@@ -13,7 +13,7 @@
 % Input
 % -----
 % - intree   ::integer:   index of tree in trees or structured tree
-% - inodes   ::vector:    node indices
+% - pars.inodes   ::vector:    node indices
 %     {DEFAULT: nothing!! (this used to be: last node)}
 % - options  ::string:
 %     '-s'   : show
@@ -37,35 +37,35 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function tree = delete_tree (intree, inodes, options)
+function tree = delete_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 tree         = intree;
 
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('inodes', [])
+p.addParameter('w', false, @isBinary)
+p.addParameter('r', false, @isBinary)
+p.addParameter('x', false, @isBinary)
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {'inodes'}, {'w', 'r', 'x', 's'});
+%==============================================================================%
+
 dA           = tree.dA;      % directed adjacency matrix of tree
 N            = size (dA, 1); % number of nodes in tree
 
-if (nargin < 2) || isempty (inodes)
-    % {DEFAULT: nothing!! (this used to be: last node)}
-    inodes   = [];
+if islogical (pars.inodes) && numel (pars.inodes) == N
+    pars.inodes   = find (pars.inodes);
 end
 
-if islogical (inodes) && numel (inodes) == N
-    inodes   = find (inodes);
-end
-
-if size (inodes, 1) == N
+if size (pars.inodes, 1) == N
     % all nodes are deleted, return empty vector:
     tree = [];
     return
 end
 
-if (nargin < 3) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
-
-if contains (options, '-x')
+if pars.x
     append_children = false;
 else
     append_children = true;
@@ -75,20 +75,20 @@ end
 % each time, using sindex:
 sindex           = 1 : N;
 
-if contains (options, '-w')      % waitbar option: initialization
-    if length    (inodes) > 499
+if pars.w      % waitbar option: initialization
+    if length    (pars.inodes) > 499
         HW       = waitbar (0, 'deleting nodes...');
         set      (HW, 'Name', '..PLEASE..WAIT..YEAH..');
     end
 end
-for counter      = 1 : length (inodes)
-    if contains  (options, '-w')  % waitbar option: update
+for counter      = 1 : length (pars.inodes)
+    if pars.w  % waitbar option: update
         if mod   (counter, 500) == 0
-            waitbar (counter / length (inodes), HW);
+            waitbar (counter / length (pars.inodes), HW);
         end
     end
     % find the node index corresponding to the pruned tree:
-    inode        = find (inodes (counter) == sindex);
+    inode        = find (pars.inodes (counter) == sindex);
     % delete this node from the index list
     sindex (inode) = [];
     % find the column in dA corresponding to this node
@@ -107,8 +107,8 @@ for counter      = 1 : length (inodes)
     dA (inode, :) = [];
     %end
 end
-if contains      (options, '-w')  % waitbar option: close
-    if length    (inodes) > 499
+if pars.w  % waitbar option: close
+    if length    (pars.inodes) > 499
         close    (HW);
     end
 end
@@ -120,13 +120,13 @@ for counter      = 1 : length (S)
     if ~strcmp   (S{counter}, 'dA')
         vec      = tree.(S{counter});
         if isvector (vec) && (numel (vec) == N) && ~(ischar (vec))
-            tree.(S{counter})(inodes)     = [];
+            tree.(S{counter})(pars.inodes)     = [];
         end
     end
 end
 
 % eliminate obsolete regions
-if ~contains (options, '-r')
+if ~pars.r
     if isfield   (tree, 'R')
         [i1, ~, i3]  = unique (tree.R);
         tree.R   = i3;
@@ -148,12 +148,12 @@ if ~append_children && length (iA) > 1
             if ~strcmp   (S{counter2}, 'dA')
                 vec      = dtree.(S{counter2});
                 if isvector (vec) && (numel (vec) == N) && ~(ischar (vec))
-                    dtree.(S{counter2})(inodes)     = [];
+                    dtree.(S{counter2})(pars.inodes)     = [];
                 end
             end
         end
         % eliminate obsolete regions
-        if ~contains  (options, '-r')
+        if ~pars.r
             if isfield   (dtree, 'R')
                 [i1, ~, i3]  = unique (dtree.R);
                 dtree.R   = i3;
@@ -168,7 +168,7 @@ if ~append_children && length (iA) > 1
 end
 
 % display the result
-if contains      (options, '-s')
+if pars.s
     clf;
     hold         on;
     plot_tree    (intree);
@@ -202,8 +202,8 @@ if contains      (options, '-s')
     view         (2);
     grid         on;
     axis         image;
-    if ~isempty  (inodes)
-        pointer_tree (intree, inodes);
+    if ~isempty  (pars.inodes)
+        pointer_tree (intree, pars.inodes);
     end
 end
 

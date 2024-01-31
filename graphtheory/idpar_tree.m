@@ -11,7 +11,7 @@
 % -----
 % - intree   ::integer:      index of tree in trees or structured tree
 % - options  ::string:
-%     '-0'   : the root node is 0 instead of itself, careful this is NEW!!
+%     '-z'   : the root node is 0 instead of itself (Careful, used to be called '-0')
 %     '-s'   : show
 %     {DEFAULT: ''}
 %
@@ -29,27 +29,29 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function idpar = idpar_tree (intree, options)
+function idpar = idpar_tree (intree, varargin)
 
 ver_tree     (intree);                 % verify that input is a tree
 % use only directed adjacency for this function
 dA           = intree.dA;
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('s', false, @isBinary)
+p.addParameter('z', false, @isBinary)
+pars = parseArgs(p, varargin, {}, {'s', 'z'});
+%==============================================================================%
 
 % index to direct parent:
 % simple graph theory: feature of adjacency matrix:
 idpar            = dA * (1 : size (dA, 1))';
 
-if ~contains (options, '-0')
-    % null-compartment (root) becomes index to itsself
+if ~pars.z
+    % null-compartment (root) becomes index to itself
     idpar (idpar == 0) = find ((idpar == 0));
 end
 
-if contains (options,'-s')            % show option
+if pars.s            % show option
     clf; 
     HP           = plot_tree  (intree, [], [], [], [], '-b');
     set          (HP, ...

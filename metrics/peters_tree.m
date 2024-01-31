@@ -19,7 +19,7 @@
 % - synapsedis ::number:  threshold maximum distance between synapses
 %     {DEFAULT: 3}
 % - options  ::
-%     'r'    : resample to 1 um, each tree 
+%     '-r'    : resample to 1 um, each tree 
 % 
 % Output
 % ------
@@ -38,29 +38,22 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function csyns = peters_tree (intree1, intree2, spinedis, synapsedis, options)
+function csyns = peters_tree (intree1, intree2, varargin)
 
 ver_tree     (intree1); % verify that input 1 is a tree structure
-tree1    = intree1;
+tree1        = intree1;
 ver_tree     (intree2); % verify that input 2 is a tree structure
-tree2    = intree2;
+tree2        = intree2;
 
-if (nargin < 3) || isempty (spinedis)
-    % {DEFAULT: 3}
-    spinedis = 3;
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('spinedis', 3, @isnumeric) % TODO check for the size of v
+p.addParameter('synapsedis', 3, @isnumeric)
+p.addParameter('r', true, @isBinary)
+pars = parseArgs(p, varargin, {'spinedis', 'synapsedis'}, {'r'});
+%==============================================================================%
 
-if (nargin < 4) || isempty (synapsedis)
-    % {DEFAULT: 3}
-    synapsedis = 3;
-end
-
-if (nargin < 5) || isempty (options)
-    % {DEFAULT: 3}
-    options  = '';
-end
-
-if ~contains (options, 'r')
+if pars.r
     tree1    = resample_tree (tree1, 1);
     tree2    = resample_tree (tree2, 1);
 end
@@ -76,7 +69,7 @@ for node1        = 1 : lastnode
         (tree2.Z - tree1.Z (node1)).^2);
     %find all nodes that are closer then spinedistance and
     %store the amount of these nodes in c
-    inodes       = find   (distance < spinedis);
+    inodes       = find   (distance < pars.spinedis);
     syns1        = [syns1; ...
         [(node1 + zeros(length (inodes), 1)) inodes (distance (inodes))]];
 end
@@ -100,7 +93,7 @@ while ~isempty (syns1)
         (tree2.Y (syns1 (1, 2)) - tree2.Y (itree2)).^2 + ...
         (tree2.Z (syns1 (1, 2)) - tree2.Z (itree2)).^2);
     syns1 (1, :)     = [];
-    syns1 ((distance1 < synapsedis) & (distance2 < synapsedis), :) = [];
+    syns1 ((distance1 < pars.synapsedis) & (distance2 < pars.synapsedis), :) = [];
 end
 
 format           short g

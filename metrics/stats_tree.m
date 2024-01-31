@@ -15,17 +15,17 @@
 % - intrees  ::tree, cell array of trees OR
 %     cell array of cell array of trees
 %     {DEFAULT: cell array of trees trees}
-% - s        ::cell array of strings: names of the groups of cells. Must be
-%     organized like intrees input.
+% - g        ::cell array of strings: names of the groups of cells. Must be
+%     organized like intrees input. (The variable used to be called s)
 % - name     ::string: file name with path if statistics should be saved as
 %     ".sts" file
 % - options::string:
 %     '-s'  : show results
 %     '-w'  : waitbar
-%     '-2d' : 2d tree, concerns hulls
+%     '-dim2' : 2d tree, concerns hulls (Careful, it used to be '-2d')
 %     '-x'  : no extras (much much less time consuming)
 %     '-f'  : save as file
-%     {DEFAULT: '-w -s -x'}
+%     {DEFAULT: '-w -s'}
 %
 % Output
 % -------
@@ -42,7 +42,7 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [stats, tname, tpath] = stats_tree (intrees, s, tname, options)
+function [stats, name, tpath] = stats_tree (intrees, varargin)
 
 % make intrees cell array convoluted to 2 depth:
 if ~iscell   (intrees)
@@ -54,24 +54,27 @@ else
 end
 
 lens = length (intrees);
-if (nargin < 2) || isempty (s)
-    % {DEFAULT strings: call tree groups '1', '2', ...}
-    s        = num2str ((1 : lens)');
-end
 
-if (nargin < 4) || isempty (options)
-    % {DEFAULT: waitbar and show results}
-    options  = '-w -s -x';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('g', num2str ((1 : lens)'), @iscell) % {DEFAULT strings: call tree groups '1', '2', ...} TODO check for the size of g
+p.addParameter('name', false, @ischar)
+p.addParameter('dim2', false, @isBinary)
+p.addParameter('s', true, @isBinary)
+p.addParameter('w', true, @isBinary)
+p.addParameter('x', false, @isBinary)
+p.addParameter('f', false, @isBinary)
+pars = parseArgs(p, varargin, {'g', 'name'}, {'dim2', 's', 'w', 'x', 'f'});
+%==============================================================================%
 
-if contains (options, '-f') % save as file option
-    if (nargin < 3) || isempty (tname)
-        [tname, tpath] = uiputfile ( ...
+if pars.f % save as file option
+    if isempty (pars.name)
+        [pars.name, tpath] = uiputfile ( ...
             '.sts', ...
             'save trees statistics', ...
             'trees.sts');
-        if tname     == 0
-            tname    = '';
+        if pars.name     == 0
+            pars.name    = '';
             return
         end
     else
@@ -79,10 +82,11 @@ if contains (options, '-f') % save as file option
     end
 end
 
+name             = pars.name;
 gstats           = struct ([]);
 dstats           = struct ([]);
 
-if ~contains (options, '-x')   % extras option
+if pars.x   % extras option
     % sholl plot prescan:
     % first find longest euclidean distance to root among all trees:
     maxlen       = 0;
@@ -98,7 +102,7 @@ if ~contains (options, '-x')   % extras option
     dsholl       = 0 : round (1.1 * 2 * max (maxlen));
 end
 
-if contains (options, '-w') % waitbar option: initialization
+if pars.w % waitbar option: initialization
     HW           = waitbar (0, ...
         'extracting statistics tree by tree ...');
     set          (HW, ...
@@ -106,7 +110,7 @@ if contains (options, '-w') % waitbar option: initialization
 end
 
 for counter1     = 1 : lens % walk through tree groups
-    if contains (options, '-w') % waitbar option: update
+    if pars.w % waitbar option: update
         waitbar  (counter1 ./ lens, HW);
     end
     % number of trees in this group:
@@ -156,7 +160,7 @@ for counter1     = 1 : lens % walk through tree groups
     % center of mass z:
     gstats (counter1).chullz     = zeros (lent, 1);
     
-    if ~contains (options, '-x')   % extras option
+    if pars.x   % extras option
         % sholl intersections:
         dstats (counter1).sholl  = {};
         % asymmetry at branching points:
@@ -211,7 +215,7 @@ for counter1     = 1 : lens % walk through tree groups
         % distribution):
         dstats (counter1).blen{counter2}   = blen_d (blen_d > 0.2);
         
-        if ~contains (options, '-x') % extras option
+        if pars.x % extras option
             % asymmetry:
             dstats (counter1).asym{counter2}   = asym_tree  ( ...
                 intrees{counter1}{counter2}, ...
@@ -222,7 +226,7 @@ for counter1     = 1 : lens % walk through tree groups
                 dsholl);
             
             % calculate convex hull area and put in "ahull"
-            if contains (options, '-2d')
+            if pars.dim2
                 [~, ahull]                     = convhull  (  ...
                     double (intrees{counter1}{counter2}.X), ...
                     double (intrees{counter1}{counter2}.Y));
@@ -237,7 +241,7 @@ for counter1     = 1 : lens % walk through tree groups
             gstats (counter1).hull (counter2)  = ahull;
             
             % density calculation:
-            if contains (options, '-2d')
+            if pars.dim2
                 dhull                          = hull_tree  ( ...
                     intrees{counter1}{counter2}, [], [], [], [], '-2d');
                 [Xt, Yt]                       = cpoints (dhull);
@@ -247,7 +251,7 @@ for counter1     = 1 : lens % walk through tree groups
                     find (iBT), [], '-2d');
             else
                 dhull                          = hull_tree  ( ....
-                    intrees{counter1}{counter2},[],[],[],[],'none');
+                    intrees{counter1}{counter2}, [], [], [], [], 'none');
                 points                         = dhull.vertices;
                 [~, ~, ~, vol]                 = vhull_tree ( ...
                     intrees{counter1}{counter2}, [], points, ...
@@ -280,7 +284,7 @@ for counter1     = 1 : lens % walk through tree groups
         % mean branch order
         gstats (counter1).mbo      (counter2)  = mean ( ...
             dstats (counter1).BO{counter2});
-        if ~contains (options, '-x') % extras option
+        if pars.x % extras option
             gstats (counter1).mparea (counter2)  = mean ( ...
                 dstats (counter1).parea{counter2});
             [cx, cy]                             = cpoints (dhull);
@@ -319,22 +323,22 @@ for counter1     = 1 : lens % walk through tree groups
         end
     end
 end
-if contains (options, '-w') % waitbar option: close
+if pars.w % waitbar option: close
     close        (HW);
 end
 stats.gstats     = gstats;
 stats.dstats     = dstats;
-stats.s          = s;
+stats.s          = pars.g;
 if exist         ('dsholl', 'var')
     stats.dsholl = dsholl;
 end
 
-if ~contains (options, '-x')
+if pars.x
     % flag indicating that extras have been calculated:
     stats.extras = 1;
 end
 
-if contains (options, '-2d')
+if pars.dim2
     % indicate that hulls were calculated for 2D:
     stats.dim    = 2;
 else
@@ -342,13 +346,13 @@ else
     stats.dim    = 3;
 end
 
-if contains (options, '-f')
-    if tname     ~= 0
-        save     ([tpath tname], 'stats');
+if pars.f
+    if name     ~= 0
+        save     ([tpath name], 'stats');
     end
 end
 
-if contains (options, '-s') % show option, see "dstats_tree"
+if pars.s % show option, see "dstats_tree"
     dstats_tree  (stats, [], '-d -c -g');
 end
 

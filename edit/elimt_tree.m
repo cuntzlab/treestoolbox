@@ -13,7 +13,7 @@
 % - intree   ::integer:   index of tree in trees or structured tree
 % - options  ::string:
 %     '-s'   : show
-%     '-0'   : do not eliminate trifurcation at root
+%     '-z'   : do not eliminate trifurcation at root (careful, used to be called '-0')
 %     '-e'   : echo changes
 %     {DEFAULT: ''}
 %
@@ -34,22 +34,25 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [tree, ntrif] = elimt_tree (intree, options)
+function [tree, ntrif] = elimt_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 tree         = intree;
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: nothing}
-    options  = '';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('e', false, @isBinary)
+p.addParameter('z', false, @isBinary)
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {}, {'e', 'z', 's'});
+%==============================================================================%
 
 dA               = tree.dA;            % directed adjacency matrix of tree
 num              = size (dA, 1);       % number of nodes in tree
 sumdA            = ones (1, num) * dA; % actually faster than sum (dA)!
 idpar            = idpar_tree (tree);
 itrif            = find (sumdA > 2);   % find trifurcations
-if contains      (options, '-0')       % do not eliminate root trifurcation
+if pars.z       % do not eliminate root trifurcation
     itrif        = setdiff (itrif, find ((dA * ones (num, 1)) == 0));
 end
 
@@ -123,7 +126,7 @@ for counter      = 1 : length (itrif)
 end
 tree.dA          = dA;
 
-if contains      (options, '-s')   % show option
+if pars.s   % show option
     clf;
     hold         on;
     xplore_tree  (tree);
@@ -139,7 +142,7 @@ if contains      (options, '-s')   % show option
     axis         image;
 end
 
-if contains      (options, '-e')
+if pars.e
     disp         ([ ...
         'elimt_tree: eliminated '  ...
         (num2str (length (itrif))) ...

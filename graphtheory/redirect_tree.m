@@ -34,22 +34,19 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [tree, order] = redirect_tree (intree, istart, options)
+function [tree, order] = redirect_tree (intree, varargin)
 
 ver_tree     (intree);                 % verify that input is a tree
 tree         = intree;
 
-if (nargin < 2) || isempty (istart)
-    % {DEFAULT index: last node in tree}
-    istart   = size (tree.dA, 1);
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('istart', size (tree.dA, 1), @isnumeric) % TODO check the size and type of istart
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {'istart'}, {'s'});
+%==============================================================================%
 
-if (nargin < 3) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
-
-if sum (tree.dA (:, istart)) == 2
+if sum (tree.dA (:, pars.istart)) == 2
     warning      (...
         'TREES:BCTinconsistency', ...
         'branching point! => trifurcation will occur');
@@ -58,7 +55,7 @@ end
 % simple use of the adjacency matrix again
 A                = tree.dA + tree.dA';
 counter          = 1;
-W                = A (:, istart);
+W                = A (:, pars.istart);
 PL               = W;
 resW             = W;
 % maximum depth by 2x maximum path length for when root is in center:
@@ -69,7 +66,7 @@ while ((sum (sum (resW == 1)) ~= 0) && (counter <= maxPL))
     resW         = A * resW;
     PL           = PL + counter .* (resW == 1);
 end
-PL (istart)      = 0;
+PL (pars.istart)      = 0;
 [~, order]          = sort (PL);
 
 % change the trees-structure according to the new order:
@@ -85,7 +82,7 @@ for counter      = 1 : length (S)
     end
 end
 
-if contains (options,'-s') % show option
+if pars.s % show option
     clf;
     hold         on; 
     HP           = plot_tree  (intree, [], [], [], [], '-b');

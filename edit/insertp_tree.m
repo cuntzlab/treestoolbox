@@ -40,48 +40,47 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [tree, indx] = insertp_tree (intree, inode, plens,  options)
+function [tree, indx] = insertp_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 tree         = intree;
-
 N            = size (tree.dA, 1); % number of nodes in tree
-
-if (nargin < 2) || isempty (inode)
-    % {DEFAULT: last node defines the path}
-    inode    = N;
-end
-
 Plen         = Pvec_tree (intree); % path length from the root [um]
 
-if (nargin < 3) || isempty (plens)
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('inode', N, @isnumeric) % TODO check the size and type of fac
+p.addParameter('plens', [])
+p.addParameter('e', true, @isBinary)
+p.addParameter('p', false, @isBinary)
+p.addParameter('pr', false, @isBinary)
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {'inode', 'plens'}, {'e', 'p', 'pr', 's'});
+%==============================================================================%
+
+if isempty (pars.plens)
     % {DEFAULT: every 10 um from the root to inode}
-    if Plen  (inode) > 10 
-        plens    = (0 : 10 : Plen (inode));
+    if Plen  (pars.inode) > 10 
+        pars.plens    = (0 : 10 : Plen (pars.inode));
     else
         % {DEFAULT: halfway to root if inode too close}
-        plens    = Plen (inode) / 2;
+        pars.plens    = Plen (pars.inode) / 2;
     end
-end
-
-if (nargin < 4) || isempty (options)
-    % {DEFAULT: echo changes}
-    options  = '-e'; 
 end
 
 % pathi: node indices of path from inode to root
 ipar             = ipar_tree (intree);
-pathi            = fliplr    (ipar (inode, ipar (inode, :) > 0));
+pathi            = fliplr    (ipar (pars.inode, ipar (pars.inode, :) > 0));
 
 % plen: path lengths from root to nodes on the path
 plen             = Plen';
 plen             = plen    (pathi);
 % don't add points where points are already:
-plens            = setdiff (plens, plen);
+pars.plens       = setdiff (pars.plens, plen);
 % otherwise the branch would explode
-plens            = plens   (plens < max (plen));
+pars.plens       = pars.plens   (pars.plens < max (plen));
 % number of points to be added:
-N2               = length  (plens);
+N2               = length  (pars.plens);
 
 % expand adjacency matrix:
 tree.dA          = [ ...
@@ -90,19 +89,19 @@ tree.dA          = [ ...
     (sparse (N2, N + N2))];
 
 for counter      = 1 : N2
-    iplen        = find (plen >= plens (counter));
+    iplen        = plen >= pars.plens (counter);
     ilen2        = min  (plen (iplen));     % child
-    iplen        = find (plen <  plens (counter));
+    iplen        = find (plen <  pars.plens (counter));
     [ilen1, i2]  = max  (plen (iplen));     % parent
     pos          = iplen (i2);
     % parent node and relative position between both
-    rpos         = (plens (counter) - ilen1) ./ (ilen2 - ilen1);
+    rpos         = (pars.plens (counter) - ilen1) ./ (ilen2 - ilen1);
     ipos         = pathi (pos + 1);
     idpar        = pathi (pos);
     % update path-lengths and path-indices:
     plen         = [ ...
         (plen  (1 : pos)) ...
-        (plens (counter)) ...
+        (pars.plens (counter)) ...
         (plen  (pos + 1 : end))];
     pathi        = [ ...
         (pathi (1 : pos)) ...
@@ -135,7 +134,7 @@ for counter      = 1 : N2
     end
 end
 
-if contains (options, '-s')
+if pars.s
     HP           = plot3 ( ...
         tree.X (N + 1 : N + N2), ...
         tree.Y (N + 1 : N + N2), ...
@@ -147,7 +146,7 @@ end
 [tree, indx]     = sort_tree (tree, '-LO');
 indx             = indx > N;
 
-if contains (options, '-s')
+if pars.s
     clf;
     hold         on;
     xplore_tree  (tree);
@@ -161,7 +160,7 @@ if contains (options, '-s')
     axis         image;
 end
 
-if contains (options, '-e')
+if pars.e
    warning       ('TREES:notetreechange', ...
        ['added ' (num2str (N2)) ' node(s)']);
 end

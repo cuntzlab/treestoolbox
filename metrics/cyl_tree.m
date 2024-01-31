@@ -18,7 +18,7 @@
 % -----
 % - intree   ::integer: index of tree in trees or structured tree
 % - options  ::string:
-%     '-2d'  : output is only X and Y
+%     '-dim2'  : output is only X and Y (Careful, it used to be '-2d')
 %     '-dA'  : XYZ values are written in the correct location of the
 %             adjacency matrix (slower)
 %     {DEFAULT : ''}
@@ -40,28 +40,30 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function  [X1, X2, Y1, Y2, Z1, Z2] = cyl_tree (intree, options)
+function  [X1, X2, Y1, Y2, Z1, Z2] = cyl_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 tree         = intree;
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('dim2', false, @isBinary)
+p.addParameter('dA', false, @isBinary)
+pars = parseArgs(p, varargin, {}, {'dim2', 'dA'});
+%==============================================================================%
 
 X                = tree.X;         % X-locations of nodes on tree
 Y                = tree.Y;         % Y-locations of nodes on tree
 dA               = tree.dA;        % directed adjacency matrix of tree
 
-if ~contains (options, '-dA')
+if ~pars.dA
      % vector containing index to direct parent:
     idpar        = idpar_tree (intree);
     X1           = X (idpar); % then it is simple, right?
     X2           = X;
     Y1           = Y (idpar);
     Y2           = Y;
-    if ~contains (options, '-2d')
+    if ~pars.dim2
         Z        = tree.Z;
         Z1       = Z (idpar);
         Z2       = Z;
@@ -83,7 +85,7 @@ else
     % coordinates of second point in cylinder:
     X2           =      spdiags (X, 0, N, N) * dA;
     Y2           =      spdiags (Y, 0, N, N) * dA;
-    if ~contains (options, '-2d')
+    if ~pars.dim2
         Z        = tree.Z;
         Z1       = dA * spdiags (Z, 0, N, N);
         Z2       =      spdiags (Z, 0, N, N) * dA;

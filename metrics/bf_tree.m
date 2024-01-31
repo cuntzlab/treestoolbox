@@ -1,7 +1,7 @@
 % BF_TREE   Estimates the balancing factor of a tree.
 % (trees package)
 %
-% [bf, k] = bf_tree (input, options)
+% [bf, k] = bf_tree (inputData, values, options)
 % ----------------------------------
 %
 % Returns the centripetal bias k of a tree, vector of root angles, or cell
@@ -10,12 +10,12 @@
 %
 % Input
 % -----
-% - input   ::integer, vector, or cell array:  index of tree in trees or
-%     structured tree, vector of root angles, or cell array of trees
+% - inputData   ::integer, vector, or cell array: structured tree, vector of 
+%      root angles, or cell array of trees
 % - options  ::string:
-%     '-3d'  : three-dimensional distribution
-%     '-2d'  : two-dimensional distribution
-%     {DEFAULT: '-3d'}
+%     '-dim3'  : three-dimensional distribution (Careful, it used to be '-3d')
+%     '-dim2'  : two-dimensional distribution (Careful, it used to be '-2d')
+%     {DEFAULT: '-dim3'}
 % - Values   ::cell array:  contains parameters relating centripetal bias to
 %     balancing factor.
 %     {DEFAULT: Values estimated in Bird and Cuntz 2019}
@@ -27,7 +27,7 @@
 %
 % Example
 % -------
-% bf_tree (sample_tree, '-3d')
+% bf_tree (sample_tree, '-dim3')
 %
 % See also rootangle_tree vonMises_tree MST_tree
 % Uses vonMises_tree
@@ -37,37 +37,41 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [bf, k] = bf_tree (input, options, Values)
+function [bf, k] = bf_tree (inputData, varargin)
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: three dimensional}
-    options   = '-3d';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('dim2', false, @isBinary)
+p.addParameter('dim3', true, @isBinary)
+p.addParameter('values', [], @iscell)
+pars = parseArgs(p, varargin, {'values'}, {'dim2', 'dim3'});
+%==============================================================================%
 
-k             = vonMises_tree (input, options); % Calculate centripetal bias
+k             = vonMises_tree (inputData, ...
+    'dim2', pars.dim2, 'dim3', pars.dim3); % Calculate centripetal bias
 
-if (nargin < 3) || isempty (Values)
+if  isempty (pars.values)
     % {DEFAULT: fit from Bird and Cuntz 2019}
-    Values    = cell (2, 1);
+    pars.values    = cell (2, 1);
     
     Params.a  = 1.201;
     Params.b  = 4.39;
     Params.c  = 0.2857;
-    Values{1} = Params;
+    pars.values{1} = Params;
     
     Params.a  = 0.7331;
     Params.b  = 3.714;
     Params.c  = 0.3331;
-    Values{2} = Params;
+    pars.values{2} = Params;
 end
 
-if contains (options, '-2d')
-    Params    = Values{1};
+if pars.dim2
+    Params    = pars.values{1};
     p1        = Params.a;
     p2        = Params.b;
     p3        = Params.c;
 else
-    Params    = Values{2};
+    Params    = pars.values{2};
     p1        = Params.a;
     p2        = Params.b;
     p3        = Params.c;

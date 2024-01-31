@@ -26,7 +26,7 @@
 %
 % Example
 % -------
-% ipar_tree    (sample_tree, '-s')
+% ipar_tree    (sample_tree, [], '-s')
 %
 % See also   idpar_tree child_tree
 % Uses       PL_tree ver_tree dA
@@ -34,21 +34,19 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function ipar = ipar_tree (intree, options, ipart)
+function ipar = ipar_tree (intree, varargin)
 
 ver_tree     (intree);                 % verify that input is a tree
 % use only directed adjacency for this function
 dA       = intree.dA;
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
-
-if (nargin < 3) || isempty (ipart)
-    % {DEFAULT: all nodes}
-    ipart    = [];%(1 : size (dA, 1))';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('ipart', []) % TODO check the size and type of fac
+p.addParameter('T', false, @isBinary)
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {'ipart'}, {'T', 's'});
+%==============================================================================%
 
 % number of nodes in tree:
 N                = size (dA, 1);
@@ -63,24 +61,24 @@ for counter      = 2 : maxPL + 2
     ipar (:, counter) = V;
 end
 
-if contains      (options, '-T') % Only terminal branches
+if pars.T % Only terminal branches
     B            = B_tree       (intree);
     T            = T_tree       (intree);
-    if ~isempty  (ipart)
-        T        = T (ipart);
+    if ~isempty  (pars.ipart)
+        T        = T (pars.ipart);
     end
     B1           = [0; B];
     ibranch      = cumsum       (B1 (ipar + 1), 2) < 1;
     ipar         = ibranch (T, :) .* ipar (T, :);
-elseif ~isempty      (ipart)
-    ipar         = ipar (ipart, any (ipar (ipart, :) ~= 0, 1));
+elseif ~isempty      (pars.ipart)
+    ipar         = ipar (pars.ipart, any (ipar (pars.ipart, :) ~= 0, 1));
 end
 
 % if ~isempty      (ipart)
 %     ipar         = ipar (ipart, any (ipar (ipart, :) ~= 0, 1));
 % end
 
-if contains (options, '-s') % show option
+if pars.s % show option
     clf;
     imagesc      (ipar);
     ylabel       ('node #');

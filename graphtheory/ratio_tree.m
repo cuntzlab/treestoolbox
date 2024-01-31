@@ -31,26 +31,23 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function ratio = ratio_tree (intree, v, options)
+function ratio = ratio_tree (intree, varargin)
 
 ver_tree     (intree);                 % verify that input is a tree
 
-if (nargin < 2) || isempty (v)
-    % {DEFAULT vector: diameter values from the tree}
-    v = intree.D;
-end
-
-if (nargin < 3) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('v', intree.D, @isnumeric) % TODO check the size and type of v
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {'v'}, {'s'});
+%==============================================================================%
 
  % vector containing index to direct parent:
 idpar            = idpar_tree (intree);
 % well yes, is this worth an extra function?:
-ratio            = v ./ v (idpar);      
+ratio            = pars.v ./ pars.v (idpar);      
 
-if contains (options, '-s')       % show option
+if pars.s       % show option
     clf;
     hold         on; 
     HP           = plot_tree (intree, ratio, [], [], [], '-b');

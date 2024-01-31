@@ -14,7 +14,7 @@
 %     {DEFAULT: all nodes}
 % - options  ::string:
 %     '-s'   : show
-%     '-1'   : output only first child
+%     '-f'   : output only first child (Careful, it used to be '-1')
 %     {DEFAULT: ''}
 %
 % Output
@@ -33,35 +33,33 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function idchild = idchild_tree (intree, ipart, options)
+function idchild = idchild_tree (intree, varargin)
 
 ver_tree     (intree);                 % verify that input is a tree
 % use only directed adjacency for this function
 dA           = intree.dA;
 N            = size (dA, 1);
 
-if (nargin < 2) || isempty (ipart)
-    % {DEFAULT index: select all nodes/points}
-    ipart    = (1 : N)';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('ipart', (1 : N)', @isnumeric) % TODO check the size and type of ipart
+p.addParameter('s', false, @isBinary)
+p.addParameter('f', false, @isBinary)
+pars = parseArgs(p, varargin, {'ipart'}, {'s', 'f'});
+%==============================================================================%
 
-if (nargin < 3) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
+idchild          = NaN (numel (pars.ipart), 2);
+[row, col]       = find (dA (:, pars.ipart));
 
-idchild          = NaN (numel (ipart), 2);
-[row, col]       = find (dA (:, ipart));
-
-for n            = 1 : numel (ipart)
+for n            = 1 : numel (pars.ipart)
     idchild (n, 1 : sum (col == n)) = row (col == n)';
 end
 
-if contains (options, '-1')
+if pars.f
    idchild       = idchild (:, 1); 
 end
 
-if contains (options, '-s')            % show option
+if pars.s            % show option
     clf; 
     HP           = plot_tree  (intree, [], [], [], [], '-b');
     set          (HP, ...

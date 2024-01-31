@@ -28,9 +28,15 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function surf = surf_tree (intree, options)
+function treeSurf = surf_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
+
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {}, {'s'});
+%==============================================================================%
 
 % use only local diameters vector for this function
 isfrustum    = 0;
@@ -41,32 +47,27 @@ if ...
     isfrustum  = 1;
 end
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
-
 len              = len_tree   (intree); % length values of tree segments
 if isfrustum
     idpar        = idpar_tree (intree); % indices to direct parent
     % surface according to frustum (cone) like segments:
-    surf         = (pi * (D + D (idpar)) / 2) .* ...
+    treeSurf         = (pi * (D + D (idpar)) / 2) .* ...
         sqrt   (len.^2 + (D - D (idpar)).^2 / 4);
 else
     % surface according to cylinder segments:
-    surf         =  pi *  D .* len;
+    treeSurf         =  pi *  D .* len;
 end
 
-if contains (options, '-s') % show option
-    ipart        = find (surf ~= 0); % single out non-0-length segments
+if pars.s % show option
+    ipart        = find (treeSurf ~= 0); % single out non-0-length segments
     clf;
     hold         on;
-    HP           = plot_tree (intree, surf (ipart), [], ipart, [], '-b');
+    HP           = plot_tree (intree, treeSurf (ipart), [], ipart, [], '-b');
     set          (HP, ...
         'edgecolor',           'none');    
     colorbar;
     title        ( ...
-        ['surface in \mum^2 [total ' (num2str (round (sum (surf)))) ']']);
+        ['surface in \mum^2 [total ' (num2str (round (sum (treeSurf)))) ']']);
     xlabel       ('x [\mum]');
     ylabel       ('y [\mum]');
     zlabel       ('z [\mum]');

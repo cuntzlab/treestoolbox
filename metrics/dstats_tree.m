@@ -33,7 +33,7 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function dstats_tree (stats, vcolor, options)
+function dstats_tree (stats, varargin)
 
 if (nargin < 1) || isempty (stats)
     [tname, path] = uigetfile ( ...
@@ -46,10 +46,19 @@ if (nargin < 1) || isempty (stats)
     stats    = data.stats;
 end
 
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('vcolor', []) %TODO check for the size and type of vcolor
+p.addParameter('g', true, @isBinary)
+p.addParameter('d', true, @isBinary)
+p.addParameter('c', true, @isBinary)
+pars = parseArgs(p, varargin, {'vcolor'}, {'g', 'd', 'c'});
+%==============================================================================%
+
 lens         = length (stats.gstats);
 
-if (nargin < 2) || isempty (vcolor)
-    vcolor   = [ ...
+if isempty (pars.vcolor)
+    pars.vcolor = [ ...
         [0 0 0]; ...
         [1 0 0]; ...
         [0 1 0]; ...
@@ -57,13 +66,9 @@ if (nargin < 2) || isempty (vcolor)
         (rand (lens - 4, 3))];
 end
 
-if (nargin < 3) || isempty (options)
-    options  = '-d -g -c';
-end
-
 clf;
-if contains (options, '-g')
-    if contains (options, '-d')
+if pars.g
+    if pars.d
         by                     = 2;
     else
         by                     = 1;
@@ -158,14 +163,14 @@ if contains (options, '-g')
                 mean  (y), ...
                 1.2 * (counter1 - 1), 's');
             set                (HP, ...
-                'color',       vcolor (counter1, :), ...
-                'markerfacecolor', vcolor (counter1, :));
+                'color',       pars.vcolor (counter1, :), ...
+                'markerfacecolor', pars.vcolor (counter1, :));
             HL                 = line ( ...
                 mean  (y) + [-std(y) std(y)], ...
                 [1 1] * (1.2 * (counter1 - 1)));
             set                (HL, ...
                 'linewidth',   2, ...
-                'color',       vcolor (counter1, :));
+                'color',       pars.vcolor (counter1, :));
             if diff (lxax)     == 0
                 lxax           = sort ([0.9 1.1] .* lxax);
             end
@@ -189,8 +194,8 @@ if contains (options, '-g')
     end
 end
 
-if contains               (options, '-d')
-    if contains           (options, '-g')
+if pars.d
+    if pars.g
         by                     = 2;
     else
         by                     = 1;
@@ -278,9 +283,9 @@ if contains               (options, '-d')
                 xax            = 0 : ceil (maxBO);
             end
             for counter3       = 1 : length (y)
-                yax            = histc (y{counter3}, xax)';
+                yax            = histax (y{counter3}, xax)';
                 yax            = yax ./ max (yax);
-                if contains (options, '-c') % smoothing:
+                if pars.c % smoothing:
                     HP         = plot ( ...
                         xax, ...
                         1.2 * (counter1 - 1) + ...
@@ -292,20 +297,20 @@ if contains               (options, '-d')
                         yax, '-');
                 end
                 set            (HP, ...
-                    'color',   vcolor (counter1, :));
+                    'color',   pars.vcolor (counter1, :));
             end
             HP                 = plot ( ...
                 mean (ym), ...
                 1.2 * (counter1 - 1), 's');
             set                (HP, ...
-                'color',           vcolor (counter1, :), ...
-                'markerfacecolor', vcolor (counter1, :));
+                'color',           pars.vcolor (counter1, :), ...
+                'markerfacecolor', pars.vcolor (counter1, :));
             HL                 = line ( ...
                 mean (ym) + [(-std (ym)) (std (ym))], ...
                 [1 1] * (1.2 * (counter1 - 1)));
             set                (HL, ...
                 'linewidth',   2, ...
-                'color',       vcolor (counter1, :));
+                'color',       pars.vcolor (counter1, :));
             xlim               ([(min (xax)) (max (xax))]);
             ylim               ([-0.2 (lens * 1.2)]);
             if counter2        == 1
@@ -338,7 +343,7 @@ if contains               (options, '-d')
             for counter3       = 1 : length (y)
                 yax            = y{counter3};
                 yax            = yax ./ max (yax);
-                if contains (options, '-c') % smoothing:
+                if pars.c % smoothing:
                     HP         = plot ( ...
                         stats.dsholl (indy_dsholl), ...
                         convn (yax (indy_dsholl), ones(1, 5) / 5, 'same') + ...
@@ -350,7 +355,7 @@ if contains               (options, '-d')
                         1.2 * (counter1 - 1), '-');
                 end
                 set            (HP, ...
-                    'color',   vcolor (counter1, :));
+                    'color',   pars.vcolor (counter1, :));
             end
             xlim               ([0 (max (stats.dsholl))]);
             ylim               ([-0.2 (lens * 1.2)]);

@@ -34,17 +34,19 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function strahler = strahler_tree (intree, options)
+function strahler = strahler_tree (intree, varargin)
 
 ver_tree (intree); % verify that input is a tree structure
 
-if (nargin < 2) || isempty (options)
-    options  = ''; % {DEFAULT: no option}
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('s', false, @isBinary)
+pars = parseArgs(p, varargin, {}, {'s'});
+%==============================================================================%
 
 T                = T_tree (intree);
 strahler         = double (T);
-idpar            = idpar_tree (intree, '-0');
+idpar            = idpar_tree (intree, '-z');
 pid              = idpar  (T);
 
 counter          = 1;
@@ -93,7 +95,7 @@ while ~isempty   (find (strahler == 0, 1))
     end
 end
 
-if contains (options, '-s') % show option
+if pars.s % show option
     clf;
     hold         on;
     HP           = plot_tree (intree, strahler, [], [], [], '-b');
