@@ -1,7 +1,11 @@
 function pars = parseArgs(p, inputArgs, argNames, optionsNames)
 
 numArgs = numel(inputArgs);
-if (numArgs > 0 && ischar(inputArgs{1}) && ~startsWith(inputArgs{1}, '-')) ...
+if (numArgs > 0 && ...
+        ischar(inputArgs{1}) && ...
+        ~startsWith(inputArgs{1}, '-') && ...
+        ~isempty(inputArgs{1}) && ...
+        ~contains(inputArgs{1}, 'none')) ...
         || numArgs == 0
     p.parse(inputArgs{:})
 else
@@ -14,15 +18,21 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function args = parsePositionalArgs(inputArgs, argNames, optionsNames)
+
 optionsPos = numel(argNames) + 1; % Always comes at the end after all the other arguments
 % Check if the options argument is provided
 if numel(inputArgs) >= optionsPos
-    mask = cellfun(@(x) contains(inputArgs{optionsPos}, x), optionsNames);
-    optionsNames = optionsNames(mask);
-    numOptions   = numel(optionsNames);
+    if isempty(inputArgs{optionsPos}) || contains(inputArgs{optionsPos}, 'none')
+        optionVal    = false;
+    else
+        mask = cellfun(@(x) contains(inputArgs{optionsPos}, x), optionsNames);
+        optionsNames = optionsNames(mask);
+        optionVal    = true;
+    end
+    numOptions       = numel(optionsNames);
     options          = cell(1, numOptions*2);
     options(1:2:end) = optionsNames;
-    options(2:2:end) = repelem({true}, numOptions);
+    options(2:2:end) = repelem({optionVal}, numOptions);
 
     inputArgs(optionsPos) = []; % Now delete the options argument from the input
 end
