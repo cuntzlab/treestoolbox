@@ -1,14 +1,14 @@
-classdef TTree < handle
-    % TTree    TTree class that stores tree structure along with other
+classdef Tree < handle
+    % trees.Tree    trees.Tree class that stores tree structure along with other
     %         properties.
     % (trees package)
     %
     % See
     %
-    % tree = TTree (intree, properties)
+    % tree = trees.Tree (intree, properties)
     % ------------------------------
     %
-    % Creates an instance of a TTree class from the given tree structure in tree_struct. Optionally takes a second
+    % Creates an instance of a trees.Tree class from the given tree structure in tree_struct. Optionally takes a second
     % structure properties that stores properties of the tree.
     %
     % Input
@@ -19,12 +19,12 @@ classdef TTree < handle
     %
     % Output
     % ------
-    % - tree     ::instance of TTree class representing intree
+    % - tree     ::instance of trees.Tree class representing intree
     %
     % Example
     % -------
-    % TTree(sample_tree);
-    % TTree(sample_tree, struct('name', 'mytree'));
+    % trees.Tree(sample_tree);
+    % trees.Tree(sample_tree, struct('name', 'mytree'));
     %
     % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
     % Copyright (C) 2009 - 2016  Hermann Cuntz
@@ -49,11 +49,11 @@ classdef TTree < handle
     % private methods
     methods (Access='protected')
         function container = CONTAINER(self)
-             container = @TREES;
+             container = @trees.Trees;
         end
 
         function self = SELF(self)
-             self = @TTree;
+             self = @trees.Tree;
         end
 
         function tree = make_tree_(self, t)
@@ -70,7 +70,7 @@ classdef TTree < handle
 
     methods(Static)
         function tree = load(filename)
-            % tree = TTree.load(filename)
+            % tree = trees.Tree.load(filename)
             % ------------------------------
             %
             % Loads a tree from a given file name via load_tree, static method.
@@ -81,11 +81,11 @@ classdef TTree < handle
             %
             % Output
             % ------
-            % - tree     ::instance of TTree class
+            % - tree     ::instance of trees.Tree class
             %
             % Example
             % -------
-            % TTree.load('mytree');
+            % trees.Tree.load('mytree');
             %
             % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
             % Copyright (C) 2009 - 2024  Hermann Cuntz
@@ -97,16 +97,16 @@ classdef TTree < handle
                tree = [];
                return;
             end
-            tree = TTree(tree);
+            tree = trees.Tree(tree);
         end
         
         % template for factory method
         function tree = MST(varargin)
             tree = MST_tree(varargin{:});
             if iscell(tree)
-                tree = TREES(tree);
+                tree = Trees(tree);
             else
-                tree = TTree(tree);
+                tree = trees.Tree(tree);
             end
         end
 
@@ -114,11 +114,11 @@ classdef TTree < handle
 
     % public methods
     methods
-        function self = TTree(varargin)
-            % tree = TTree (intree, properties)
+        function self = Tree(varargin)
+            % tree = trees.Tree (intree, properties)
             % ------------------------------
             %
-            % Creates an instance of a TTree class from the given tree structure in tree_struct. Optionally takes a second
+            % Creates an instance of a trees.Tree class from the given tree structure in tree_struct. Optionally takes a second
             % structure properties that stores properties of the tree.
             %
             % Input
@@ -129,12 +129,12 @@ classdef TTree < handle
             %
             % Output
             % ------
-            % - tree     ::instance of TTree class representing intree
+            % - tree     ::instance of trees.Tree class representing intree
             %
             % Example
             % -------
-            % TTree(sample_tree);
-            % TTree(sample_tree, struct('name', 'mytree'));
+            % trees.Tree(sample_tree);
+            % trees.Tree(sample_tree, struct('name', 'mytree'));
             %
             % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
             % Copyright (C) 2009 - 2024  Hermann Cuntz
@@ -152,7 +152,7 @@ classdef TTree < handle
         end
         
         function self = repair(self)
-            while isa(self.tree_, 'TTree')
+            while isa(self.tree_, 'trees.Tree')
                 self.tree_ = self.tree_.tree_;
             end
         end
@@ -183,7 +183,7 @@ classdef TTree < handle
                            return;
                        end
                    end
-                   if numel(varargout) == 1 && isstruct(varargout{1}) && ~isa(varargout{1}, 'TTree') && isfield(varargout{1}, 'dA') && ~strcmp(name, 'tree')
+                   if numel(varargout) == 1 && isstruct(varargout{1}) && ~isa(varargout{1}, 'trees.Tree') && isfield(varargout{1}, 'dA') && ~strcmp(name, 'tree')
                        varargout{1} = feval(sprintf('%s', class(self)), varargout{1}, self.props_);
                    end
                case '{}'
@@ -210,7 +210,7 @@ classdef TTree < handle
             % props = props()
             % ------------------------------
             %
-            % Returns the properties of a TTree instance.
+            % Returns the properties of a trees.Tree instance.
             %
             % Input
             % -----
