@@ -14,7 +14,6 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function args = parsePositionalArgs(inputArgs, argNames, optionsNames)
-
 optionsPos = numel(argNames) + 1; % Always comes at the end after all the other arguments
 % Check if the options argument is provided
 if numel(inputArgs) >= optionsPos
