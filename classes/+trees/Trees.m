@@ -1,4 +1,4 @@
-classdef TREES < handle
+classdef Trees < handle
 
     % constants
     properties (Constant=true, GetAccess='protected')
@@ -30,10 +30,10 @@ classdef TREES < handle
     % private methods
     methods (Access='protected')
         function containee = CONTAINEE(self)
-             containee = @TTree;
+             containee = @trees.Tree;
         end
         function self = SELF(self)
-             self = @TREES;
+             self = @trees.Trees;
         end
 
         function waitbar(self, s)
@@ -41,7 +41,7 @@ classdef TREES < handle
                 return;
             end
 
-            n = numel(self.trees());
+            n = numel(self.ttrees());
             if self.wait_msg_
                 msg = sprintf('%s: processing objects... [%d / %d]', self.wait_msg_, s, n);
             else
@@ -81,11 +81,11 @@ classdef TREES < handle
 
     methods(Static)
 
-        function trees = load(filename)
-            % trees = TREES.load(filename)
+        function ttrees = load(filename)
+            % ttrees = trees.Trees.load(filename)
             % ------------------------------
             %
-            % Loads a collection of trees from a given file name via load_tree, static method.
+            % Loads a collection of ttrees from a given file name via load_tree, static method.
             %
             % Input
             % -----
@@ -93,33 +93,33 @@ classdef TREES < handle
             %
             % Output
             % ------
-            % - trees     ::instance of TREES class
+            % - ttrees     ::instance of trees.Trees class
             %
             % Example
             % -------
-            % TREES.load('mytrees.mtr');
+            % trees.Trees.load('mytrees.mtr');
             %
-            % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
+            % the TREES toolbox: edit, generate, visualise and analyse neuronal ttrees
             % Copyright (C) 2009 - 2024  Hermann Cuntz
 
             if exist(filename, 'file')
-               trees = load_tree(filename);
+               ttrees = load_tree(filename);
             else
                warning('File %s does not exist!', filename);
-               trees = [];
+               ttrees = [];
                return;
             end
-            trees = TREES.from_trees(trees{1});
+            ttrees = trees.Trees.from_trees(ttrees{1});
         end
 
-        function trees = from_trees(trees)
-        % trees = TREES.from_trees(trees) is the same as trees = TREES(trees)
-        % where the input 'trees' is a cell array that contains tree structs
-            ts = TTree.empty();
-            for i = 1 : numel(trees)
-                ts(i) = TTree(trees{i});
+        function ttrees = from_trees(ttrees)
+        % ttrees = trees.Trees.from_trees(ttrees) is the same as ttrees = trees.Trees(ttrees)
+        % where the input 'ttrees' is a cell array that contains tree structs
+            ts = trees.Tree.empty();
+            for i = 1 : numel(ttrees)
+                ts(i) = trees.Tree(ttrees{i});
             end
-            trees = TREES(ts);
+            ttrees = trees.Trees(ts);
         end
 
     end
@@ -127,11 +127,11 @@ classdef TREES < handle
     % public methods
     methods
         % constructor
-        function self = TREES(varargin)
+        function self = Trees(varargin)
             if nargin > 0
-                trees = varargin{1};
+                ttrees = varargin{1};
             else
-                trees = [];
+                ttrees = [];
             end
             if nargin > 1
                 props = varargin{2};
@@ -144,31 +144,31 @@ classdef TREES < handle
                 name = [];
             end
             self.name_ = name;
-            if isstruct(trees)
-                ts = TTree.empty();
-                ts(1) = TTree(trees, props);
-            elseif iscell(trees)
+            if isstruct(ttrees)
+                ts = trees.Tree.empty();
+                ts(1) = trees.Tree(ttrees, props);
+            elseif iscell(ttrees)
                 ts = feval(self.CONTAINEE);
                 idx = 1;
-                for i=1:numel(trees)
-                    n = trees{i};
+                for i=1:numel(ttrees)
+                    n = ttrees{i};
                     if numel(n) == 0
                         warning('skipping empty cell at position %d', i);
                         continue;
                     end
-                    if ~isa(n, 'TTree')
-                        n = TTree(n, props);
+                    if ~isa(n, 'trees.Tree')
+                        n = trees.Tree(n, props);
                     end
                     ts(idx) = n;
                     idx = idx + 1;
                 end
             else
-                ts = trees;
+                ts = ttrees;
             end
             self.trees_ = ts;
             self.props_ = props;
             self.name_ = name;
-            self.waitbar_min_size_ = TREES.DEFAULT_WAITBAR_MIN_SIZE;
+            self.waitbar_min_size_ = trees.Trees.DEFAULT_WAITBAR_MIN_SIZE;
             self.log_level_ = false;
         end
 
@@ -180,46 +180,46 @@ classdef TREES < handle
             self.name_ = n;
         end
 
-        function trees = trees(self)
-            trees = self.trees_;
+        function ttrees = ttrees(self)
+            ttrees = self.trees_;
         end
 
-        function trees = to_trees(self)
+        function ttrees = to_trees(self)
             ts = {};
             for i = 1:numel(self.trees_)
                 t = self.trees_(i);
                 ts = cat(1, ts, t.tree());
             end
-            trees = ts;
+            ttrees = ts;
         end
 
         function slf = add_tree(self, tree, varargin)
             % slf = add_tree(self, tree, varargin)
             % ------------------------------
             %
-            % Appends a tree to the object TREES.
+            % Appends a tree to the object trees.Trees.
             %
             % Input
             % -----
-            % - tree      ::struct, or instance of TTree class
+            % - tree      ::struct, or instance of trees.Tree class
             %
             % Output
             % ------
-            % - trees     ::instance of TREES class
+            % - ttrees     ::instance of trees.Trees class
             %
             % Example
             % -------
-            % TREES.load('mytrees.mtr');
+            % trees.Trees.load('mytrees.mtr');
             %
-            % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
+            % the TREES toolbox: edit, generate, visualise and analyse neuronal ttrees
             % Copyright (C) 2009 - 2024  Hermann Cuntz
-            if ~isa(tree, 'TTree')
+            if ~isa(tree, 'trees.Tree')
                 if iscell(tree)
                     for i = 1:numel(tree)
                         self.add_tree(tree{i}, varargin{:});
                     end
                 else
-                    self.add_tree(TTree(tree, varargin{:}));
+                    self.add_tree(trees.Tree(tree, varargin{:}));
                 end
             else
                 if numel(self.trees_) == 0
@@ -231,19 +231,19 @@ classdef TREES < handle
             slf = self;
         end
 
-        function slf = add_trees(self, trees, varargin)
-            if isa(trees, 'TREES') || isa(trees, 'TTree')
-                if isa(trees, 'TREES')
-                    trees = trees.trees_;
+        function slf = add_trees(self, ttrees, varargin)
+            if isa(ttrees, 'trees.Trees') || isa(ttrees, 'trees.Tree')
+                if isa(ttrees, 'trees.Trees')
+                    ttrees = ttrees.trees_;
                 else
-                    trees = trees.tree;
+                    ttrees = ttrees.tree;
                 end
-                for i=1:numel(trees)
-                    self.add_tree(trees(i), varargin{:});
+                for i=1:numel(ttrees)
+                    self.add_tree(ttrees(i), varargin{:});
                 end
             elseif iscell(tree)
-                for i = 1:numel(trees)
-                    self.add_tree(trees{i}, varargin{:});
+                for i = 1:numel(ttrees)
+                    self.add_tree(ttrees{i}, varargin{:});
                 end
             end
             slf = self;
@@ -379,7 +379,7 @@ classdef TREES < handle
                          end
                          args = args2;
                      end
-                     if numel(find(ismember(methods(self.trees()), method))) > 0
+                     if numel(find(ismember(methods(self.ttrees()), method))) > 0
                          self.set_waitbar_msg(method);
                          x = self.perform_arguments(method, args);
                          out = x;
@@ -400,7 +400,7 @@ classdef TREES < handle
                      else
                          args = {};
                      end
-                     if numel(find(ismember(methods(self.trees()), s(1).subs))) > 0 || ...
+                     if numel(find(ismember(methods(self.ttrees()), s(1).subs))) > 0 || ...
                             any(arrayfun(@(x) numel(x{1})==1, strfind(self.TREE_PROPERTIES, s(1).subs)))
                          self.set_waitbar_msg(s(1).subs);
                          x = self.perform(s(1).subs, args{:});
@@ -410,7 +410,7 @@ classdef TREES < handle
                          if exist(treefun, 'file')
                              tf = str2func(treefun);
                              self.set_waitbar_msg(treefun);
-                             if numel(find(strcmp(TREES.POPULATION_FUNCTIONS, treefun))) > 0
+                             if numel(find(strcmp(trees.Trees.POPULATION_FUNCTIONS, treefun))) > 0
                                 out = tf(self.to_trees(), args{:});
                              else
                                 out = self.map_tree(tf, args{:});
@@ -424,7 +424,7 @@ classdef TREES < handle
                  st = s(1);
                  st.type = '()';
                  out = builtin('subsref', self.trees_, st);
-                 if ~strcmp(class(out), class(self)) && ~isscalar(out) && strcmp(class(out), class(self.trees()))
+                 if ~strcmp(class(out), class(self)) && ~isscalar(out) && strcmp(class(out), class(self.ttrees()))
                     out = feval(sprintf('%s', class(self)), out, self.props_, self.name_);
                     if numel(s) > 1
                         out = out.subsref(s(2:end));
@@ -436,7 +436,7 @@ classdef TREES < handle
                  end
               case '()'
                  out = builtin('subsref', self.trees_, s(1));
-                 if ~strcmp(class(out), class(self)) && ~isscalar(out) && strcmp(class(out), class(self.trees()))
+                 if ~strcmp(class(out), class(self)) && ~isscalar(out) && strcmp(class(out), class(self.ttrees()))
                     out = feval(sprintf('%s', class(self)), out, self.props_, self.name_);
                     if numel(s) > 1
                         out = out.subsref(s(2:end));
@@ -447,7 +447,7 @@ classdef TREES < handle
                      end
                  end
            end
-           if ~strcmp(class(out), class(self)) && ~isscalar(out) && strcmp(class(out), class(self.trees()))
+           if ~strcmp(class(out), class(self)) && ~isscalar(out) && strcmp(class(out), class(self.ttrees()))
                out = feval(sprintf('%s', class(self)), out, self.props_, self.name_);
                out.set_log_level(self.log_level_);
            end
@@ -473,45 +473,45 @@ classdef TREES < handle
             if numel(varargin) > 0
                 varname = varargin{1};
             else
-                varname = 'trees';
+                varname = 'ttrees';
             end
             S = struct();
             S.(varname) = self;
             save(filename, '-struct', 'S');
         end
 
-        function trees = sort_by_prop_value(self, prop)
+        function ttrees = sort_by_prop_value(self, prop)
             ts = self.trees_;
-            trees = feval(sprintf('%s', class(self.trees_)));
+            ttrees = feval(sprintf('%s', class(self.trees_)));
             props = self.perform('prop', prop);
             [~, idx] = sort(props);
             for i=1:numel(ts)
-                trees(i) = ts(idx(i));
+                ttrees(i) = ts(idx(i));
             end
         end
 
-        function trees = split_forests(self)
+        function ttrees = split_forests(self)
             ts = self.trees_;
-            trees = feval(sprintf('%s', class(self.trees_)));
+            ttrees = feval(sprintf('%s', class(self.trees_)));
             k = 1;
             for i=1:numel(ts)
                 self.waitbar(i);
                 tss = ts(i).split_forest();
-                tssn = tss.trees();
+                tssn = tss.ttrees();
                 for j=1:numel(tssn)
-                    trees(k) = tssn(j);
+                    ttrees(k) = tssn(j);
                     k = k + 1;
                 end
             end
             self.waitbar(-1);
             if k == 1
-                trees = [];
+                ttrees = [];
             end
         end
 
         function map = prop_count_map(self, prop)
             map = containers.Map();
-            ts = self.trees();
+            ts = self.ttrees();
             for idx = 1:numel(ts)
                 tree = ts(idx);
                 value = tree.prop(prop);
@@ -531,7 +531,7 @@ classdef TREES < handle
             if nargin < 2
                 name = [];
             end
-            ts = self.trees();
+            ts = self.ttrees();
             if iscell(name)
                 props = struct();
                 for i = 1:numel(name)
@@ -561,7 +561,7 @@ classdef TREES < handle
             end
         end
 
-        function trees = filter_func(self, func, varargin)
+        function ttrees = filter_func(self, func, varargin)
             tree = feval(sprintf('%s', class(self.trees_)));
             idx = [];
             s = 1;
@@ -576,19 +576,19 @@ classdef TREES < handle
             if s == 1
                 tree = [];
             end
-            trees = feval(class(self), tree, self.props_, self.name_);
+            ttrees = feval(class(self), tree, self.props_, self.name_);
             self.waitbar(-1);
         end
 
-        function trees = filter_prop_equals(self, prop, value)
-            trees = self.filter_func(...
+        function ttrees = filter_prop_equals(self, prop, value)
+            ttrees = self.filter_func(...
                 @(tree) (ischar(tree.prop(prop)) && strcmp(tree.prop(prop), value)) || ...
                     (~ischar(tree.prop(prop)) && tree.prop(prop) == value));
         end
 
-        function trees = filter_empty(self)
+        function ttrees = filter_empty(self)
             self.set_waitbar_msg('filter_empty');
-            trees = self.filter_func(@(t) ~t.isempty());
+            ttrees = self.filter_func(@(t) ~t.isempty());
         end
 
         function idx = index_prop(self, prop, value)
@@ -655,15 +655,15 @@ classdef TREES < handle
         %    out = {};
         %    bb = self.perform('bbox');
         %    s = max(abs(min([dx(:); dy(:); dz(:)])), abs(max([dx(:); dy(:); dz(:)])));
-        %    for idx = 1:numel(self.trees())
-        %        out{idx} = self.trees(idx).scale(s);
+        %    for idx = 1:numel(self.ttrees())
+        %        out{idx} = self.ttrees(idx).scale(s);
         %    end
         %end
 
         function typen = typeN_points(self)
             typen = [];
-            for idx = 1:numel(self.trees())
-                tn = typeN_tree(self.trees(idx).tree());
+            for idx = 1:numel(self.ttrees())
+                tn = typeN_tree(self.ttrees(idx).tree());
                 tnc = [numel(tn(tn == 0)), numel(tn(tn == 1)), numel(tn(tn == 2))];
                 typen = [typen; tnc];
             end
@@ -717,7 +717,7 @@ classdef TREES < handle
                     t = self.trees_(i);
                     x = t.map_tree(func, varargin{:});
                     out{i} = x;
-                    if ~isa(x, 'TTree')
+                    if ~isa(x, 'trees.Tree')
                         wrap = false;
                     end
                 catch err
@@ -779,11 +779,11 @@ classdef TREES < handle
         end
 
         function varargout = perform_(self, name, varargin)
-            [varargout{1:nargout}] = arrayfun(@(x) x.(name)(varargin{:}), self.trees(), 'UniformOutput', false);
+            [varargout{1:nargout}] = arrayfun(@(x) x.(name)(varargin{:}), self.ttrees(), 'UniformOutput', false);
         end
 
         function out = perform_arguments(self, name, args)
-            N = numel(self.trees());
+            N = numel(self.ttrees());
             out = cell(N, 1);
             wrap = true;
             j = 1;
@@ -800,13 +800,13 @@ classdef TREES < handle
                         ai = args{i};
                     end
                     out{j} = n.(name)(ai{:});
-                    if isa(out{j}, 'TREES')
+                    if isa(out{j}, 'trees.Trees')
                         ts = out{j}.trees_;
                         for k=1:numel(ts)
                             out{j + k - 1} = ts(k);
                         end
                         j = j + numel(ts) - 1;
-                    elseif ~isa(out{j}, 'TTree')
+                    elseif ~isa(out{j}, 'trees.Tree')
                         wrap = false;
                     end
                     j = j + 1;
@@ -826,7 +826,7 @@ classdef TREES < handle
         end
 
         function out = perform(self, name, varargin)
-            N = numel(self.trees());
+            N = numel(self.ttrees());
             out = cell(N, 1);
             wrap = true;
             j = 1;
@@ -835,19 +835,19 @@ classdef TREES < handle
                 n = self.trees_(i);
                 try
                     out{i} = n.(name)(varargin{:});
-                    if isa(out{j}, 'TREES')
+                    if isa(out{j}, 'trees.Trees')
                         ts = out{j}.trees_;
                         for k=1:numel(ts)
                             out{j + k - 1} = ts(k);
                         end
                         j = j + numel(ts) - 1;
-                    elseif isa(out{j}, 'TTree') && numel(out{j}) > 1
+                    elseif isa(out{j}, 'trees.Tree') && numel(out{j}) > 1
                         ts = out{j};
                         for k=1:numel(ts)
                             out{j + k - 1} = ts(k);
                         end
                         j = j + numel(ts) - 1;
-                    elseif ~isa(out{j}, 'TTree')
+                    elseif ~isa(out{j}, 'trees.Tree')
                         wrap = false;
                     end
                     j = j + 1;
@@ -868,7 +868,7 @@ classdef TREES < handle
         end
 
         function out = perform_func(self, func, varargin)
-            N = numel(self.trees());
+            N = numel(self.ttrees());
             out = cell(N, 1);
             wrap = true;
             for i=1:N
@@ -879,7 +879,7 @@ classdef TREES < handle
                 catch
                     out{i} = [];
                 end
-                if ~isa(out{i}, 'TTree')
+                if ~isa(out{i}, 'trees.Tree')
                     wrap = false;
                 end
             end
@@ -890,11 +890,11 @@ classdef TREES < handle
         end
 
         function varargout = perform_uniform_(self, name, varargin)
-            [varargout{1:nargout}] = arrayfun(@(x) x.(name)(varargin{:}), self.trees());
+            [varargout{1:nargout}] = arrayfun(@(x) x.(name)(varargin{:}), self.ttrees());
         end
 
         function varargout = perform_uniform(self, name, varargin)
-            N = numel(self.trees());
+            N = numel(self.ttrees());
             out = [];
             for i=1:N
                 self.waitbar(i);
@@ -915,12 +915,12 @@ classdef TREES < handle
         end
 
         function varargout = gscale(self, varargin)
-            [varargout{1:nargout}] = gscale_tree(self.trees(), varargin{:});
+            [varargout{1:nargout}] = gscale_tree(self.ttrees(), varargin{:});
         end
 
-        function trees = clone_tree(self, num, bf, options)
-            ts = clone_tree(self.trees(), num, bf, options);
-            trees = TREES.from_trees(ts);
+        function ttrees = clone_tree(self, num, bf, options)
+            ts = clone_tree(self.ttrees(), num, bf, options);
+            ttrees = trees.Trees.from_trees(ts);
         end
 
         function mat = hist_eucl_tree_fun(self, func, varargin)
@@ -933,7 +933,7 @@ classdef TREES < handle
             else
                 ds = varargin{1};
             end
-            dists = arrayfun(@(t) max(eucl_tree(t{1})), self.trees());
+            dists = arrayfun(@(t) max(eucl_tree(t{1})), self.ttrees());
             mat = self.map_tree_mat(@hf, func, ds, max(dists) + ds);
         end
 
@@ -1065,7 +1065,7 @@ classdef TREES < handle
             [cells1, cells2] = self.versus(func1, args1, func2, args2);
 
             if contains(options, '-s')
-                TREES.plot_versus_scalar(label1, cells1, label2, cells2);
+                trees.Trees.plot_versus_scalar(label1, cells1, label2, cells2);
             end
         end
 
@@ -1127,7 +1127,7 @@ classdef TREES < handle
                      [c1, c2] = self.versus_segment_scalar(funcs{i}, {}, funcs{j}, {});
                      fig = figure();
                      set(fig, 'Visible', 'off');
-                     TREES.plot_versus_scalar(labels{i}, c1, labels{j}, c2, fig);
+                     trees.Trees.plot_versus_scalar(labels{i}, c1, labels{j}, c2, fig);
                      saveas(fig, sprintf('out/%s-%s-%s.png', labels_short{i}, labels_short{j}, name));
                      close(fig);
                 end
@@ -1194,10 +1194,10 @@ classdef TREES < handle
         end
 
         function self = save_png(self, name)
-            trees = self.trees();
-            digits = num2str(ceil(log10(numel(trees))));
-            for i=1:numel(trees)
-                n = trees(i);
+            ttrees = self.ttrees();
+            digits = num2str(ceil(log10(numel(ttrees))));
+            for i=1:numel(ttrees)
+                n = ttrees(i);
                 nname = sprintf(strcat(name, '-%0', digits, 'd'), i);
                 n.savepng(nname);
             end
