@@ -37,10 +37,10 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [M, dX, dY, dZ, HP] = gdens_tree (intree, sr, ipart, options)
+function [M, dX, dY, dZ, HP] = gdens_tree (intree, varargin)
 
 % use only node position for this function
-if isnumeric (intree) && numel (intree) > 1
+if isnumeric (intree)
     X        = intree (:, 1);
     Y        = intree (:, 2);
     Z        = intree (:, 3);
@@ -51,50 +51,43 @@ else
     Z        = intree.Z;
 end
 
-if (nargin < 2) || isempty (sr)
-    % {DEFAULT value: 5um sampling}
-    sr       = 5;
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('sr', 5)
+p.addParameter('ipart', (1 : length (X))')
+p.addParameter('s', true, @isBinary)
+pars = parseArgs(p, varargin, {'sr', 'ipart'}, {'s'});
+%==============================================================================%
 
-if (nargin < 3) || isempty (ipart)
-    % {DEFAULT index: select all nodes/points}
-    ipart    = (1 : length (X))';
-end
-
-if (nargin < 4) || isempty (options)
-    % {DEFAULT: show result}
-    options  = '-s';
-end
-
-X                = X   (ipart);
-Y                = Y   (ipart);
-Z                = Z   (ipart);
-dX               = min (X) - 2 * sr : sr : max (X) + 2 * sr;
-dY               = min (Y) - 2 * sr : sr : max (Y) + 2 * sr;
-dZ               = min (Z) - 2 * sr : sr : max (Z) + 2 * sr;
+X                = X   (pars.ipart);
+Y                = Y   (pars.ipart);
+Z                = Z   (pars.ipart);
+dX               = min (X) - 2 * pars.sr : pars.sr : max (X) + 2 * pars.sr;
+dY               = min (Y) - 2 * pars.sr : pars.sr : max (Y) + 2 * pars.sr;
+dZ               = min (Z) - 2 * pars.sr : pars.sr : max (Z) + 2 * pars.sr;
 M                = zeros ( ...
     length  (dY), ...
     length  (dX), ...
     length  (dZ));
 iX               = ...
-    (repmat (X, 1, length (dX)) <  repmat (dX + sr, length (X), 1)) & ...
+    (repmat (X, 1, length (dX)) <  repmat (dX + pars.sr, length (X), 1)) & ...
     (repmat (X, 1, length (dX)) >= repmat (dX,      length (X), 1));
 iY               = ...
-    (repmat (Y, 1, length (dY)) <  repmat (dY + sr, length (Y), 1)) & ...
+    (repmat (Y, 1, length (dY)) <  repmat (dY + pars.sr, length (Y), 1)) & ...
     (repmat (Y, 1, length (dY)) >= repmat (dY,      length (Y), 1));
 iZ               = ...
-    (repmat (Z, 1, length (dZ)) <  repmat (dZ + sr, length (Z), 1)) & ...
+    (repmat (Z, 1, length (dZ)) <  repmat (dZ + pars.sr, length (Z), 1)) & ...
     (repmat (Z, 1, length (dZ)) >= repmat (dZ,      length (Z), 1));
 iX               = sum (iX .* repmat (1 : length (dX), length (X), 1), 2);
 iY               = sum (iY .* repmat (1 : length (dY), length (Y), 1), 2);
 iZ               = sum (iZ .* repmat (1 : length (dZ), length (Z), 1), 2);
 indx             = sub2ind (size (M), iY, iX, iZ);
 uindx            = unique  (indx);
-dX               = dX + sr / 2;
-dY               = dY + sr / 2;
-dZ               = dZ + sr / 2;
-M (uindx)        = histax (indx, uindx);
-if contains (options, '-s')
+dX               = dX + pars.sr / 2;
+dY               = dY + pars.sr / 2;
+dZ               = dZ + pars.sr / 2;
+M (uindx)        = histc (indx, uindx);
+if pars.s
     hold         on;
     minM         = min (min (min (M)));
     maxM         = max (max (max (M)));

@@ -34,26 +34,20 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [HP, M] = lego_tree (intree, sr, thr, options)
+function [HP, M] = lego_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 
-if (nargin < 2) || isempty (sr)
-    % {DEFAULT value: 50 um sampling}
-    sr       = 50;
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('sr', 50)
+p.addParameter('thr', 0)
+p.addParameter('e', false, @isBinary)
+p.addParameter('f', false, @isBinary)
+pars = parseArgs(p, varargin, {'sr', 'thr'}, {'e', 'f'});
+%==============================================================================%
 
-if (nargin < 3) || isempty (thr)
-    % {DEFAULT value: no thresholding}
-    thr      = 0;
-end
-
-if (nargin < 4) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
-
-[M, dX, dY, dZ]  = gdens_tree (intree, sr, [], 'none');
+[M, dX, dY, dZ]  = gdens_tree (intree, pars.sr, [], 'none');
 
 % cube
 cX               = [ ...
@@ -96,7 +90,7 @@ sc               = mean   (diff (dX));      % scaling factor
 % unity cylinder : p = patch (xX',xY',xZ',[0 0 0]);
 
 uM               = unique (M);
-uM               = uM (uM > thr .* max (uM));
+uM               = uM (uM > pars.thr .* max (uM));
 nM               = uM - min (uM);
 if nM            == 0
     nM           = 1;
@@ -157,11 +151,11 @@ for counter      = 1 : length (uM)
         p (5)    = patch  (SX', SY', SZ', uM (counter));
 
         HP       = [HP; p];
-        if ~contains (options, '-e')
+        if ~pars.e
             set  (p, ...
                 'edgecolor',   'none');       % remove black lines
         end
-        if ~contains (options, '-f')
+        if ~pars.f
             set  (p, ...
                 'facealpha',   nM (counter)); % increase opacity / density
         end

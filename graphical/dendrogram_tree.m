@@ -45,45 +45,27 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function HP = dendrogram_tree ( ...
-    intree, diam, yvec, color, DD, wscale, options)
+function HP = dendrogram_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 % use only directed adjacency for this function
 dA           = intree.dA;
 
-if (nargin < 2) || isempty (diam)
-    % {DEFAULT: half of distance between two end-nodes}
-    diam     = 0.5;
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('diam', 0.5)
+p.addParameter('yvec', Pvec_tree(intree))
+p.addParameter('color', [0 0 0])
+p.addParameter('DD', [0 0 0])
+p.addParameter('wscale', 1)
+p.addParameter('p', true, @isBinary)
+p.addParameter('v', false, @isBinary)
+pars = parseArgs(p, varargin, {'diam', 'yvec', 'color', 'DD', 'wscale'}, {'p', 'v'});
+%==============================================================================%
 
-if (nargin < 3) || isempty (yvec)
-    % {DEFAULT vector: metric path length}
-    yvec     = Pvec_tree (intree);
-end
-
-if (nargin < 4) || isempty (color)
-    % {DEFAULT color: black}
-    color    = [0 0 0];
-end
-
-if (nargin < 5) || isempty (DD)
-    % {DEFAULT 3-tupel: no spatial displacement from the root}
-    DD       = [0 0 0];
-end
-if length (DD) < 3
+if length (pars.DD) < 3
     % append 3-tupel with zeros:
-    DD       = [DD (zeros (1, 3 - length (DD)))];
-end
-
-if (nargin < 6) || isempty (wscale)
-    % {DEFAULT: 1 um between two terminal nodes}
-    wscale   = 1;
-end
-
-if (nargin < 7) || isempty (options)
-    % {DEFAULT: as patches}
-    options  = '-p';
+    pars.DD       = [pars.DD (zeros (1, 3 - length (pars.DD)))];
 end
 
 % get the x-positions for the dendrogram:
@@ -94,16 +76,16 @@ xdend            = xdend_tree (intree);
 idpar            = dA * (1 : size (dA, 1))';
 idpar (idpar == 0) = 1;
 % coordinates of the nodes in dendrogram:
-X1               = ((xdend (idpar)) .* wscale) + DD (1);
-X2               = (xdend .* wscale)           + DD (1);
-Y1               = yvec  (idpar)               + DD (2);
-Y2               = yvec                        + DD (2);
-Z1               = zeros (size (X1, 1), 1)     + DD (3);
-Z2               = zeros (size (X1, 1), 1)     + DD (3);
-if numel (diam)  == 1
-    diam         = ones (size (X1, 1), 1) .* diam;
+X1               = ((xdend (idpar)) .* pars.wscale) + pars.DD (1);
+X2               = (xdend .* pars.wscale)           + pars.DD (1);
+Y1               = pars.yvec  (idpar)               + pars.DD (2);
+Y2               = pars.yvec                        + pars.DD (2);
+Z1               = zeros (size (X1, 1), 1)          + pars.DD (3);
+Z2               = zeros (size (X1, 1), 1)          + pars.DD (3);
+if numel (pars.diam)  == 1
+    pars.diam         = ones (size (X1, 1), 1) .* pars.diam;
 end
-if ~contains (options, '-v')
+if ~pars.v
     % separate in horizontal and vertical components:
     X1           = [X1; X2];
     X2           = [X2; X2];
@@ -111,19 +93,19 @@ if ~contains (options, '-v')
     Y1           = [Y1; Y1];
     Z1           = [Z1; Z2];
     Z2           = [Z2; Z2];
-    if size (color, 1) > 1
-        color    = [color; color]';
+    if size (pars.color, 1) > 1
+        pars.color    = [pars.color; pars.color]';
     end
-    diam         = [ ....
-        (diam * (max (Y1) - min (Y1)) / (max (X1) - min (X1))); ...
-        diam];
+    pars.diam         = [ ....
+        (pars.diam * (max (Y1) - min (Y1)) / (max (X1) - min (X1))); ...
+        pars.diam];
 else
-    if size  (color, 1) > 1
-        color    = color';
+    if size  (pars.color, 1) > 1
+        pars.color    = pars.color';
     end
 end
 
-if ~contains (options, '-p')
+if ~pars.p
     % as lines:
     HP           = line ( ...
         [X1 X2]', ...
@@ -131,8 +113,8 @@ if ~contains (options, '-p')
         [Z1 Z2]');
     for counter  = 1 : length (HP)
         set      (HP (counter), ...
-            'linewidth',       diam (counter), ...
-            'color',           color);
+            'linewidth',       pars.diam (counter), ...
+            'color',           pars.color);
     end
 else
     % as patches:
@@ -140,8 +122,8 @@ else
         [(X2 - X1) (Y2 - Y1)] ./ ...
         repmat (sqrt ((X2 - X1).^2 + (Y2 - Y1).^2), 1, 2);
     % use rotation matrix to rotate the data
-    V1           = (A * [0, -1;  1, 0]) .* (repmat (diam, 1, 2) / 2);
-    V2           = (A * [0,  1; -1, 0]) .* (repmat (diam, 1, 2) / 2);
+    V1           = (A * [0, -1;  1, 0]) .* (repmat (pars.diam, 1, 2) / 2);
+    V2           = (A * [0,  1; -1, 0]) .* (repmat (pars.diam, 1, 2) / 2);
     HP           = patch ([ ...
         (X1 + V2 (:, 1)) ...
         (X1 + V1 (:, 1)) ...
@@ -152,7 +134,7 @@ else
         (Y2 + V1 (:, 2)) ...
         (Y2 + V2 (:, 2))]', ...
         [Z1 Z1 Z2 Z2]', ...
-        color);
+        pars.color);
     set           (HP, ...
         'edgecolor',           'none');
 end
