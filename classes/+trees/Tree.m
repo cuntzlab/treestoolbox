@@ -44,6 +44,7 @@ classdef Tree < handle
 
     % public properties
     properties
+        dA, X, Y, Z, D, R, rnames
     end
 
     % private methods
@@ -141,6 +142,14 @@ classdef Tree < handle
 
             if nargin > 0
                self.tree_ = varargin{1};
+               % props = properties(class(self))
+               self.dA      = varargin{1}.dA;
+               self.X       = varargin{1}.X;
+               self.Y       = varargin{1}.Y;
+               self.Z       = varargin{1}.X;
+               self.D       = varargin{1}.D;
+               self.R       = varargin{1}.R;
+               self.rnames  = varargin{1}.rnames;
             else
                self.tree_ = {};
             end
