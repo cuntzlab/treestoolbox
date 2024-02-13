@@ -30,7 +30,7 @@
 %     '-s'   : show isosurface/line
 %     '-w'   : waitbar, good for large bx and by and bz
 %     '-F'   : output M is full distances matrix instead of binary
-%     '-2d'  : 2D isoline instead of 3D isosurface
+%     '-dim2'  : 2D isoline instead of 3D isosurface (Careful, it used to be called '-2d')
 %     {DEFAULT: '-w -s -F'}
 %
 % Outputs
@@ -50,12 +50,20 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [c, M, HP] = hull_tree (intree, thr, bx, by, bz, options)
+function [c, M, HP] = hull_tree (intree, varargin)
 
-if (nargin < 6) || isempty (options)
-    % {DEFAULT: waitbar, show result and output full distance matrix}
-    options  = '-w -s -F';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('thr', 25)
+p.addParameter('bx', 50)
+p.addParameter('by', 50)
+p.addParameter('bz', 50)
+p.addParameter('s', true, @isBinary)
+p.addParameter('w', true, @isBinary)
+p.addParameter('F', true, @isBinary)
+p.addParameter('dim2', false, @isBinary)
+pars = parseArgs(p, varargin, {'thr', 'bx', 'by', 'bz'}, {'s', 'w', 'F', 'dim2'});
+%==============================================================================%
 
 % use node position for this function
 if isnumeric (intree) && numel (intree) > 1
@@ -66,54 +74,34 @@ else
     ver_tree (intree);                   % verify that input is a tree
     X        = intree.X;
     Y        = intree.Y;
-    if ~contains (options, '-2d')
+    if ~pars.dim2
         Z    = intree.Z;
     end
 end
 
-if (nargin < 2) || isempty (thr)
-    % {DEFAULT: 25 um distance threshold}
-    thr      = 25;
-end
-
-if (nargin < 3) || isempty (bx)
-    % {DEFAULT: divide x axis in 50 pieces}
-    bx       = 50;
-end
-
-if (nargin < 4) || isempty (by)
-    % {DEFAULT: divide y axis in 50 pieces}
-    by       = 50;
-end
-
-if (nargin < 5) || isempty (bz)
-    % {DEFAULT: divide z axis in 50 pieces}
-    bz       = 50;
-end
-
 % calculate bx / by / bz values for the grid:
-if numel (bx)    == 1
-    bx           = ...
-        min (X) - 2 * thr : ...
-        (4 * thr + max (X) - min (X)) / bx : ...
-        max (X) + 2 * thr;
+if numel (pars.bx)    == 1
+    pars.bx           = ...
+        min (X) - 2 * pars.thr : ...
+        (4 * pars.thr + max (X) - min (X)) / pars.bx : ...
+        max (X) + 2 * pars.thr;
 end
-if numel (by)    == 1
-    by           = ...
-        min (Y) - 2 * thr : ...
-        (4 * thr + max (Y) - min (Y)) / by : ...
-        max (Y) + 2 * thr;
+if numel (pars.by)    == 1
+    pars.by           = ...
+        min (Y) - 2 * pars.thr : ...
+        (4 * pars.thr + max (Y) - min (Y)) / pars.by : ...
+        max (Y) + 2 * pars.thr;
 end
 
-if ~contains (options, '-2d')  % 3D option
-    if numel     (bz) == 1                   % only here do you need bz
-        bz       = ...
-            min (Z) - 2 * thr : ...
-            (4 * thr + max (Z) - min (Z)) / bz : ...
-            max (Z) + 2 * thr;
+if ~pars.dim2  % 3D option
+    if numel     (pars.bz) == 1                   % only here do you need bz
+        pars.bz       = ...
+            min (Z) - 2 * pars.thr : ...
+            (4 * pars.thr + max (Z) - min (Z)) / pars.bz : ...
+            max (Z) + 2 * pars.thr;
     end
-    len          = length (by);              % line by line on y-axis
-    M            = zeros  (len, length (bx), length (bz));
+    len          = length (pars.by);              % line by line on y-axis
+    M            = zeros  (len, length (pars.bx), length (pars.bz));
     [X1, X2, Y1, Y2, Z1, Z2] = ...
         cyl_tree (intree);               % start and end coord.
     % create N x len comparison matrices:
@@ -123,22 +111,22 @@ if ~contains (options, '-2d')  % 3D option
     Y2           = repmat (Y2, 1, len);
     Z1           = repmat (Z1, 1, len);
     Z2           = repmat (Z2, 1, len);
-    if contains (options, '-w')           % waitbar option: initialization
-        if length  (bz) > 9
+    if pars.w           % waitbar option: initialization
+        if length  (pars.bz) > 9
             HW   = waitbar (0, 'building up distance matrix ...');
             set  (HW, 'Name', '..PLEASE..WAIT..YEAH..');
         end
     end
-    for counterz = 1 : length (bz)
-        if contains (options, '-w')     % waitbar option: update
+    for counterz = 1 : length (pars.bz)
+        if pars.w     % waitbar option: update
             if mod   (counterz, 10) == 0
-                waitbar  (counterz ./ length (bz), HW);
+                waitbar  (counterz ./ length (pars.bz), HW);
             end
         end
-        for counterx = 1 : length (bx)
-            XP   = ones (size (X1, 1), len) .* bx (counterx);
-            YP   = repmat (by, size (X1, 1), 1);
-            ZP   = ones (size (X1, 1), len) .* bz (counterz);
+        for counterx = 1 : length (pars.bx)
+            XP   = ones (size (X1, 1), len) .* pars.bx (counterx);
+            YP   = repmat (pars.by, size (X1, 1), 1);
+            ZP   = ones (size (X1, 1), len) .* pars.bz (counterz);
             % oh yeah it's the full palette, calculate distance from each
             % point to the line between two nodes of the tree:
             u    = ( ...
@@ -163,13 +151,13 @@ if ~contains (options, '-2d')  % 3D option
             M (:, counterx, counterz)  = reshape (i1, len, 1, 1);
         end
     end
-    if contains (options, '-w') % waitbar option: close
-        if length    (bz) > 9
+    if pars.w % waitbar option: close
+        if length    (pars.bz) > 9
             close    (HW);
         end
     end
-    c            = isosurface (bx, by, bz, M, thr);
-    if contains (options, '-s') % show option
+    c            = isosurface (pars.bx, pars.by, pars.bz, M, pars.thr);
+    if pars.s % show option
         HP       = patch (c);
         set      (HP, ...
             'FaceColor',       'red', ...
@@ -181,12 +169,12 @@ if ~contains (options, '-2d')  % 3D option
     end
 else                                     % 2D option:
     [X1, X2, Y1, Y2] = ...
-        cyl_tree (intree, '-2d');        % start and end coord.
-    lenx         = length (bx);
-    leny         = length (by);
+        cyl_tree (intree, '-dim2');        % start and end coord.
+    lenx         = length (pars.bx);
+    leny         = length (pars.by);
     len2         = lenx * leny;          % estimate expense of calculation
     if len2      > 256                   % if that is large then split up:
-        BX       = bx;
+        BX       = pars.bx;
         M        = zeros (leny, lenx);
         lenx     = 1;
         len2     = leny;
@@ -195,22 +183,22 @@ else                                     % 2D option:
         Y1       = repmat (Y1, 1, len2);
         X2       = repmat (X2, 1, len2);
         Y2       = repmat (Y2, 1, len2);
-        if contains (options, '-w')
+        if pars.w
             if length (BX) > 9
                 HW   = waitbar (0, 'building up distance matrix ...');
                 set  (HW, 'Name', 'please wait...');
             end
         end
         for counterx = 1 : length (BX)
-            if contains (options, '-w')
+            if pars.w
                 if mod   (counterx, 10) == 0
                     waitbar (counterx ./ length (BX), HW);
                 end
             end
-            bx   = BX (counterx);
-            XP   = repmat (reshape (repmat (bx,  leny, 1),    1, len2), ...
+            pars.bx   = BX (counterx);
+            XP   = repmat (reshape (repmat (pars.bx,  leny, 1),    1, len2), ...
                 size (X1, 1), 1);
-            YP   = repmat (reshape (repmat (by', 1,    lenx), 1, len2), ...
+            YP   = repmat (reshape (repmat (pars.by', 1,    lenx), 1, len2), ...
                 size (X1, 1), 1);
             % oh yeah it's the full palette, calculate distance from each
             % point to the line between two nodes of the tree:
@@ -231,8 +219,8 @@ else                                     % 2D option:
             % build up distance matrix:
             M (:, counterx)  = reshape (i1, leny, lenx);
         end
-        bx       = BX;
-        if contains (options, '-w')
+        pars.bx  = BX;
+        if pars.w
             if length    (BX) > 9
                 close    (HW);
             end
@@ -243,9 +231,9 @@ else                                     % 2D option:
         Y1       = repmat (Y1, 1, len2);
         X2       = repmat (X2, 1, len2);
         Y2       = repmat (Y2, 1, len2);
-        XP       = repmat (reshape (repmat (bx,  leny, 1),    1, len2), ...
+        XP       = repmat (reshape (repmat (pars.bx,  leny, 1),    1, len2), ...
             size (X1, 1), 1);
-        YP       = repmat (reshape (repmat (by', 1,    lenx), 1, len2), ...
+        YP       = repmat (reshape (repmat (pars.by', 1,    lenx), 1, len2), ...
             size (X1, 1), 1);
         % oh yeah it's the full palette, calculate distance from each
         % point to the line between two nodes of the tree:
@@ -266,11 +254,11 @@ else                                     % 2D option:
         M        = reshape (i1, leny, lenx); % build up distance matrix
     end
     % use contour to find isoline:
-    c            = contourc (bx, by, M, [thr thr]);
+    c            = contourc (pars.bx, pars.by, M, [pars.thr pars.thr]);
     % checkout "cpoints" and "cplotter" to find out more about contour
     % convention:
     c            = c';
-    if contains (options, '-s')
+    if pars.s
         HP       = cplotter (c);
         if sum   (get (gca, 'Dataaspectratio') == [1 1 1]) ~= 3
             axis equal;
@@ -278,7 +266,7 @@ else                                     % 2D option:
     end
 end
 
-if ~contains (options, '-F') % threshold distance matrix
-    M            = M < thr;
+if ~pars.F % threshold distance matrix
+    M            = M < pars.thr;
 end
 

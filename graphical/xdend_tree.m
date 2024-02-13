@@ -36,14 +36,16 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [xdend, tree] = xdend_tree (intree, options)
+function [xdend, tree] = xdend_tree (intree, varargin)
 
 ver_tree     (intree);                 % verify that input is a tree
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('s', false, @isBinary)
+p.addParameter('w', false, @isBinary)
+pars = parseArgs(p, varargin, {}, {'s', 'w'});
+%==============================================================================%
 
 % xdend is (minT + maxT) ./ 2 after labeling terminals with T_tree
 % this is still tricky because we have to obtain 
@@ -64,7 +66,7 @@ xdend            = (maxT + minT) ./ 2;     % there you go
 
 % Now if you want to build a standard tree that disregards the existing
 % spatial embedding use this, but this doesn't seem to work...
-if (nargout > 1) || contains (options, '-s')
+if (nargout > 1) || pars.s
     tree         = intree;
     angle        = pi - 2 * pi * xdend ./ max (xdend);
     N            = length (xdend);
@@ -86,14 +88,14 @@ if (nargout > 1) || contains (options, '-s')
         len      = 10 * ones (N, 1);
     end
     % (avoid showing result as well but conserve waitbar)
-    if contains  (options, '-w')
+    if pars.w
         tree     = morph_tree (tree, len, '-w');
     else
         tree     = morph_tree (tree, len, 'none');
     end
 end
 
-if contains (options, '-s') % show option
+if pars.s % show option
     clf;
     hold         on;
     HP           = plot_tree (intree, [], -150);

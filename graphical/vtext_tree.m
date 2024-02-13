@@ -24,7 +24,8 @@
 %     {DEFAULT tight}
 % - ipart    ::index:        index to the nodes to be plotted
 % - options  ::string:
-%     '-2d'  : text coordinates only 2 dimensions (DD has to correspond)
+%     '-dim2'  : text coordinates only 2 dimensions (DD has to correspond)
+%                (Careful, used to be called '-2d')
 %     '-sc'  : text does not scale the axis not even with axis tight, this
 %         option does it for you
 %     {DEFAULT ''}
@@ -43,115 +44,102 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function HP = vtext_tree (intree, v, color, DD, crange, ipart, options)
-
-if (nargin < 7) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
+function HP = vtext_tree (intree, varargin)
 
 ver_tree     (intree);                 % verify that input is a tree
+N            = size (intree.X, 1);     % number of nodes in tree
+
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('v', (1 : N)')
+p.addParameter('color', [1 0 0])
+p.addParameter('DD', [0 0 0])
+p.addParameter('crange', [])
+p.addParameter('ipart', (1 : N)')
+p.addParameter('dim2', false, @isBinary)
+p.addParameter('sc', false, @isBinary)
+pars = parseArgs(p, varargin, {'v', 'color', 'DD', 'crange', 'ipart'}, ...
+    {'dim2', 'sc'});
+%==============================================================================%
 
 % use only node position for this function
-
 X            = intree.X;
 Y            = intree.Y;
-if ~contains (options, '-2d')
+if ~pars.dim2
     Z        = intree.Z;
 end
 
-
-N            = size (X, 1); % number of nodes in tree
-
-if (nargin < 6) || isempty (ipart)
-    % {DEFAULT: select all nodes}
-    ipart    = (1 : N)';
+if (size (pars.v, 1) == N) && (size (pars.ipart, 1) ~= N)
+    pars.v        = pars.v (pars.ipart);
 end
 
-if (nargin < 2) || isempty (v)
-    % {DEFAULT: count up nodes}
-    v        = (1 : N)';
-end
-if (size (v, 1) == N) && (size (ipart, 1) ~= N)
-    v        = v (ipart);
+if (size (pars.color, 1) == N) && (size (pars.ipart, 1) ~= N)
+    pars.color    = pars.color (pars.ipart);
 end
 
-if (nargin < 3) || isempty (color)
-    % {DEFAULT color: red}
-    color    = [1 0 0];
-end
-
-if (size (color, 1) == N) && (size (ipart, 1) ~= N)
-    color    = color (ipart);
-end
-
-if (nargin < 4) || isempty (DD)
-    % {DEFAULT 3-tupel: no spatial displacement from the root}
-    DD       = [0 0 0];                  
-end
-if length (DD) < 3
+if length (pars.DD) < 3
     % append 3-tupel with zeros:
-    DD       = [DD (zeros (1, 3 - length (DD)))];
+    pars.DD       = [pars.DD (zeros (1, 3 - length (pars.DD)))];
 end
 
 % if color values are mapped:
-if size              (color, 1) > 1
-    if size          (color, 2) ~= 3
-        if islogical (color)
-            color    = double (color);
+if size              (pars.color, 1) > 1
+    if size          (pars.color, 2) ~= 3
+        if islogical (pars.color)
+            pars.color    = double (pars.color);
         end
-        if (nargin < 5) || isempty (crange)
-            crange   = [ ...
-                (min (color)) ...
-                (max (color))];
+        if isempty (pars.crange)
+            pars.crange   = [ ...
+                (min (pars.color)) ...
+                (max (pars.color))];
         end
         % scaling of the vector
-        if diff (crange) == 0
-            color    = ones (size (color, 1), 1);
+        if diff (pars.crange) == 0
+            pars.color    = ones (size (pars.color, 1), 1);
         else
-            color    = floor ( ...
-                (color - crange (1)) ./ ...
-                ((crange (2) - crange (1)) ./ 64));
-            color (color < 1 ) =  1;
-            color (color > 64) = 64;
+            pars.color    = floor ( ...
+                (pars.color - pars.crange (1)) ./ ...
+                ((pars.crange (2) - pars.crange (1)) ./ 64));
+            pars.color (pars.color < 1 ) =  1;
+            pars.color (pars.color > 64) = 64;
         end
         map          = colormap;
-        colors       = map (color, :);
+        colors       = map (pars.color, :);
     else
-        colors       = color;
+        colors       = pars.color;
     end
 end
 
-if contains (options, '-2d')
-    vt               = num2str (v);
+if pars.dim2
+    vt               = num2str (pars.v);
     HP               = text ( ...
-        X (ipart) + DD (1), ...
-        Y (ipart) + DD (2), vt);
+        X (pars.ipart) + pars.DD (1), ...
+        Y (pars.ipart) + pars.DD (2), vt);
 else
-    vt               = num2str (v);
+    vt               = num2str (pars.v);
     HP               = text ( ...
-        X (ipart) + DD (1), ...
-        Y (ipart) + DD (2), ...
-        Z (ipart) + DD (3), vt);
+        X (pars.ipart) + pars.DD (1), ...
+        Y (pars.ipart) + pars.DD (2), ...
+        Z (pars.ipart) + pars.DD (3), vt);
 end
 
-if size (color, 1)   > 1
-    for counter      = 1 : length (ipart)
+if size (pars.color, 1)   > 1
+    for counter      = 1 : length (pars.ipart)
         set          (HP (counter), ...
             'color',           colors (counter, :), ...
             'fontsize',        14);
     end
 else
     set              (HP, ...
-        'color',               color, ...
+        'color',               pars.color, ...
         'fontsize',            14);
 end
 
-if contains (options, '-sc')
+if pars.sc
     axis             equal;
     xlim             ([(min (X)) (max (X))]);
     ylim             ([(min (Y)) (max (Y))]);
-    if ~contains (options, '-2d')
+    if ~pars.dim2
         zlim         ([(min (Z)) (max (Z))]);
     end
 end

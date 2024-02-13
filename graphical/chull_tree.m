@@ -22,7 +22,7 @@
 % - alpha    ::value:        transparency value for the patch
 %     {DEFAULT 0.2}
 % - options  ::string:
-%     '-2d'  : 2D
+%     '-dim2'  : 2D (Careful, used to be called '-2d')
 %     {DEFAULT ''}
 %
 % Output
@@ -45,9 +45,7 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [HP,  hull] = chull_tree ( ...
-    intree, ...
-    ipart, color, DD, alpha, options)
+function [HP,  hull] = chull_tree (intree, varargin)
 
 % use only node position for this function
 if isnumeric (intree) && numel (intree) > 1
@@ -59,67 +57,52 @@ else
     X        = intree.X;
     Y        = intree.Y;
     Z        = intree.Z;
-
 end
 
-if (nargin < 2) || isempty (ipart)
-    % {DEFAULT index: select all nodes/points}
-    ipart    = (1 : length (X))';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('ipart', (1 : length (X))')
+p.addParameter('color', [0 0 0])
+p.addParameter('DD', [0 0 0])
+p.addParameter('alpha', 0.2)
+p.addParameter('dim2', false, @isBinary)
+pars = parseArgs(p, varargin, {'ipart', 'color', 'DD', 'alpha'}, {'dim2'});
+%==============================================================================%
 
-if (nargin < 3) || isempty (color)
-    % {DEFAULT color: black}
-    color    = [0 0 0];
-end
-
-if (nargin < 4) || isempty (DD)
-    % {DEFAULT 3-tupel: no spatial displacement from the root}
-    DD       = [0 0 0];
-end
-if length (DD) < 3
+if length (pars.DD) < 3
     % append 3-tupel with zeros:
-    DD       = [DD (zeros (1, 3 - length (DD)))];
-end
-
-if (nargin < 5) || isempty (alpha)
-    % {DEFAULT value: quite a bit transparent}
-    alpha    = 0.2;
-end
-
-if (nargin < 6) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
+    pars.DD       = [pars.DD (zeros (1, 3 - length (pars.DD)))];
 end
 
 % this is basically simple graphical patch of the output of convhull
-if contains      (options, '-2d')
-    if     length (ipart) > 2
-        ch       = convhull (X (ipart), Y (ipart));
+if pars.dim2
+    if     length (pars.ipart) > 2
+        ch       = convhull (X (pars.ipart), Y (pars.ipart));
         HP       = patch    ( ...
-            X (ipart (ch)) + DD (1), ...
-            Y (ipart (ch)) + DD (2), color);
+            X (pars.ipart (ch)) + pars.DD (1), ...
+            Y (pars.ipart (ch)) + pars.DD (2), pars.color);
         set      (HP, ...
-            'facealpha',       alpha, ...
+            'facealpha',       pars.alpha, ...
             'edgecolor',       'none');
-    elseif length (ipart) == 2
+    elseif length (pars.ipart) == 2
         HP       = line ( ...
-            X (ipart) + DD (1), ...
-            Y (ipart) + DD (2));
+            X (pars.ipart) + pars.DD (1), ...
+            Y (pars.ipart) + pars.DD (2));
         set      (HP, ...
-            'color',           color);
-    elseif length (ipart) < 2
+            'color',           pars.color);
+    elseif length (pars.ipart) < 2
         HP       = plot ( ...
-            X (ipart) + DD (1), ...
-            Y (ipart) + DD (2), 'k.');
+            X (pars.ipart) + pars.DD (1), ...
+            Y (pars.ipart) + pars.DD (2), 'k.');
         set      (HP, ...
-            'color',           color);
+            'color',           pars.color);
     end
 else
-    if     length (ipart) > 2
+    if     length (pars.ipart) > 2
         XYZ      = [ ...
-            (X (ipart) + DD (1)), ...
-            (Y (ipart) + DD (2)), ...
-            (Z (ipart) + DD (3))];
+            (X (pars.ipart) + pars.DD (1)), ...
+            (Y (pars.ipart) + pars.DD (2)), ...
+            (Z (pars.ipart) + pars.DD (3))];
         ch       = convhulln (XYZ);
         xc       = XYZ (:, 1);
         yc       = XYZ (:, 2);
@@ -127,24 +110,24 @@ else
         HP       = patch ( ...
             xc (ch)', ...
             yc (ch)', ...
-            zc (ch)', color);
+            zc (ch)', pars.color);
         set      (HP, ...
-            'facealpha',       alpha, ...
+            'facealpha',       pars.alpha, ...
             'edgecolor',       'none');
-    elseif length (ipart) == 2
+    elseif length (pars.ipart) == 2
         HP       = line  ( ...
-            X (ipart) + DD (1), ...
-            Y (ipart) + DD (2), ...
-            Z (ipart) + DD (3));
+            X (pars.ipart) + pars.DD (1), ...
+            Y (pars.ipart) + pars.DD (2), ...
+            Z (pars.ipart) + pars.DD (3));
         set      (HP, ...
-            'color',           color);
-    elseif length (ipart) < 2
+            'color',           pars.color);
+    elseif length (pars.ipart) < 2
         HP       = plot3 ( ...
-            X (ipart) + DD (1), ...
-            Y (ipart) + DD (2), ...
-            Z (ipart) + DD (3) , 'k.');
+            X (pars.ipart) + pars.DD (1), ...
+            Y (pars.ipart) + pars.DD (2), ...
+            Z (pars.ipart) + pars.DD (3) , 'k.');
         set      (HP, ...
-            'color',           color);
+            'color',           pars.color);
     end
 end
 
@@ -153,17 +136,17 @@ if sum (get (gca, 'Dataaspectratio') == [1 1 1]) ~= 3
 end
 
 if (nargout > 1)
-    if contains (options, '-2d')
+    if pars.dim2
         hull     = [];
         hull.XY  = [ ...
-            (X (ipart) + DD (1)) ...
-            (Y (ipart) + DD (2))];
+            (X (pars.ipart) + pars.DD (1)) ...
+            (Y (pars.ipart) + pars.DD (2))];
     else
         hull     = [];
         hull.XYZ = [ ...
-            (X (ipart) + DD (1)) ...
-            (Y (ipart) + DD (2)) ...
-            (Z (ipart) + DD (3))];
+            (X (pars.ipart) + pars.DD (1)) ...
+            (Y (pars.ipart) + pars.DD (2)) ...
+            (Z (pars.ipart) + pars.DD (3))];
     end
     hull.ch      = ch;
 end

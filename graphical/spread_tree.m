@@ -39,22 +39,16 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [DD, outtrees] = spread_tree (intrees, dX, dY, options)
+function [DD, outtrees] = spread_tree (intrees, varargin)
 
-if (nargin < 2) || isempty (dX)
-    % {DEFAULT: trees are 50 um apart horizontally}
-    dX       = 50;
-end
-
-if (nargin < 3) || isempty (dY)
-    % {DEFAULT: trees are 50 um apart vertically}
-    dY       = 50;
-end
-
-if (nargin < 4) || isempty (options)
-    % {DEFAULT: none}
-    options  = '';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('dX', 50)
+p.addParameter('dY', 50)
+p.addParameter('s', false, @isBinary)
+p.addParameter('noclear', false, @isBinary)
+pars = parseArgs(p, varargin, {'dX', 'dY'}, {'s', 'noclear'});
+%==============================================================================%
 
 if isstruct (intrees)
     level    = 0;
@@ -103,11 +97,11 @@ switch               level
             end
             % sqrtN gives a maximum deflection in X
             % (make the layout sort of square):
-            sqrtN    = sum (mX + dX) ./ sqrt (length (mX));
+            sqrtN    = sum (mX + pars.dX) ./ sqrt (length (mX));
             % divide summed up X ranges (+dX) by sqrtN and collect
             % remainder in DDX:
-            DDX      = mod   ([0; (cumsum (mX + dX))], sqrtN);
-            cY       = floor ([0; (cumsum (mX + dX))] / sqrtN);
+            DDX      = mod   ([0; (cumsum (mX + pars.dX))], sqrtN);
+            cY       = floor ([0; (cumsum (mX + pars.dX))] / sqrtN);
             DDX      = DDX   (1 : end - 1);
             cY       = cY    (1 : end - 1);
             % take from DDX the first empty bit in each line:
@@ -121,7 +115,7 @@ switch               level
             end
             % DDY becomes the cumulative sum of these maximum deflections
             % (+DY)
-            mmY      = [0;  (-cumsum (mmY + dY))];
+            mmY      = [0;  (-cumsum (mmY + pars.dY))];
             DDXYZ    = [DDX (mmY (cY + 1))];
             % DDZ is kept zero, but for each cell:
             dDD      = ...
@@ -165,11 +159,11 @@ switch               level
         end
         % sqrtN gives a maximum deflection in X
         % (make the layout sort of square):
-        sqrtN        = sum (mX + dX) ./ sqrt (length (mX));
+        sqrtN        = sum (mX + pars.dX) ./ sqrt (length (mX));
         % divide summed up X ranges (+dX) by sqrtN and collect remainder in
         % DDX:
-        DDX          = mod   ([0; (cumsum (mX + dX))], sqrtN);
-        cY           = floor ([0; (cumsum (mX + dX))] / sqrtN);
+        DDX          = mod   ([0; (cumsum (mX + pars.dX))], sqrtN);
+        cY           = floor ([0; (cumsum (mX + pars.dX))] / sqrtN);
         DDX          = DDX   (1 : end - 1);
         cY           = cY    (1 : end - 1);
         % take from DDX the first empty bit in each line:
@@ -182,7 +176,7 @@ switch               level
             mmY (counter) = max (mY (cY == ucY (counter)));
         end
         % DDY becomes the cumulative sum of these maximum deflections (+DY)
-        mmY          = [0;  (-cumsum (mmY + dY))];
+        mmY          = [0;  (-cumsum (mmY + pars.dY))];
         DDXYZ        = [DDX (mmY (cY + 1))];
         % DDZ is kept zero, but for each cell:
         dDD          = ...
@@ -202,8 +196,8 @@ switch               level
         end
 end
 
-if contains (options, '-s')
-    if ~contains (options, '-noclear')
+if pars.s
+    if ~pars.noclear
         clf;
     end
     switch level
@@ -216,7 +210,7 @@ if contains (options, '-s')
                 end
             end
         case         1
-            if ~contains (options, '-noclear')
+            if ~pars.noclear
                 clf;
             end
             for counter = 1 : lent
