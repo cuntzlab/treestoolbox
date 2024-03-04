@@ -36,40 +36,38 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [BTs, BTtrees] = allBTs_tree (N, options)
+function [BTs, BTtrees] = allBTs_tree (varargin)
 
-if (nargin < 1) || isempty (N)
-    % {DEFAULT: 15 nodes}
-    N        = 15;
-end
-
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: waitbar}
-    options  = '-w';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('N', 15)
+p.addParameter('w', true)
+p.addParameter('s', false)
+pars = parseArgs(p, varargin, {'N'}, {'w', 's'});
+%==============================================================================%
 
 MT               = [];
-if contains      (options, '-w')     % waitbar option: initialization
+if pars.w     % waitbar option: initialization
     HW           = waitbar (0, 'trying out BCT strings...');
     set          (HW, 'Name', '..PLEASE..WAIT..YEAH..');
 end
-for counter      = 0 : (2^N) - 1
+for counter      = 0 : (2^pars.N) - 1
     % waitbar option: update
-    if contains  (options, '-w') && (mod (counter, 1000) == 0)  
-        waitbar  (counter / ((2^N) - 1), HW);
+    if pars.w && (mod (counter, 1000) == 0)  
+        waitbar  (counter / ((2^pars.N) - 1), HW);
     end
     % create all possible strings with B and T:
-    BT           = 2 * mod (floor (counter ./ (2.^(N - 1 : -1 : 0))), 2);
+    BT           = 2 * mod (floor (counter ./ (2.^(pars.N - 1 : -1 : 0))), 2);
     if isBCT_tree (BT)
         % if they are BT conform then add them to the list:
         MT       = [MT; BT];
     end
 end
-if contains      (options, '-w')     % waitbar option: close
+if pars.w     % waitbar option: close
     close        (HW);
 end
 
-MT2              = zeros (size (MT, 1), N);
+MT2              = zeros (size (MT, 1), pars.N);
 for counter      = 1 : size (MT, 1)
     BT           = MT (counter, :);
     tree         = BCT_tree  (BT,   '-dA'); % create tree from BCT string
@@ -78,14 +76,14 @@ for counter      = 1 : size (MT, 1)
 end
 
 BTs              = unique (MT2, 'rows'); % get rid of duplicates
-if (nargout > 1) || ~isempty (contains (options, '-s'))
+if (nargout > 1) || pars.s
     BTtrees      = cell (1,  size (BTs, 1));
     for counter  = 1 : size (BTs, 1)
         BTtrees {counter} = BCT_tree (BTs (counter, :));
     end
 end
 
-if contains      (options, '-s') % show option
+if pars.s % show option
     clf;
     hold         on;
     dd           = spread_tree (BTtrees);
@@ -93,7 +91,7 @@ if contains      (options, '-s') % show option
         plot_tree    (BTtrees {counter}, [] , dd {counter});
         pointer_tree (dd {counter});
     end
-    text         (0, 50, ['all BCT trees - ' num2str(N) ' nodes']);
+    text         (0, 50, ['all BCT trees - ' num2str(pars.N) ' nodes']);
     view         (2);
     axis         equal off
 end

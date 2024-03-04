@@ -54,45 +54,69 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [X, Y, Z, HP] = rpoints_tree (M, N, c, x, y, z, thr, options)
+function [X, Y, Z, HP] = rpoints_tree (varargin)
 
-if (nargin < 1) || isempty (M)
-    M        = [];
-    % possibly:
-    % sr     = 25; % sets the bin size for sampling the density
-    % % calculates the density matrix M at points (dX, dY):
-    % [M, dX, dY] = gdens_tree (intree, ...
-    %    sr, B_tree (intree) | T_tree (intree));
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+% possibly:
+% sr     = 25; % sets the bin size for sampling the density
+% % calculates the density matrix M at points (dX, dY):
+% [M, dX, dY] = gdens_tree (intree, ...
+%    sr, B_tree (intree) | T_tree (intree));
+p.addParameter('M', [])
+p.addParameter('N', 1000)
+p.addParameter('c', [])
+p.addParameter('x', [])
+p.addParameter('y', [])
+p.addParameter('z', [])
+p.addParameter('thr', [])
+p.addParameter('s', false)
+p.addParameter('w', true)
+pars = parseArgs(p, varargin, {'M', 'N', 'c', 'x', 'y', 'z', 'thr'}, {'s', 'w'});
+%==============================================================================%
 
-if (nargin < 2) || isempty (N)
-    N        = 1000;
-end
-
-if (nargin < 3) || isempty (c)
-    c        = [];
-end
-
-if (nargin < 7) || isempty (thr)
-    thr      = [];
-end
-
-if (nargin < 8) || isempty (options)
-    options  = '-w';
-end
+% if (nargin < 1) || isempty (M)
+%     M        = [];
+%     % possibly:
+%     % sr     = 25; % sets the bin size for sampling the density
+%     % % calculates the density matrix M at points (dX, dY):
+%     % [M, dX, dY] = gdens_tree (intree, ...
+%     %    sr, B_tree (intree) | T_tree (intree));
+% end
+% 
+% if (nargin < 2) || isempty (N)
+%     N        = 1000;
+% end
+% 
+% if (nargin < 3) || isempty (c)
+%     c        = [];
+% end
+% 
+% if (nargin < 7) || isempty (thr)
+%     thr      = [];
+% end
+% 
+% if (nargin < 8) || isempty (options)
+%     options  = '-w';
+% end
+M = pars.M;
+N = pars.N;
+x = pars.x;
+y = pars.y;
+z = pars.z;
 
 if ~isempty      (M)
-    if (nargin < 4) || isempty (x)
+    if isempty (x)
         % possibly go gdens_tree
         x        = 1 : size (M, 2);
     end
-    if (nargin < 5) || isempty (y)
+    if isempty (y)
         y        = 1 : size (M, 1);
     end
-    if (nargin < 6) || isempty (z)
+    if isempty (z)
         z        = 1 : size (M, 3);
     end
-    if contains  (options, '-w')
+    if pars.w
         HW       = waitbar (0, 'distributing points...');
         set      (HW, ...
             'Name',            '..PLEASE..WAIT..YEAH..');
@@ -106,7 +130,7 @@ if ~isempty      (M)
         r1       = zeros (length (R), 1);
         r2       = zeros (length (R), 1);
         for counter  = 1 : length (R)
-            if contains   (options, '-w')
+            if pars.w
                 if mod (counter, 5000) == 1
                     waitbar  (counter / length (R), HW);
                 end
@@ -130,7 +154,7 @@ if ~isempty      (M)
         r2       = zeros (length (R), 1);
         r3       = zeros (length (R), 1);
         for counter = 1 : length (R)
-            if contains (options, '-w')
+            if pars.w
                 if mod (counter, 5000) == 1
                     waitbar (counter / length (R), HW);
                 end
@@ -146,14 +170,14 @@ if ~isempty      (M)
         Y        = y (r1)' + (rand (N, 1) - 0.5) .* (diff (y (1 : 2)));
         Z        = z (r3)' + (rand (N, 1) - 0.5) .* (diff (z (1 : 2)));
     end
-    if contains  (options, '-w')
+    if pars.w
         close    (HW);
     end
 else % if no density matrix was defined do a fully homogeneous picking
-    if (nargin < 4) || isempty (x)
+    if isempty (x)
         x        = [-500 500];
     end
-    if (nargin < 5) || isempty (y)
+    if isempty (y)
         y        = x;
     end
     if diff (x) ~= diff (y)
@@ -166,11 +190,11 @@ else % if no density matrix was defined do a fully homogeneous picking
     Z            = zeros (N, 1);
 end
 
-if ~isempty      (c)
-    IN           = find (in_c (X, Y, c));
-    [PX, PY]     = cpoints (c);
+if ~isempty      (pars.c)
+    IN           = find (in_c (X, Y, pars.c));
+    [PX, PY]     = cpoints (pars.c);
     M            = eucdist (X (IN), PX, Y (IN), PY);
-    IN2          = min     (M, [], 2) > thr;
+    IN2          = min     (M, [], 2) > pars.thr;
     XR           = X;
     YR           = Y;
     X            = XR (IN (IN2));
@@ -178,11 +202,11 @@ if ~isempty      (c)
     Z            = zeros (length (Y), 1);
 end
 
-if contains      (options, '-s') % show option
+if pars.s % show option
     clf;
     hold         on;
-    if ~isempty  (c)
-        cplotter (c);
+    if ~isempty  (pars.c)
+        cplotter (pars.c);
     end
     HP           = plot3 (X, Y, Z, 'ko');
     set          (HP, ...

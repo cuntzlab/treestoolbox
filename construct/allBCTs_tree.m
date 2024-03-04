@@ -34,46 +34,44 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [BCTs, BCTtrees] = allBCTs_tree (N, options)
+function [BCTs, BCTtrees] = allBCTs_tree (varargin)
 
-if (nargin < 1) || isempty (N)
-    % {DEFAULT: eight nodes}
-    N        = 8;
-end
-
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: waitbar}
-    options  = '-w';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('N', 8)
+p.addParameter('w', true)
+p.addParameter('s', false)
+pars = parseArgs(p, varargin, {'N'}, {'w', 's'});
+%==============================================================================%
 
 MT               = [];
-if contains       (options, '-w')     % waitbar option: initialization
-    if ((3^N) - 1) > 19998
+if pars.w     % waitbar option: initialization
+    if ((3^pars.N) - 1) > 19998
         HW       = waitbar (0, 'trying out BCT strings...');
         set      (HW, 'Name', '..PLEASE..WAIT..YEAH..');
     end
 end
-for counter      = 0 : (3^N) - 1
+for counter      = 0 : (3^pars.N) - 1
     % waitbar option: update:
-    if contains   (options, '-w')
+    if pars.w
         if  (mod (counter, 20000) == 19999)
-            waitbar (counter / ((3^N) - 1), HW);
+            waitbar (counter / ((3^pars.N) - 1), HW);
         end
     end
     % create all possible strings with B, C and T:
-    BCT          = mod (floor (counter ./ (3.^(N - 1 : -1 : 0))), 3);
+    BCT          = mod (floor (counter ./ (3.^(pars.N - 1 : -1 : 0))), 3);
     if isBCT_tree (BCT)
         % if they are BCT conform then add them to the list:
         MT       = [MT; BCT];
     end
 end
-if contains       (options, '-w')     % waitbar option: close
-    if ((3^N) - 1) > 19998
+if pars.w     % waitbar option: close
+    if ((3^pars.N) - 1) > 19998
         close    (HW);
     end
 end
 
-MT2              = zeros (size (MT, 1), N);
+MT2              = zeros (size (MT, 1), pars.N);
 for counter      = 1 : size (MT, 1)
     BCT          = MT (counter, :);
     tree         = BCT_tree  (BCT,  '-dA'); % create tree from BCT string
@@ -82,27 +80,22 @@ for counter      = 1 : size (MT, 1)
 end
 
 BCTs             = unique (MT2, 'rows'); % get rid of duplicates
-if (nargout > 1) || contains (options, '-s')
+if (nargout > 1) || pars.s
     BCTtrees     = cell (1,  size (BCTs, 1));
     for counter  = 1 : size (BCTs, 1)
         BCTtrees{counter} = BCT_tree (BCTs (counter, :));
     end
 end
 
-if contains       (options, '-s') % show option
+if pars.s % show option
     clf; hold on;
     dd           = spread_tree (BCTtrees);
     for counter  = 1 : length  (BCTtrees)
         pointer_tree (dd{counter}, 1, [], [], [], '-o');
         plot_tree    (BCTtrees{counter}, [] , dd{counter});
     end
-    text         (0, 50, ['all BCT trees - ' (num2str (N)) ' nodes']);
+    text         (0, 50, ['all BCT trees - ' (num2str (pars.N)) ' nodes']);
     view         (2);
     axis         image off
 end
-
-
-
-
-
 
