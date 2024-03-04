@@ -36,17 +36,17 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function tree = clean_tree (intree, radius, options)
+function tree = clean_tree (intree, varargin)
 
 ver_tree (intree); % verify that input is a tree structure
 
-if (nargin < 2) || isempty (radius)
-    radius   = 1;
-end
-
-if (nargin < 3) || isempty (options)
-    options  = '-w';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('radius', 1)
+p.addParameter('w', true)
+p.addParameter('s', false)
+pars = parseArgs(p, varargin, {'radius'}, {'w', 's'});
+%==============================================================================%
 
 % sort tree to be BCT conform, heavy parts left:
 tree             = sort_tree (intree, '-LO');
@@ -60,7 +60,7 @@ iBpar            = [];
 idpar            = idpar_tree (tree);
 IFFER            = [];
 if length (iT)   > 1
-    if contains   (options, '-w') % waitbar option: initialization
+    if pars.w % waitbar option: initialization
         if length (iT) > 499
             HW   = waitbar (0, 'cleaning the tree...');
             set  (HW, 'Name', '..PLEASE..WAIT..YEAH..');
@@ -68,7 +68,7 @@ if length (iT)   > 1
     end
     for counter  = 1 : length (iT)
         % waitbar option: update:
-        if contains (options, '-w')
+        if pars.w
             if   (mod (counter, 500) == 0)
                  waitbar (counter / length (iT), HW);
             end
@@ -79,18 +79,18 @@ if length (iT)   > 1
         idbpar   = idpar (ibranch (1)); % direct parent branch point
         if ~ismember (idbpar, iBpar) && ...
                 ~isempty (setdiff (find (eucl_tree (tree, iT (counter)) < ...
-                (D / 2 + radius / 2)), ibranch))
+                (D / 2 + pars.radius / 2)), ibranch))
             iBpar  = [iBpar idbpar];
             IFFER  = [IFFER ibranch];
         end
         if ~ismember (idbpar, iBpar) && ...
                 ~isempty (ibranch) && ...
-                (sum (len (ibranch)) < radius)
+                (sum (len (ibranch)) < pars.radius)
             iBpar  = [iBpar idbpar];
             IFFER  = [IFFER ibranch];
         end
     end
-    if contains   (options, '-w') % waitbar option: close
+    if pars.w % waitbar option: close
         if length (iT) > 499
             close (HW);
         end
@@ -101,7 +101,7 @@ if ~isempty      (IFFER)
     tree         = delete_tree (tree, IFFER); % delete all unwanted points
 end
 
-if contains       (options, '-s')
+if pars.s
     clf;
     hold         on;
     plot_tree    (intree, [],      [], [], [], '-3l');

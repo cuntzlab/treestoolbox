@@ -105,7 +105,7 @@ if contains (options, '-a')
    tree.R (idpar (indaxon)) = find (strcmp (tree.rnames, 'axon'));
 end
 
-if contain       (options, '-s')
+if contains       (options, '-s')
     clf; hold on;
     HP           = plot_tree (intree);
     set          (HP, 'facealpha', .5);

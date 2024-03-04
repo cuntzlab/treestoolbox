@@ -23,7 +23,7 @@
 %
 % Example
 % -------
-% c          = hull_tree (sample_tree, 5, [], [], [], '-2d');
+% c          = hull_tree (sample_tree, 5, [], [], [], '-dim2');
 % cplotter   (c);
 %
 % See also hull_tree cpoints
@@ -32,20 +32,18 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function HP  = cplotter (c, color, DD)
+function HP  = cplotter (c, varargin)
 
-if (nargin < 2) || isempty (color)
-    % {DEFAULT color: black}
-    color    = [0 0 0];
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('color', [0 0 0])
+p.addParameter('DD', [0 0 0])
+pars = parseArgs(p, varargin, {'color', 'DD'}, {});
+%==============================================================================%
 
-if (nargin < 3) || isempty (DD)
-    % {DEFAULT 3-tupel: no spatial displacement from the root}
-    DD       = [0 0 0];
-end
-if length (DD) < 3
+if length (pars.DD) < 3
     % append 3-tupel with zeros:
-    DD       = [DD (zeros (1, 3 - length (DD)))];
+    pars.DD       = [pars.DD (zeros (1, 3 - length (pars.DD)))];
 end
 
 hold             on;
@@ -56,16 +54,12 @@ while (iic  < size (c, 1))
     ic           = c (iic, 2);
     CC           = c (iic + 1 : iic + ic, :);
     HP (counter) = plot3 ( ...
-        CC (:, 1) + DD (1), ...
-        CC (:, 2) + DD (2), ...
-        ones (size (CC, 1), 1) .* DD (3), 'k');
+        CC (:, 1) + pars.DD (1), ...
+        CC (:, 2) + pars.DD (2), ...
+        ones (size (CC, 1), 1) .* pars.DD (3), 'k');
     iic          = iic + ic + 1;
     counter      = counter + 1;
 end
 set              (HP, ...
-    'color',                   color);
-
-
-
-
+    'color',                   pars.color);
 

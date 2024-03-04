@@ -32,16 +32,18 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function  [P0, tree] = quadfit_tree (intree, options)
+function  [P0, tree] = quadfit_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('w', false)
+p.addParameter('s', false)
+pars = parseArgs(p, varargin, {}, {'w', 's'});
+%==============================================================================%
 
-if contains  (options, '-w')   % waitbar option: initialization
+if pars.w   % waitbar option: initialization
     HW       = waitbar (0.3, 'fitting quad diameter...');
     set      (HW, ...
         'Name',                '..PLEASE..WAIT..YEAH..');
@@ -49,15 +51,15 @@ end
 
 P0               = fminsearch (@(P) qfit (P, intree), rand (1, 2));
 
-if contains      (options, '-w')   % waitbar option: close
+if pars.w   % waitbar option: close
     close        (HW);
 end
 
-if (nargout > 1) || contains (options, '-s')
-    tree         = quaddiameter_tree (intree, P0 (1), P0 (2), 'none');
+if (nargout > 1) || pars.s
+    tree         = quaddiameter_tree (intree, P0 (1), P0 (2), [], [], 'none');
 end
 
-if contains      (options, '-s') % show option
+if pars.s % show option
     clf;
     hold         on;
     plot_tree    (tree,   [1 0 0]);

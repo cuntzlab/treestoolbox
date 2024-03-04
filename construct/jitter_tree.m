@@ -1,7 +1,7 @@
 % JITTER_TREE   Jitters coordinates of a tree.
 % (trees package)
 %
-% tree = jitter_tree (intree, stde, lambda, options, ipart)
+% tree = jitter_tree (intree, stde, lambda, ipart, options)
 % ---------------------------------------------------------
 %
 % Adds spatial noise to the coordinates of the nodes of a tree.
@@ -14,11 +14,11 @@
 % - lambda   ::integer: length constant of treeed low pass filter applied
 %     on the noise
 %     {DEFAULT: 10}
+% - ipart    ::index: nodes of the tree affected by jitter
 % - options  ::string:
 %     '-s'   : show
 %     '-w'   : waitbar
 %     {DEFAULT: '-w'}
-% - ipart    ::index: nodes of the tree affected by jitter
 %
 % Output
 % ------
@@ -27,7 +27,7 @@
 %
 % Example
 % -------
-% jitter_tree (sample_tree, [], [], '-s');
+% jitter_tree (sample_tree, [], [], [], '-s');
 %
 % See also smooth_tree MST_tree
 % Uses ipar_tree
@@ -38,62 +38,55 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function  tree = jitter_tree (intree, stde, lambda, options, ipart)
+function  tree = jitter_tree (intree, varargin)
 
 ver_tree     (intree);
 tree         = intree;
-
-if (nargin < 2) || isempty (stde)
-    stde     = 1;
-end
-
-if (nargin < 3) || isempty (lambda)
-    lambda   = 10;
-end
-
-if (nargin < 4) || isempty (options)
-    options  = '-w';
-end
-
 N            = size (tree.X, 1);
 
-if (nargin < 5) || isempty (ipart)
-    ipart    = 1 : N;
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('stde', 1)
+p.addParameter('lambda', 10)
+p.addParameter('ipart', 1 : N)
+p.addParameter('w', true)
+p.addParameter('s', false)
+pars = parseArgs(p, varargin, {'stde', 'lambda', 'ipart'}, {'w', 's'});
+%==============================================================================%
 
-if islogical (ipart) && numel (ipart) == N  % transform logical indexing
-    ipart    = find (ipart);
+if islogical (pars.ipart) && numel (pars.ipart) == N  % transform logical indexing
+    pars.ipart    = find (pars.ipart);
 end
 
 % all paths:
 A                = tree.dA + tree.dA';
 As               = cell (1, 1);
 
-if contains      (options, '-w')     % waitbar option: initialization
+if pars.w     % waitbar option: initialization
     HW           = waitbar (0, 'calculating paths...');
     set          (HW, ...
         'Name',                  '..PLEASE..WAIT..YEAH..');
 end
 
-for counter      = 1 : lambda
-    if contains  (options, '-w')   % waitbar option: update
+for counter      = 1 : pars.lambda
+    if pars.w   % waitbar option: update
         if mod   (counter, 5) == 0
-            waitbar (counter / lambda, HW);
+            waitbar (counter / pars.lambda, HW);
         end
     end
     As{counter}  = A ^ counter;
 end
 R                = zeros (N, 3);
-R (ipart, :)     = randn (numel (ipart), 3) * stde * lambda;
+R(pars.ipart, :) = randn (numel (pars.ipart), 3) * pars.stde * pars.lambda;
 R1               = zeros (N, 3);
 
-if contains      (options, '-w')     % waitbar option: reinitialization
+if pars.w     % waitbar option: reinitialization
     waitbar      (0, ...
         HW,                    'jittering...');
 end
 
 for counter      = 1 : N
-    if contains  (options, '-w')   % waitbar option: update
+    if pars.w   % waitbar option: update
         if mod   (counter, 50) == 0
             waitbar (counter / N, HW);
         end
@@ -102,18 +95,18 @@ for counter      = 1 : N
     Z (counter)  = 1;
     S            = zeros (N, 1);
     S1           = zeros (N, 1);
-    for counter2 = 1 : lambda
+    for counter2 = 1 : pars.lambda
         zA       = As{counter2} * Z > 0;
         iA       = find ((zA - S1) > 0);
         S1 (iA)  =  1;
         S  (iA)  = counter2;
     end
     S (S == 0)   = 100000;
-    S            = gauss (S, 1, lambda / 5);
+    S            = gauss (S, 1, pars.lambda / 5);
     R1 (counter, :) = sum   (R .* [S S S]);
 end
 
-if contains      (options, '-w')       % waitbar option: close
+if pars.w       % waitbar option: close
     close        (HW);
 end
 
@@ -121,7 +114,7 @@ tree.X           = tree.X + R1 (:, 1) - R1 (1, 1);
 tree.Y           = tree.Y + R1 (:, 2) - R1 (1, 2);
 tree.Z           = tree.Z + R1 (:, 3) - R1 (1, 3);
 
-if contains      (options, '-s')
+if pars.s
     clf;
     hold         on;
     plot_tree    (intree);
