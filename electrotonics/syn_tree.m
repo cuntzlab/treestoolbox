@@ -41,74 +41,62 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function syn = syn_tree ( ...
-    intree, ...
-    ge, gi, Ee, Ei, ...              % synaptic inputs
-    I, options)
+function syn = syn_tree (intree, varargin)
 
 ver_tree     (intree);
 
 M            = M_tree (intree);
 N            = size (M, 1);
 
-if (nargin < 2) || isempty (ge)
-    ge       = sparse (N, 1);
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('ge', sparse (N, 1))
+p.addParameter('gi', sparse (N, 1))
+p.addParameter('Ee', 60)
+p.addParameter('Ei', -20)
+p.addParameter('I', [])
+p.addParameter('s', false)
+pars = parseArgs(p, varargin, {'ge', 'gi', 'Ee', 'Ei', 'I'}, {'s'});
+%==============================================================================%
+
+if numel (pars.ge) == 1
+    dg       = pars.ge;
+    pars.ge  = sparse (N, 1);
+    pars.ge (dg) = 1;
 end
 
-if (nargin < 3) || isempty (gi)
-    gi       = sparse (N, 1);
+if numel (pars.gi) == 1
+    dg       = pars.gi;
+    pars.gi  = sparse (N, 1);
+    pars.gi (dg) = 1;
 end
 
-if (nargin < 4) || isempty (Ee)
-    Ee       =  60;
-end
-
-if (nargin < 5) || isempty (Ei)
-    Ei       = -20;
-end
-
-if numel (ge) == 1
-    dg       = ge;
-    ge       = sparse (N, 1);
-    ge (dg)  = 1;
-end
-
-if numel (gi) == 1
-    dg       = gi;
-    gi       = sparse (N, 1);
-    gi (dg)  = 1;
-end
-
-if (nargin < 6) || isempty (I)
-    I        = sparse (size (ge, 1), 1);
+if isempty (pars.I)
+    pars.I   = sparse (size (pars.ge, 1), 1);
 
 end
 
-if numel (I)     == 1
-    dI           = I;
-    I            = sparse (size (ge, 1), 1);
-    I (dI)       = 1;
-end
-
-if (nargin < 7) || isempty(options)
-    options      = '';
+if numel (pars.I) == 1
+    dI       = pars.I;
+    pars.I   = sparse (size (pars.ge, 1), 1);
+    pars.I (dI) = 1;
 end
 
 % feed into M the synaptic conductances
 M                = M + ...
-    spdiags  (ge, 0, N, N) + ...
-    spdiags  (gi, 0, N, N);
+    spdiags  (pars.ge, 0, N, N) + ...
+    spdiags  (pars.gi, 0, N, N);
 % and then inject the corresponding current
-syn              = M \ ((ge .* Ee) + (gi .* Ei) + I);
+syn              = M \ ((pars.ge .* pars.Ee) + (pars.gi .* pars.Ei) + pars.I);
 
-if contains      (options, '-s')
+if pars.s
     clf;
     hold on;
     plot_tree    (intree, syn(:, 1));
     colorbar;
-    L (1)        = pointer_tree (intree, find (ge ~= 0), ...
+    L (1)        = pointer_tree (intree, find (pars.ge ~= 0), ...
         [], [0 1 0], [], '-l');
-    L (2)        = pointer_tree (intree, find (gi ~= 0), ...
+    L (2)        = pointer_tree (intree, find (pars.gi ~= 0), ...
         [], [1 0 0], [], '-l');
     legend       (L, {'exc', 'inh'});
     set          (L, 'facealpha', 0.5);

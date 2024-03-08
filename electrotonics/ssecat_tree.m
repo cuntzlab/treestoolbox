@@ -47,13 +47,9 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function sse = ssecat_tree ( ...
-    intrees, ...
-    inodes1, inodes2, gelsyn, ...        % electrical synapses
-    I, options)
+function sse = ssecat_tree (intrees, varargin)
 
 len          = length (intrees);
-
 for counter  = 1 : len
     ver_tree  (intrees{counter});
 end
@@ -65,21 +61,20 @@ end
 sumsiz       = [0 cumsum(siz)];
 N            = sumsiz (end);
 
-if (nargin < 2) || isempty (inodes1)
-    inodes1  = size (sumsiz (end), 1);
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('inodes1', size (sumsiz (end), 1))
+p.addParameter('inodes2', 1)
+p.addParameter('gelsyn', 1)
+p.addParameter('I', [])
+p.addParameter('s', false)
+pars = parseArgs(p, varargin, {'inodes1', 'inodes2', 'gelsyn', 'I'}, {'s'});
+%==============================================================================%
 
-if (nargin < 3) || isempty (inodes2)
-    inodes2  = 1;
-end
-
-if (nargin < 4) || isempty (gelsyn)
-    gelsyn   = 1;
-end
-
-if (nargin < 6) || isempty (options)
-    options  = '';
-end
+inodes1 = pars.inodes1;
+inodes2 = pars.inodes2;
+gelsyn  = pars.gelsyn;
+I       = pars.I;
 
 MM               = sparse ( ...
     sumsiz (len + 1), ...
@@ -118,7 +113,7 @@ else
     sse          = MM \ I;
 end
 
-if contains      (options, '-s')
+if pars.s
     if numel (MM) == numel (sse)
         clf;
         imagesc  (sse);

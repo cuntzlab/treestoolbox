@@ -27,22 +27,23 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function gi  = gi_tree (intree, options)
+function gi  = gi_tree (intree, varargin)
 
 ver_tree     (intree);                   % verify that input is a tree
 % use only axial resistance vector/value for this function
 Ri       = intree.Ri;
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';                       
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('s', false)
+pars = parseArgs(p, varargin, {}, {'s'});
+%==============================================================================%
 
 Hlov             = 1 ./ (cvol_tree (intree) * 10000);
 % conversion cvol from 1/um to 1/cm Hlov is in [cm]
 gi               = Hlov ./ Ri;
 
-if contains (options, '-s')         % show option
+if pars.s         % show option
     ipart        = find (gi < 0.0099);   % single out non-0-length segments
     clf;
     hold         on;

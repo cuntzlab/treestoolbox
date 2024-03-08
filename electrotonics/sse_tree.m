@@ -44,28 +44,31 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function sse = sse_tree (intree, I, options)
+function sse = sse_tree (intree, varargin)
 
 ver_tree     (intree);
 
-if (nargin < 3) || isempty (options)
-    options  = '';
-end
+
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('I', [])
+p.addParameter('s', false)
+pars = parseArgs(p, varargin, {'I'}, {'s'});
+%==============================================================================%
 
 M                = M_tree (intree);
-
-if (nargin < 2) || isempty (I)
+if isempty (pars.I)
     sse          = full (inv (M));
 else
-    if numel (I) == 1
-        dI       = I;
-        I        = sparse (size (M, 1), 1);
-        I (dI)   = 1;
+    if numel (pars.I) == 1
+        dI       = pars.I;
+        pars.I   = sparse (size (M, 1), 1);
+        pars.I (dI) = 1;
     end
-    sse          = full (M \ I);
+    sse          = full (M \ pars.I);
 end
 
-if contains      (options, '-s')
+if pars.s
     if numel     (M) == numel (sse)
         clf; 
         imagesc  (sse);
