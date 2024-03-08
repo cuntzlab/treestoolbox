@@ -27,19 +27,20 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function lambda = lambda_tree (intree, options)
+function lambda = lambda_tree (intree, varargin)
 
 ver_tree     (intree);                   % verify that input is a tree
 tree         = intree;
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('s', false)
+pars = parseArgs(p, varargin, {}, {'s'});
+%==============================================================================%
 
 lambda           = sqrt ((tree.D / 4) ./ (10000 .* tree.Gm .* tree.Ri));
 
-if contains      (options, '-s')         % show option
+if pars.s         % show option
     clf;
     hold         on; 
     plot_tree    (intree, lambda);

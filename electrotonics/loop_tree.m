@@ -36,33 +36,26 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function M   = loop_tree (intree, ...
-    inodes1, inodes2, gelsyn, ...     % electrical synapses
-    options)
+function M   = loop_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
-
 M            = M_tree (intree);
 
-if (nargin < 2) || isempty (inodes1)
-    inodes1  = size (M, 1);
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('inodes1', size (M, 1))
+p.addParameter('inodes2', 1)
+p.addParameter('gelsyn', 1)
+p.addParameter('s', false)
+pars = parseArgs(p, varargin, {'inodes1', 'inodes2', 'gelsyn'}, {'s'});
+%==============================================================================%
 
-if (nargin < 3) || isempty (inodes2)
-    inodes2  = 1;
-end
-
-if (nargin < 4) || isempty (gelsyn)
-    gelsyn   = 1;
-end
+inodes1 = pars.inodes1;
+inodes2 = pars.inodes2;
+gelsyn  = pars.gelsyn;
 
 if numel (gelsyn) == 1
     gelsyn   = ones (size (inodes1, 1), 1) .* gelsyn;
-end
-
-if (nargin < 5) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
 end
 
 for counter      = 1 : size (inodes1, 1)
@@ -80,7 +73,7 @@ for counter      = 1 : size (inodes1, 1)
         gelsyn (counter);
 end
 
-if contains      (options, '-s')     % show option
+if pars.s     % show option
     clf;
     hold         on;
     [i1, i2]     = ind2sub (size (M), find (M > 0));

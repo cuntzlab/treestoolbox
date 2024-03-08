@@ -51,11 +51,7 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function syn = syncat_tree (...
-    intrees, ...
-    inodes1, inodes2, gelsyn, ...        % electrical synapses
-    ge, gi, Ee, Ei, ...                  % synaptic inputs
-    I, options)
+function syn = syncat_tree (intrees, varargin)
 
 len          = length (intrees);
 
@@ -70,58 +66,41 @@ end
 sumsiz       = [0 (cumsum (siz))];
 N            = sumsiz (end);
 
-if (nargin < 2) || isempty (inodes1)
-    inodes1  = size (N, 1);
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('inodes1', size (N, 1))
+p.addParameter('inodes2', 1)
+p.addParameter('gelsyn', 1)
+p.addParameter('ge', sparse (N, 1))
+p.addParameter('gi', sparse (N, 1))
+p.addParameter('Ee', 60)
+p.addParameter('Ei', -20)
+p.addParameter('I', [])
+p.addParameter('s', false)
+pars = parseArgs(p, varargin, {'inodes1', 'inodes2', 'gelsyn', ...
+                               'ge', 'gi', 'Ee', 'Ei', 'I'}, {'s'});
+%==============================================================================%
+
+if numel (pars.ge)  == 1
+    dg       = pars.ge;
+    pars.ge  = sparse (N, 1);
+    pars.ge (dg) = 1;
 end
 
-if (nargin < 3) || isempty (inodes2)
-    inodes2  = 1;
+if numel (pars.gi)  == 1
+    dg       = pars.gi;
+    pars.gi  = sparse (N, 1);
+    pars.gi (dg) = 1;
 end
 
-if (nargin < 4) || isempty (gelsyn)
-    gelsyn   = 1;
+if isempty (pars.I)
+    pars.I   = sparse (N, 1);
 end
 
-if (nargin < 5) || isempty (ge)
-    ge       = sparse (N, 1);
-end
-
-if (nargin < 6) || isempty (gi)
-    gi       = sparse (N, 1);
-end
-
-if (nargin < 7) || isempty (Ee)
-    Ee       =  60;
-end
-
-if (nargin < 8) || isempty (Ei)
-    Ei       = -20;
-end
-
-if numel (ge)  == 1
-    dg       = ge;
-    ge       = sparse (N, 1);
-    ge (dg)  = 1;
-end
-
-if numel (gi)  == 1
-    dg       = gi;
-    gi       = sparse (N, 1);
-    gi (dg)  = 1;
-end
-
-if (nargin < 9) || isempty (I)
-    I        = sparse (N, 1);
-end
-
-if numel (I) == 1
-    dI       = I;
-    I        = sparse (N, 1);
-    I (dI)   = 1;
-end
-
-if (nargin < 10) || isempty (options)
-    options  = '';
+if numel (pars.I) == 1
+    dI       = pars.I;
+    pars.I   = sparse (N, 1);
+    pars.I (dI) = 1;
 end
 
 MM               = sparse ( ...
@@ -134,6 +113,10 @@ for counter      = 1 : len
         sumsiz (counter) + 1 : sumsiz (counter + 1)) = ...
         M_tree   (intrees{counter});
 end
+
+inodes1 = pars.inodes1;
+inodes2 = pars.inodes2;
+gelsyn  = pars.gelsyn;
 
 if numel (gelsyn) == 1
     gelsyn       = ones (length (inodes1), 1) .* gelsyn;
@@ -152,12 +135,12 @@ end
 
 % feed into M the synaptic conductances
 MMg              = MM + ...
-    spdiags (ge, 0, N, N) + ...
-    spdiags (gi, 0, N, N);
+    spdiags (pars.ge, 0, N, N) + ...
+    spdiags (pars.gi, 0, N, N);
 % and then inject the corresponding current
-syn              = MMg \ ((ge .* Ee) + (gi .* Ei) + I);
+syn              = MMg \ ((pars.ge .* pars.Ee) + (pars.gi .* pars.Ei) + pars.I);
 
-if contains      (options, '-s')
+if pars.s
     clf;
     hold         on;
     X            = zeros (N, 1);
@@ -174,7 +157,7 @@ if contains      (options, '-s')
             intrees{counter}.Z;
     end
     L            = [];
-    ige          = find (ge ~= 0);
+    ige          = find (pars.ge ~= 0);
     R            = rand ( ...
         length (ige), 3) .* repmat ([50 50 150], ...
         length (ige), 1);
@@ -187,7 +170,7 @@ if contains      (options, '-s')
         'color',             [0 1 0], ...
         'linewidth',         2);
     L (1)        = HP (1);
-    igi          = find (gi ~= 0);
+    igi          = find (pars.gi ~= 0);
     R            = rand ( ...
         length (igi), 3) .* repmat ([50 50 150], ...
         length (igi), 1);
