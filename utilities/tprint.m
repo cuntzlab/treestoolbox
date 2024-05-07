@@ -153,16 +153,16 @@ if ~isempty(regexp(options, '-tif','ONCE'))
 end
 if ~isempty(regexp(options, '-eps','ONCE'))
     %     print        ('-depsc2', [tpath tname '.eps']);
-    print        ('-painters', '-depsc2', ...
+    print        ('-vector', '-depsc', ... % replaces -painters? -depsc2
         [tpath tname '.eps']);
     usedFormats = usedFormats +1;
 end
 if ~isempty(regexp(options, '-pdf','ONCE'))
     if ~isempty  (regexp(tname, '.pdf','ONCE'))
-        print    ('-painters', '-dpdf', ...
+        print    ('-vector', '-dpdf', ...
             ['-r' (num2str (res))], '-loose', [tpath tname]);
     else
-        print    ('-painters', '-dpdf', ...
+        print    ('-vector', '-dpdf', ...
             ['-r' (num2str (res))], [tpath tname '.pdf']);
     end
     usedFormats = usedFormats +1;
