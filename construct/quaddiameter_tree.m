@@ -47,7 +47,7 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function  varargout = quaddiameter_tree (intree, scale, offset, options, ...
+function  tree = quaddiameter_tree (intree, scale, offset, options, ...
     P, ldend)
 
 ver_tree     (intree); % verify that input is a tree structure
@@ -91,7 +91,7 @@ ipari        = [(1 : N)' (ipar_tree (tree))];
 % parent index paths but only for termination nodes:
 ipariT       = ipari (T_tree (tree), :);
 
-if contains  (options, '-w')      % waitbar option: initialization
+if contains (options, '-w')      % waitbar option: initialization
     HW       = waitbar ( ...
         0,                     'calculating quad diameter...');
     set      (HW, ...
@@ -123,13 +123,14 @@ end
 % to do this than averaging):
 for counter      = 1 : N
     iR           = ipariT == counter;
-    tree.D (counter)   = mean (Ds (iR));
+    tree.D (counter) = mean (Ds (iR));
 end
 
 tree.D           = tree.D + offset; % add offset diameter
 
 if contains      (options, '-s') % show option
-    clf; hold on;
+    clf;
+    hold         on;
     plot_tree    (intree, [0 0 0]);
     plot_tree    (tree,   [1 0 0]);
     title        ('quadratic diameter tapering');
