@@ -1,8 +1,8 @@
 % LIF_TREE   Leaky integrate-and-fire in full morphology
 % (trees package)
 %
-% [v, t, sp] = LIF_tree (intree, time, options, ...
-%                  Vzone, ge, gi, Ee, Ei, I, iroot, thr, vreset, Aspike)
+% [v, sp] = LIF_tree (intree, time, Vzone, ge, gi, Ee, Ei, ...
+%                       I, iroot, thr, vreset, Aspike, options)
 % ----------------------------------------------------------------------
 %
 % Calculates passive or spiking responses to synaptic inputs with dynamic
@@ -50,103 +50,109 @@
 % the TREES toolbox: edit, visualize and analyze neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [v, time, sp] = LIF_tree (intree, time, options, ...
-    Vzone, ge, gi, Ee, Ei, I, iroot, thr, vreset, Aspike)
+function [v, sp] = LIF_tree (intree, varargin)
 
 ver_tree         (intree);
 tree             = intree;
 
-if (nargin < 2)  || isempty (time)
-    time         = 0 : 0.1 : 1000;
-end
-
-if (nargin < 3)  || isempty (options)
-    options      = '';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('time', 0 : 0.1 : 1000)
+p.addParameter('Vzone', 0.995)
+p.addParameter('ge', [])
+p.addParameter('gi', [])
+p.addParameter('Ee', [])
+p.addParameter('Ei', [])
+p.addParameter('I', [])
+p.addParameter('iroot', [])
+p.addParameter('thr', [])
+p.addParameter('vreset', [])
+p.addParameter('Aspike', [])
+pars = parseArgs(p, varargin, ...
+    {'time', 'Vzone', 'ge', 'gi', 'Ee', 'Ei', ...
+    'I', 'iroot', 'thr', 'vreset', 'Aspike'}, ...
+    {'t', 'e'});
+%==============================================================================%
 
 M                = M_tree (intree);
 N                = size   (M,    1);
-T                = size   (time, 2);
-dt               = diff   (time  (1 : 2)) / 1000;
+T                = size   (pars.time, 2);
+dt               = diff   (pars.time  (1 : 2)) / 1000;
 
-if (nargin < 4)  || isempty (Vzone)
-    Vzone        = 0.995;
-end
-
-if (nargin < 5)  || isempty (ge)
+if isempty (pars.ge)
     if ~isfield  (tree, 'ge')
-        ge       = sparse (N, T);
+        pars.ge  = sparse (N, T);
     else
-        ge       = tree.ge;
+        pars.ge  = tree.ge;
     end
 end
 
-if (nargin < 6)  || isempty (gi)
+if isempty (pars.gi)
     if ~isfield   (tree, 'gi')
-        gi       = sparse (N, T);
+        pars.gi  = sparse (N, T);
     else
-        gi       = tree.gi;
+        pars.gi  = tree.gi;
     end
 end
 
-if (nargin < 7)  || isempty (Ee)
+if isempty (pars.Ee)
     if ~isfield   (tree, 'Ee')
-        Ee       =  60;
+        pars.Ee  =  60;
     else
-        Ee       = tree.Ee;
+        pars.Ee  = tree.Ee;
     end
 end
 
-if (nargin < 8)  || isempty (Ei)
+if isempty (pars.Ei)
     if ~isfield  (tree, 'Ei')
-        Ei       =  -20;
+        pars.Ei  =  -20;
     else
-        Ei       = tree.Ei;
+        pars.Ei  = tree.Ei;
     end
 end
 
-if (nargin < 9)  || isempty (I)
+if isempty (pars.I)
     if ~isfield  (tree, 'I')
-        I        = sparse (size (ge));
+        pars.I   = sparse (size (pars.ge));
     else
-        I        = tree.I;
+        pars.I   = tree.I;
     end
 end
 
-if (nargin < 10)  || isempty (iroot)
+if isempty (pars.iroot)
     if ~isfield  (tree, 'iroot')
-        iroot    = 1;
+        pars.iroot = 1;
     else
-        iroot    = tree.iroot;
+        pars.iroot = tree.iroot;
     end
 end
 
-if (nargin < 11) || isempty (thr)
+if isempty (pars.thr)
     if ~isfield  (tree, 'thr')
-        thr      = 10;
+        pars.thr = 10;
     else
-        thr      = tree.thr;
+        pars.thr = tree.thr;
     end
 end
 
-if (nargin < 12) || isempty (vreset)
+if isempty (pars.vreset)
     if ~isfield  (tree, 'vreset')
-        vreset   = 0;
+        pars.vreset = 0;
     else
-        vreset   = tree.vreset;
+        pars.vreset = tree.vreset;
     end
 end
 
-if (nargin < 13) || isempty (Aspike)
+if isempty (pars.Aspike)
     if ~isfield  (tree, 'Aspike')
-        Aspike   = 75;
+        pars.Aspike = 75;
     else
-        Aspike   = tree.Aspike;
+        pars.Aspike = tree.Aspike;
     end
 end
 
 plset            = zeros (N, 1);
-if contains (options, '-t')
+if pars.t
     lambda       = 100;
     xoffset      = 600;
     Pvec         = Pvec_tree (tree);
@@ -158,32 +164,32 @@ Msurf            = spdiags   (surf, 0, N, N);
 Mcm              = (Msurf .* tree.Cm) / dt; % given in micro Farad!!!!
 M                = M + Mcm;
 Mcm_vec          = full      (diag (Mcm)); % get capacitance vector
-v                = zeros     (size (I));
+v                = zeros     (size (pars.I));
 sp               = [];
 for counterT     = 1 : T - 1
-    if contains  (options, '-e')
+    if pars.e
         if mod (counterT - 1, 100) == 0
-            disp (time (counterT));
+            disp (pars.time (counterT));
         end
     end
     M1           = M;
     % feed into M the synaptic conductances
     M1           = M1 +  ...
-        spdiags  (ge (:, counterT), 0, N, N) + ...
-        spdiags  (gi (:, counterT), 0, N, N);
+        spdiags  (pars.ge (:, counterT), 0, N, N) + ...
+        spdiags  (pars.gi (:, counterT), 0, N, N);
     v (:, counterT + 1) = M1 \ (...
-        (ge   (:, counterT) .* Ee') + ...
-        (gi   (:, counterT) .* Ei') + ...
-        I     (:, counterT) + ...
-        v     (:, counterT) .* Mcm_vec);
+        (pars.ge   (:, counterT) .* pars.Ee') + ...
+        (pars.gi   (:, counterT) .* pars.Ei') + ...
+        pars.I     (:, counterT) + ...
+        v          (:, counterT) .* Mcm_vec);
     % voltage reaches threshold -> reset
-    if  v (iroot, counterT + 1) >=  thr
-        v     (iroot, counterT) =   Aspike;   % spike amplitude
+    if  v (pars.iroot, counterT + 1) >=  pars.thr
+        v     (pars.iroot, counterT) =   pars.Aspike;   % spike amplitude
         v0       = v (:, counterT + 1);
         %         v     (v     (ireset, counterT + 1) > Vzone * thr, counterT + 1) = ...
         %             vreset;   % reset voltage
         
-        v (:, counterT + 1) = vreset + (v0 - vreset) .* plset;
+        v (:, counterT + 1) = pars.vreset + (v0 - pars.vreset) .* plset;
         % remember spike times:
         sp       =   [sp; (counterT * dt)];
     end

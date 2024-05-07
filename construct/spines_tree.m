@@ -55,72 +55,56 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [tree, indhead, indneck] = spines_tree (intree, XYZ, ...
-    dneck, dhead, mlneck, stdlneck, ...
-    ipart, options)
+function [tree, indhead, indneck] = spines_tree (intree, varargin)
 
 ver_tree     (intree);       % verify that input is a tree structure
 tree         = intree;
-
 X            = tree.X;       % X-locations of nodes on tree
 Y            = tree.Y;       % Y-locations of nodes on tree
 Z            = tree.Z;       % Z-locations of nodes on tree
 N            = size (X, 1);  % number of nodes in tree
 
-if (nargin < 2) || isempty (XYZ)
-    XYZ      = 100;
-end
-
-if (nargin < 3) || isempty (dneck)
-    dneck    = 0.5;
-end
-
-if (nargin < 4) || isempty (dhead)
-    dhead    = 1;
-end
-
-if (nargin < 5) || isempty (mlneck)
-    mlneck   = 1;
-end
-
-if (nargin < 6) || isempty (stdlneck)
-    stdlneck = 1;
-end
-
-if (nargin < 7) || isempty (ipart)
-    % {DEFAULT index: select all nodes/points}
-    ipart    = (1 : N)';
-end
-
-if (nargin < 8) || isempty (options)
-    options  = '-w';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('XYZ', 100)
+p.addParameter('dneck', 0.5)
+p.addParameter('dhead', 1)
+p.addParameter('mlneck', 1)
+p.addParameter('stdlneck', 1)
+p.addParameter('ipart', (1 : N)')
+p.addParameter('sr', false)
+p.addParameter('w', true)
+p.addParameter('s', false)
+pars = parseArgs(p, varargin, ...
+    {'XYZ', 'dneck', 'dhead', 'mlneck', 'stdlneck', 'ipart'}, ...
+    {'sr', 'w', 's'});
+%==============================================================================%
 
 direction        = direction_tree (tree, '-n');
-if     numel (XYZ) == 1
-    indy         = ceil (rand (XYZ, 1) * length (ipart));
-elseif all   (XYZ < N) % they are indices
-    indy         = XYZ;
+if     numel (pars.XYZ) == 1
+    indy         = ceil (rand (pars.XYZ, 1) * length (pars.ipart));
+elseif all   (pars.XYZ < N) % they are indices
+    indy         = pars.XYZ;
 end
 dXYZ             = zeros (numel (indy), 3);
 for counter      = 1 : numel (indy)
     % calculate an orthogonal vector to the direction of the dendrite:
-    [~, ~, V]    = svd (direction (ipart (indy (counter)), :), 0);  
+    [~, ~, V]    = svd (direction (pars.ipart (indy (counter)), :), 0);  
     % rotate the vector around axis dendrite axis by random radians:
     M            = makehgtform ('axisrotate', ....
-        direction (ipart (indy (counter)), :), ...
+        direction (pars.ipart (indy (counter)), :), ...
         2 * rand () * pi);
     dXYZ (counter, :) = V (:, 3)' * M (1 : 3, 1 : 3);
 end
-XYZ              = [ ...
-    (X (ipart (indy))) ...
-    (Y (ipart (indy))) ...
-    (Z (ipart (indy)))] + ...
-    repmat ((randn (numel (indy), 1) * stdlneck + mlneck), 1, 3) .* dXYZ;
+pars.XYZ         = [ ...
+    (X (pars.ipart (indy))) ...
+    (Y (pars.ipart (indy))) ...
+    (Z (pars.ipart (indy)))] + ...
+    repmat ((randn (numel (indy), 1) * pars.stdlneck + pars.mlneck), 1, 3) .* dXYZ;
 
 if isfield       (tree, 'R')
     if isfield   (tree, 'rnames')
-        if contains (options, '-sr')
+        if pars.sr
             r    = find (strcmpi (tree.rnames, 'spine_neck'));
             if ~isempty (r)
                 iR (1) = r (1);
@@ -153,41 +137,41 @@ end
 if numel (iR) == 1
     iR (2)       = iR (1);
 end
-if contains (options, '-sr')
+if pars.sr
     tree.rnames{iR(1)} = 'spines_neck';
     tree.rnames{iR(2)} = 'spines_head';
 end
 
-if contains (options, '-w') % waitbar option: initialization
-    if size (XYZ, 1) > 99
+if pars.w % waitbar option: initialization
+    if size (pars.XYZ, 1) > 99
         HW = waitbar (0, 'spining...');
         set (HW, 'Name', '..PLEASE..WAIT..YEAH..');
     end
 end
-for counter = 1 : size (XYZ, 1)
-    if contains (options, '-w') % waitbar option: update
+for counter = 1 : size (pars.XYZ, 1)
+    if pars.w % waitbar option: update
         if mod (counter, 100) == 0
-            waitbar (counter / size (XYZ, 1), HW);
+            waitbar (counter / size (pars.XYZ, 1), HW);
         end
     end
     [tree, indneck]    = insert_tree (tree, ...
         [1 (iR (1)) ...
-        (XYZ (counter, 1)) ...
-        (XYZ (counter, 2)) ...
-        (XYZ (counter, 3)) ...
-        dneck (ipart (indy (counter)))], 'none');
+        (pars.XYZ (counter, 1)) ...
+        (pars.XYZ (counter, 2)) ...
+        (pars.XYZ (counter, 3)) ...
+        pars.dneck (pars.ipart (indy (counter)))], 'none');
     [tree, indhead]    = insert_tree (tree, ...
         [1 (iR (2)) ...
-        (XYZ (counter, 1) + dXYZ (counter, 1) * dhead) ...
-        (XYZ (counter, 2) + dXYZ (counter, 2) * dhead) ...
-        (XYZ (counter, 3) + dXYZ (counter, 3) * dhead) ...
-        dhead (N + 1 + 2 * (counter - 1))], 'none');
+        (pars.XYZ (counter, 1) + dXYZ (counter, 1) * pars.dhead) ...
+        (pars.XYZ (counter, 2) + dXYZ (counter, 2) * pars.dhead) ...
+        (pars.XYZ (counter, 3) + dXYZ (counter, 3) * pars.dhead) ...
+        pars.dhead (N + 1 + 2 * (counter - 1))], 'none');
 end
-if contains (options, '-w') % waitbar option: close
+if pars.w % waitbar option: close
     close        (HW);
 end
 
-if contains      (options, '-s')
+if pars.s
     clf;
     hold         on;
     plot_tree    (tree);

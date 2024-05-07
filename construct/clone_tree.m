@@ -22,7 +22,7 @@
 % - bf       ::number between 0 .. 1: balancing factor
 %     {DEFAULT: 0.4}
 % - options  ::string:
-%     '-2d'  : 2D clones
+%     '-dim2': 2D clones (Careful, used to be called '-2d')
 %     '-s'   : show plot
 %     '-w'   : with waitbar
 %     {DEFAULT '-w'}
@@ -42,20 +42,20 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function ctrees = clone_tree (intrees, num, bf, options)
+function ctrees = clone_tree (intrees, varargin)
 
-if (nargin < 2) || isempty (num)
-    % {DEFAULT number of trees: one}
-    num      = 1;
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('num', 1)
+p.addParameter('bf', 0.4)
+p.addParameter('dim2', false)
+p.addParameter('w', true)
+p.addParameter('s', false)
+pars = parseArgs(p, varargin, {'num', 'bf'}, {'dim2', 'w', 's'});
+%==============================================================================%
 
-if (nargin < 3) || isempty (bf)
-    % {DEFAULT balancing factor (see "MST_tree")}
-    bf       = 0.4;
-end
-
-if (nargin < 4) || isempty (options)
-    options  = '-w';
+if ~iscell(intrees)
+    intrees = {intrees};
 end
 
 spanning         = gscale_tree   (intrees);
@@ -67,16 +67,16 @@ Rother           = find ( ...
     ~strcmp (spanning.regions, 'axon')   & ...
     ~strcmp (spanning.regions, 'soma'));
 
-if contains      (options, '-w') % waitbar option: initialization
+if pars.w % waitbar option: initialization
     HW           = waitbar (0, 'creating clones one by one...');
     set          (HW, 'Name', '..PLEASE..WAIT..YEAH..');
 end
 
 % store synthetic trees:
-ctrees           = cell (1, num);
-for counterN     = 1 : num
-    if contains  (options, '-w') % waitbar option: update
-        waitbar  (counterN / num, HW);
+ctrees           = cell (1, pars.num);
+for counterN     = 1 : pars.num
+    if pars.w % waitbar option: update
+        waitbar  (counterN / pars.num, HW);
     end
     if ~isempty  (Rsoma)
         maxD     = [];
@@ -98,7 +98,7 @@ for counterN     = 1 : num
             +        mean (spanning.ylims{Rsoma}(:, 1))); ...
             (randn * std  (spanning.ylims{Rsoma}(:, 2)) ...
             +        mean (spanning.ylims{Rsoma}(:, 2)))];
-        if ~contains (options, '-2d')
+        if ~pars.dim2
             ZL   = [ ...
                 (randn * std  (spanning.zlims{Rsoma}(:, 1)) ...
                 +        mean (spanning.zlims{Rsoma}(:, 1))); ...
@@ -222,7 +222,7 @@ for counterN     = 1 : num
         [XR, YR, ZR]  = rpoints_tree (M, 4 * N, [], dX, dY, dZ, 0, 'none');
         % try out one tree with N points
         [tree1, indx] = MST_tree ({soma}, ...
-            XR (1 : N), YR (1 : N), ZR (1 : N), bf , ...
+            XR (1 : N), YR (1 : N), ZR (1 : N), pars.bf , ...
             10000, 150000, [], '-b');
         iNEW     = zeros (size (tree1.dA, 1), 1);
         iNEW (indx (indx (:, 2) ~= 0, 2)) = 1;
@@ -235,7 +235,7 @@ for counterN     = 1 : num
             NN   = round (N * 3.5);
         end
         tree     = MST_tree ({soma}, ...
-            XR (1 : NN), YR (1 : NN), ZR (1 : NN), bf ,...
+            XR (1 : NN), YR (1 : NN), ZR (1 : NN), pars.bf ,...
             10000, 150000, [], '-b');
         idpar    = idpar_tree (tree);
         % index at which the primary dendrite is attached (hopefully):
@@ -260,7 +260,7 @@ for counterN     = 1 : num
         end
         [XR, YR, ZR]  = rpoints_tree (M, 4 * N, [], dX, dY, dZ, 0, 'none');
         [tree1, indx] = MST_tree ({subtree}, ...
-            XR (1 : N), YR (1 : N), ZR (1 : N), bf, ...
+            XR (1 : N), YR (1 : N), ZR (1 : N), pars.bf, ...
             10000, 150000, [], '-b');
         iNEW     = zeros (size (tree1.dA, 1), 1);
         iNEW (indx (indx (:, 2) ~= 0, 2)) = 1;
@@ -270,7 +270,7 @@ for counterN     = 1 : num
             NN   = round (N * 3.5);
         end
         subtree  = MST_tree ({subtree}, ...
-            XR (1 : NN), YR (1 : NN), ZR (1 : NN), bf ,...
+            XR (1 : NN), YR (1 : NN), ZR (1 : NN), pars.bf ,...
             10000, 150000, [], '-b');
         subtree.R (subtree.R == 1) = ...
             subtree.R (subtree.R == 1) * 0 + ...
@@ -370,7 +370,7 @@ for counterN     = 1 : num
             [XR, YR, ZR] = rpoints_tree ( ...
                 M, 4 * N, [], dX, dY, dZ, 0, 'none');
             [tree1, indx] = MST_tree ({tree}, ...
-                XR (1 : N), YR (1 : N), ZR (1 : N), bf, ...
+                XR (1 : N), YR (1 : N), ZR (1 : N), pars.bf, ...
                 10000, 150000, [], '-b');
             iNEW     = zeros (size (tree1.dA, 1), 1);
             iNEW (indx (indx (:, 2) ~= 0, 2)) = 1;
@@ -380,7 +380,7 @@ for counterN     = 1 : num
                 NN   = round (N * 3.5);
             end
             tree     = MST_tree ({tree}, ...
-                XR (1 : NN), YR (1 : NN), ZR (1 : NN), bf, ...
+                XR (1 : NN), YR (1 : NN), ZR (1 : NN), pars.bf, ...
                 10000, 150000, [], '-b');
             tree.R (tree.R == 1) = ...
                 tree.R (tree.R == 1) * 0 + ...
@@ -431,18 +431,14 @@ for counterN     = 1 : num
     ctrees{counterN}   = btree;
 end
 
-if contains      (options, '-w') % waitbar option: close
+if pars.w % waitbar option: close
     close        (HW);
 end
 
-if contains      (options, '-s') % waitbar option: close
+if pars.s
     clf;
     hold         on;
-    if length    (intrees) > 1
-        plot_tree (intrees{1});
-    else
-        plot_tree (intrees);
-    end
+    plot_tree    (intrees{1});
     plot_tree    (ctrees{1}, [1 0 0]);
     HP (1)       = plot (1, 1, 'k-');
     HP (2)       = plot (1, 1, 'r-');

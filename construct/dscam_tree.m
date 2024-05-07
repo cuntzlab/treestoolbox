@@ -26,22 +26,20 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function tree = dscam_tree (intree, iterations, options)
+function tree = dscam_tree (intree, varargin)
 
-% default num iterations
-if (nargin <2)||isempty(iterations)
-    iterations = length(intree.X)*5;
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('iterations', length(intree.X)*5)
+p.addParameter('s', false)
+pars = parseArgs(p, varargin, {'iterations'}, {'s'});
+%==============================================================================%
 
-if (nargin<3)||isempty(options)
-    options = 'none';
-end
-
-tree         = intree;
+tree             = intree;
 
 %How far should a node be moved to closest node?
 movePercent      = 0.1;
-for counter      = 1 : iterations
+for counter      = 1 : pars.iterations
 
     % create index vector
     iVector 	 = true (length (tree.X), 1);
@@ -94,7 +92,7 @@ for counter      = 1 : iterations
     tree.Z (iChild) = tree.Z (iChild) + XYZMove (3);
 end
 
-if contains      (options, '-s')
+if pars.s
     clf;
     hold         on;
     plot_tree    (intree, [],      [], [], [], '-3l');

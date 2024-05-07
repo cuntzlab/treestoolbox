@@ -27,20 +27,21 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2016  Hermann Cuntz
 
-function elen = elen_tree (intree, options)
+function elen = elen_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('s', false)
+pars = parseArgs(p, varargin, {}, {'s'});
+%==============================================================================%
 
 elen             = len_tree (intree) ./ lambda_tree (intree) / 10000;
 % conversion here from [um] length to [cm] since electrotonic properties
 % are per cm
 
-if contains      (options, '-s')
+if pars.s
     ipart        = find (elen ~= 0); % single out non-0-length segments
     clf; hold on;
     plot_tree    (intree, elen, [], ipart);

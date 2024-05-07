@@ -39,34 +39,37 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function tree = soma_tree (intree, maxD, l, options)
+function tree = soma_tree (intree, varargin)
 
 ver_tree     (intree);
 tree         = intree;
 
-if (nargin < 2) || isempty (maxD)
-    maxD     = 30;
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('maxD', 30)
+p.addParameter('l', [])
+p.addParameter('r', false)
+p.addParameter('b', false)
+p.addParameter('s', false)
+pars = parseArgs(p, varargin, {'maxD', 'l'}, {'r', 'b', 's'});
+%==============================================================================%
+
+if isempty (pars.l)
+    pars.l       = 1.5 * pars.maxD;
 end
 
-if (nargin < 3) || isempty (l)
-    l        = 1.5 * maxD;
-end
-
-if (nargin < 4) || isempty (options)
-    options  = '';
-end
 
 Plen             = Pvec_tree (tree);
-indy             = find      (Plen < l / 2);
+indy             = find      (Plen < pars.l / 2);
 % % this used to be:
 % dmaxD        = max       (tree.D (indy), ...
 %     maxD / 4 * cos (pi * Plen (indy) / (l / 2)) + maxD / 4);
 
 dmaxD            = max       ( ...
     tree.D (indy), ...
-    maxD * cos (pi * Plen (indy) / l) );
+    pars.maxD * cos (pi * Plen (indy) / pars.l) );
 
-if contains (options, '-b')
+if pars.b
     flag         = 0;
     % check if branch point directly at soma..check if this branchpoint is
     % just the axon (angle should be wider than 90°):
@@ -91,14 +94,14 @@ end
 
 tree.D (indy)    = dmaxD;
 
-if contains (options, '-r')
+if pars.r
     if ~any (strcmp (intree.rnames,'soma'))
         tree.rnames  = [tree.rnames, 'soma'];
     end
     tree.R (indy)    = find (strcmp (tree.rnames, 'soma'));
 end
 
-if contains      (options, '-s')
+if pars.s
     clf;
     hold         on;
     HP           = plot_tree (intree);

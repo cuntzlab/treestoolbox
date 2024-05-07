@@ -41,7 +41,7 @@
 %     '-t'   : time lapse save
 %     '-b'   : suppress multifurcations
 %     '-c'   : grow only from cut ends (marked in DIST)
-%     {DEFAULT '-w'}
+%     {DEFAULT ''}
 %
 % Output
 % ------
@@ -62,8 +62,7 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [tree, indx] = MST_tree (msttrees, X, Y, Z, bf, ...
-    thr, mplen, DIST, options)
+function [tree, indx] = MST_tree (msttrees, varargin)
 
 if (nargin < 1) || isempty (msttrees)
     % starting tree is just point (0,0,0)
@@ -77,49 +76,53 @@ if (nargin < 1) || isempty (msttrees)
     msttrees{1}.rnames = {'tree'};
 end
 
-if (nargin < 2) || isempty (X)
-    X        = rand  (1000, 1)        .* 400;
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('X', rand  (1000, 1) .* 400)
+p.addParameter('Y', [])
+p.addParameter('Z', [])
+p.addParameter('bf', 0.4)
+p.addParameter('thr', 50)
+p.addParameter('mplen', 10000)
+p.addParameter('DIST', [])
+p.addParameter('t', false)
+p.addParameter('b', false)
+p.addParameter('c', false)
+p.addParameter('w', false)
+p.addParameter('s', false)
+pars = parseArgs(p, varargin, {'X', 'Y', 'Z', 'bf' 'thr', 'mplen', 'DIST'}, ...
+    {'t', 'b', 'c', 'w', 's'});
+%==============================================================================%
 
-if (nargin < 3) || isempty (Y)
+X            = pars.X;
+Y            = pars.Y;
+Z            = pars.Z;
+bf           = pars.bf;
+mplen        = pars.mplen;
+thr          = pars.thr;
+
+if isempty (Y)
     Y        = rand  (size (X, 1), 1) .* 400;
 end
 
-if (nargin < 4) || isempty (Z)
+if isempty (Z)
     Z        = zeros (size (X, 1), 1);
 end
 
-if (nargin < 5) || isempty (bf)
-    bf       = 0.4;
-end
-
-if (nargin < 6) || isempty (thr)
-    thr      = 50;
-end
-
-if (nargin < 7) || isempty (mplen)
-    mplen    = 10000;
-end
-
-if (nargin < 8) || isempty (DIST)
+if isempty (pars.DIST)
     DIST     = [];
 else
-    Derr     = max (max (DIST));
-    DIST     = DIST / Derr;
+    Derr     = max (max (pars.DIST));
+    DIST     = pars.DIST / Derr;
 end
 
-if (nargin < 9) || isempty (options)
-    % options  = '-w';
-    options  = '';
-end
-
-if contains (options, '-c')
+if pars.c
     if isempty (DIST)
         disp ('Growing from cut ends only, needs DIST to be specefied!!');
         GrowCutends = false;
     else
         GrowCutends = true;
-        [Drows, Dcols] = find(DIST > 0);
+        [Drows, ~] = find(DIST > 0);
         usednodes = [];
     end
 else
@@ -160,14 +163,14 @@ if ~isempty      (DIST)
     end
 end
 
-if contains       (options, '-t')  % time lapse save
+if pars.t  % time lapse save
     timetrees    = cell (lent, 1);
     for countert = 1 : lent
         timetrees{countert}{1} = msttrees{countert};
     end
 end
 
-if contains       (options, '-s')  % prepare a plot if showing
+if pars.s  % prepare a plot if showing
     clf;
     % choose colors for the different trees:
     colors       = [ ...
@@ -224,7 +227,7 @@ for counter            = 1 : lent
         % calculate distance from all open points to any point on the tree:
         dis            = zeros (1, lenX);
         idis           = ones  (1, lenX);
-        if contains     (options, '-b') % avoid multifurcations
+        if pars.b % avoid multifurcations
             % non-branch points:
             iCT        = find (sum (msttrees{counter}.dA, 1) < 2);
             % search only among non-branch-points:
@@ -253,7 +256,7 @@ for counter            = 1 : lent
         [rdist{counter}, irdist{counter}] = sort (dis);
         % set actual vicinity to all points in distance tthr of root
         avic{counter}  = sum (rdist{counter} < tthr{counter});
-        if contains     (options, '-s')
+        if pars.s
             plot3      ( ...
                 X (irdist{counter}(1 : avic{counter})), ...
                 Y (irdist{counter}(1 : avic{counter})), ...
@@ -302,7 +305,7 @@ for counter            = 1 : lent
         [rdist{counter}, irdist{counter}] = sort (root_dist{counter});
         % set actual vicinity to all points in distance tthr of root
         avic{counter}  = sum (rdist{counter} < tthr{counter});
-        if contains     (options, '-s')
+        if pars.s
             plot3      ( ...
                 X (irdist{counter} (1 : avic{counter})), ...
                 Y (irdist{counter} (1 : avic{counter})), ...
@@ -330,7 +333,7 @@ for counter            = 1 : lent
     end
 end
 
-if contains             (options, '-w')
+if pars.w
     HW                 = waitbar (0, 'finding minimum spanning tree...');
     set                (HW, 'Name', '..PLEASE..WAIT..YEAH..');
 end
@@ -340,7 +343,7 @@ ncounter               = 0;
 flag                   = 1;
 indx                   = zeros (size (X, 1), 2);
 while ~isempty (dplen) && (flag == 1)
-    if contains         (options, '-w')
+    if pars.w
         if mod         (ncounter, 500) == 0
             waitbar    (ncounter / lenX, HW);
         end
@@ -361,7 +364,7 @@ while ~isempty (dplen) && (flag == 1)
             PlenCurrTree = Pvec_tree(msttrees{counter});
             if isfield(msttrees{1},'AddedMain')
                 CutCheckNodes = CutTermNodes(OriTreeNodes);
-                CutCheckNodes(find(CutCheckNodes >= min(msttrees{1}.AddedMain))) = [];
+                CutCheckNodes(CutCheckNodes >= min(msttrees{1}.AddedMain)) = [];
             else
                 CutCheckNodes = CutTermNodes(OriTreeNodes);
             end
@@ -383,17 +386,17 @@ while ~isempty (dplen) && (flag == 1)
                 %                 getRanInd  = randi(length(OriTreeInd));
                 itree = CutTermInds(OriTreeInd(IminCut));
                 allproxCends = CutTermInds(OriTreeInd(sortInd(:)));
-                if ~all(ismember(allproxCends,usednodes))
+                if ~all(ismember(allproxCends, usednodes))
                     Chctr = 2;
-                    while ismember(itree,usednodes)
+                    while ismember(itree, usednodes)
                         itree = CutTermInds(OriTreeInd(sortInd(Chctr)));
                         Chctr = Chctr+1;
                     end
                 end
-            elseif ~all(ismember(CutCheckNodes,usednodes))%randCutGr
+            elseif ~all(ismember(CutCheckNodes, usednodes))%randCutGr
                 if ~isempty(iopen)
-                    notused = find(ismember(CutCheckNodes,usednodes) == 0);
-                    itree = CutTermNodes(OriTreeNodes(notused(1)));
+                    notused = find(ismember(CutCheckNodes, usednodes) == 0);
+                    itree   = CutTermNodes(OriTreeNodes(notused(1)));
                     disCutPts        = sqrt ( ...
                         (X (inX{counter} (:)) - ...
                         msttrees{counter}.X (itree)).^2 + ...
@@ -408,8 +411,8 @@ while ~isempty (dplen) && (flag == 1)
                     disp('Chose a Cut Terminal...................');
                 end
             end
-            if ismember(itree,CutCheckNodes) && ~ismember(itree,usednodes)
-                usednodes = [usednodes,itree];
+            if ismember(itree, CutCheckNodes) && ~ismember(itree, usednodes)
+                usednodes = [usednodes, itree];
             end
         end
 
@@ -515,7 +518,7 @@ while ~isempty (dplen) && (flag == 1)
                 end
                 % last added point:
                 ITREE{counter} (idplen == 2) = N {counter};
-                if contains (options, '-b')
+                if pars.b
                     if sum (msttrees {counter}.dA (:, itree)) > 1
                         % non-branch points:
                         iCT = find (sum (msttrees {counter}.dA, 1) < 2);
@@ -564,7 +567,7 @@ while ~isempty (dplen) && (flag == 1)
                 indo   = irdist{counter} (avic{counter} + 1 : vic);
                 leno   = length (indo); % number of new points
                 % repeat the old story with all new points:
-                if contains (options, '-b')
+                if pars.b
                     % non-branch points:
                     iCT = find (sum (msttrees{counter}.dA, 1) < 2);
                     dis = sqrt ( ...
@@ -620,18 +623,18 @@ while ~isempty (dplen) && (flag == 1)
                 if ~isempty (DIST)
                     iDISTP{counter} = [iDISTP{counter} (indo + TSUM)];
                 end
-                if contains (options, '-s')
+                if pars.s
                     plot3 (X (indo), Y (indo), Z (indo), 'g.');
                 end
                 avic{counter} = vic;
             end
-            if contains (options, '-s')
+            if pars.s
                 set (HP{counter}, 'visible', 'off');
                 HP{counter}  = ...
                     plot_tree (msttrees{counter}, colors (counter, :));
                 drawnow;
             end
-            if contains (options, '-t')
+            if pars.t
                 timetrees{counter}{end+1} = msttrees{counter};
             end
             % indicates that a point has been added in at least one tree:
@@ -640,10 +643,10 @@ while ~isempty (dplen) && (flag == 1)
         end
     end
 end
-if contains             (options, '-w')
+if pars.w
     close              (HW);
 end
-if contains             (options, '-t')
+if pars.t
     msttrees           = timetrees;
 end
 

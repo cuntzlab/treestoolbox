@@ -34,21 +34,22 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function tree = BCT_tree (BCT, options)
+function tree = BCT_tree (varargin)
 
-if (nargin < 1) || isempty (BCT)
-    BCT      = [1 2 1 0 2 0 0];
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('BCT', [1 2 1 0 2 0 0])
+p.addParameter('w', false)
+p.addParameter('s', false)
+p.addParameter('dA', false)
+pars = parseArgs(p, varargin, {'BCT'}, {'w', 's', 'dA'});
+%==============================================================================%
 
-if (nargin < 2) || isempty (options)
-    options  = '';
-end
-
-if ~isBCT_tree (BCT)
+if ~isBCT_tree (pars.BCT)
     error    ('input vector is not BCT conform');
 end
 
-zlen             = length (BCT);
+zlen             = length (pars.BCT);
 STACK            = 1;
 POINTER          = 1;
 i1               = 0;
@@ -58,13 +59,13 @@ for counter      = 1 : zlen
         dA       (counter, i1) = 1;
     end
     i1           = counter;
-    if BCT (counter) == 0
+    if pars.BCT (counter) == 0
         % POP ART
         ART      = STACK (POINTER);
         POINTER  = POINTER - 1;
         i1       = ART;
     end
-    if BCT (counter) == 2
+    if pars.BCT (counter) == 2
         PC       = counter;
         % PUSH PC
         POINTER  = POINTER + 1;
@@ -76,18 +77,18 @@ tree             = [];
 tree.dA          = dA;
 
 % add metrics if not explicitly unwanted
-if ~contains     (options, '-dA')
-    if contains  (options, '-w')
+if ~pars.dA
+    if pars.w
         [~, tree] = xdend_tree (tree, '-w');
     else
         [~, tree] = xdend_tree (tree, 'none');
     end
 end
 
-if contains      (options, '-s') % show option
+if pars.s % show option
     clf;
     hold         on;
-    if contains  (options, '-dA')
+    if pars.dA
         dendrogram_tree (tree, [], PL_tree (tree));
         axis     off;
     else

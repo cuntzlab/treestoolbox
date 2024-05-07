@@ -30,23 +30,24 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function cgin = cgin_tree (intree, options)
+function cgin = cgin_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 % use only membrane conductance vector/value for this function:
 Gm           = intree.Gm;
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('s', false)
+pars = parseArgs(p, varargin, {}, {'s'});
+%==============================================================================%
 
 cgin             = 1 / ...
     ((1 / Gm) / (sum (surf_tree (intree)) / 100000000));
 % conversion here from [um2] to [cm2] since electrotonic properties
 % are per cm2
 
-if contains (options, '-s')
+if pars.s
     % calculate local input conductance in tree:
     gin          = 1 ./ (diag (sse_tree (intree)) * 1000000);
 

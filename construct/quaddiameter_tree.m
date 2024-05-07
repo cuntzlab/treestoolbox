@@ -1,7 +1,7 @@
 % QUADDIAMETER_TREE   Map quadratic diameter tapering to tree.
 % (trees package)
 %
-% tree = quaddiameter_tree (intree, scale, offset, options, P, ldend)
+% tree = quaddiameter_tree (intree, scale, offset, P, ldend, options)
 % -------------------------------------------------------------------
 %
 % Applies a quadratic decaying diameter on a given tree structure. P
@@ -39,7 +39,7 @@
 %
 % Example
 % -------
-% quaddiameter_tree (sample_tree, [], [], '-s')
+% quaddiameter_tree (sample_tree, [], [], [], [], '-s')
 %
 % See also
 % Uses Pvec_tree ipar_tree T_tree ver_tree dA D
@@ -47,35 +47,33 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function  tree = quaddiameter_tree (intree, scale, offset, options, ...
-    P, ldend)
+function  tree = quaddiameter_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 % use full tree for this function
 tree         = intree;
 
-if (nargin < 2) || isempty (scale)
-    % {DEFAULT: 50 % of if the branch was on its own}
-    scale    = 0.5;
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('scale', 0.5)
+p.addParameter('offset', 0.5)
+p.addParameter('P', [])
+p.addParameter('ldend', [])
+p.addParameter('s', false)
+p.addParameter('w', false)
+pars = parseArgs(p, varargin, {'scale', 'offset', 'P', 'ldend'}, {'s', 'w'});
+%==============================================================================%
 
-if (nargin < 3) || isempty (offset)
-    % {DEFAULT: + 0.5 um ofif the branch was on its own}
-    offset   = 0.5;
-end
+P            = pars.P;
+ldend        = pars.ldend;
 
-if (nargin < 4) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
-
-if (nargin < 5) || isempty (P)
+if isempty (P)
     % {DEFAULT: parameters calculated for optimal current transfer for
     % branches on their own}
     load     quaddiameter_P P
 end
 
-if (nargin < 6) || isempty (ldend)
+if isempty (ldend)
     % {DEFAULT: length values of branches for which P is given
     % quaddiameter_tree uses the P whos ldend is closest to the
     % path length for each path to termination point}
@@ -91,7 +89,8 @@ ipari        = [(1 : N)' (ipar_tree (tree))];
 % parent index paths but only for termination nodes:
 ipariT       = ipari (T_tree (tree), :);
 
-if contains (options, '-w')      % waitbar option: initialization
+
+if pars.w      % waitbar option: initialization
     HW       = waitbar ( ...
         0,                     'calculating quad diameter...');
     set      (HW, ...
@@ -100,7 +99,7 @@ end
 
 Ds               = zeros (size (ipariT));
 for counter      = 1    : size (ipariT, 1)
-    if contains   (options, '-w')    % waitbar option: update
+    if pars.w    % waitbar option: update
         if mod   (counter, 500) == 0
             waitbar (counter / size (ipariT, 1), HW);
         end
@@ -110,12 +109,12 @@ for counter      = 1    : size (ipariT, 1)
     pathh        = Plen   (iipariT);
     % find which ldend is closest to path length:
     [~, i2]      = min    ((pathh (end) - ldend).^2);
-    quadpathh    = polyval (P (i2, :), pathh) .* scale;
+    quadpathh    = polyval (P (i2, :), pathh) .* pars.scale;
     % apply the diameters:
     Ds (counter, 1 : length (quadpathh)) = fliplr (quadpathh);
 end
 
-if contains      (options, '-w')      % waitbar option: close
+if pars.w      % waitbar option: close
     close        (HW);
 end
 
@@ -126,11 +125,11 @@ for counter      = 1 : N
     tree.D (counter) = mean (Ds (iR));
 end
 
-tree.D           = tree.D + offset; % add offset diameter
+tree.D           = tree.D + pars.offset; % add offset diameter
 
-if contains      (options, '-s') % show option
-    clf;
-    hold         on;
+
+if pars.s % show option
+    clf; hold on;
     plot_tree    (intree, [0 0 0]);
     plot_tree    (tree,   [1 0 0]);
     title        ('quadratic diameter tapering');

@@ -27,21 +27,22 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function gm  = gm_tree (intree, options)
+function gm  = gm_tree (intree, varargin)
 
 ver_tree     (intree);             % verify that input is a tree structure
 % use only membrane conductance vector/value for this function
 Gm       = intree.Gm;
 
-if (nargin < 2) || isempty (options)
-    % {DEFAULT: no option}
-    options  = '';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('s', false)
+pars = parseArgs(p, varargin, {}, {'s'});
+%==============================================================================%
 
 gm               = Gm .* surf_tree (intree) / 100000000;
 % conversion from um2 to cm2 since electrotonic properties are per cm
 
-if contains (options, '-s')   % show option
+if pars.s   % show option
     ipart        = find (gm ~= 0); % single out non-0-length segments
     clf;
     hold         on;

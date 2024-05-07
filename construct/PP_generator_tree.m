@@ -42,9 +42,9 @@
 % - options  ::string:
 %     	'-m'  : show the point cloud in each iteration
 %		'-s'  : show the resulting point cloud
-%	  	'-3d' : 3D point cloud
+%	  	'-dim3' : 3D point cloud (Careful, used to be called '-3d')
 %       '-e'  : echo
-%     	{DEFAULT: '-2d -m'}
+%     	{DEFAULT: '-m -e'}
 %
 % Output
 % ------
@@ -66,52 +66,36 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [P, numIt, Rvalues] = PP_generator_tree ( ...
-    N, R, a, alpha, n_mc, level, epsilon, options)
+function [P, numIt, Rvalues] = PP_generator_tree (varargin)
 
-if nargin    < 1 || isempty (N)
-    N        = 100;
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('N', 100)
+p.addParameter('R', 1.2)
+p.addParameter('a', 0.1)
+p.addParameter('alpha', 0.5)
+p.addParameter('n_mc', 100)
+p.addParameter('level', 0.05)
+p.addParameter('epsilon', 0)
+p.addParameter('dim3', false)
+p.addParameter('m', true)
+p.addParameter('e', true)
+p.addParameter('s', false)
+pars = parseArgs(p, varargin, ...
+    {'N', 'R', 'a', 'alpha', 'n_mc', 'level', 'epsilon'}, {'dim3', 'm', 'e', 's'});
+%==============================================================================%
 
-if nargin    < 2 || isempty (R)
-    R        = 1.2;
-end
-
-if nargin    < 3 || isempty (a)
-    a        = 0.1;
-end
-
-if nargin    < 4 || isempty (alpha)
-    alpha    = 0.5;
-end
-
-if nargin    < 5 || isempty (n_mc)
-    n_mc     = 100;
-end
-
-if nargin    < 6 || isempty (level)
-    level    = 0.05;
-end
-
-if nargin    < 7 || isempty (epsilon)
-    epsilon  = 0;
-end
-
-if nargin    < 8 || isempty (options)
-    options  = '-2d -m -e';
-end
-
-if (epsilon > 0) % volume exclusion (epsilon is the minimum distance between points)
+if (pars.epsilon > 0) % volume exclusion (epsilon is the minimum distance between points)
 	X                    = 0;
 	Y                    = 0;
-	if contains           (options, '-3d')
+	if pars.dim3
 		Z                = 0;
 	end
 	counter              = 1;
-	while                (counter < N)
+	while                (counter < pars.N)
 		xini             = ceil (rand (1, 1) * 200 - 100);
 		yini             = ceil (rand (1, 1) * 200 - 100);
-		if contains       (options, '-3d')
+		if pars.dim3
 			zini         = ceil (rand (1, 1) * 200 - 100);
 			distance     = sqrt ( ...
 				(xini - X).^2 + ...
@@ -122,36 +106,37 @@ if (epsilon > 0) % volume exclusion (epsilon is the minimum distance between poi
 				(xini - X).^2 + ...
 				(yini - Y).^2);
 		end
-		if (sum (distance < epsilon) == 0) % no intersections
+		if (sum (distance < pars.epsilon) == 0) % no intersections
 			X            = [X; xini];
 			Y            = [Y; yini];
-			if contains   (options, '-3d')
+			if pars.dim3
 				Z        = [Z; zini];
 			end
 			counter      = counter + 1;
 		end
 	end
 
-	if contains           (options, '-3d')
+	if pars.dim3
 		P                = [X, Y, Z];
 		t                = struct( ...
 			'X', X, ...
 			'Y', Y, ...
 			'Z', Z);
-		Ract             = r_mc_tree (t, alpha, n_mc, level, '-3d');
+		Ract             = r_mc_tree (t, pars.alpha, pars.n_mc, pars.level);
 	else
 		P                = [X, Y];
 		t                = struct ( ...
 			'X', X, ...
 			'Y', Y, ...
 			'Z', 0 * X);
-		Ract             = r_mc_tree (t, alpha, n_mc, level, '-2d');
-	end
+		Ract             = r_mc_tree (t, pars.alpha, pars.n_mc, pars.level, '-dim2');
+    end
+    Ract                 = Ract.R;
 	Rvalues              = Ract; % initial R value
 
-	if contains           (options, '-m')
+	if pars.m
 		clf;
-		if contains       (options, '-3d')
+		if pars.dim3
 			plot3        (X, Y, Z, 'k.');
             view         (3);
 		else
@@ -162,19 +147,19 @@ if (epsilon > 0) % volume exclusion (epsilon is the minimum distance between poi
 		drawnow;
 	end
 
-	if ( ((Ract > R) && (a > 0)) || ((Ract < R) && (a < 0)))
-		a                = -a;
+	if (((Ract > pars.R) && (pars.a > 0)) || ((Ract < pars.R) && (pars.a < 0)))
+		pars.a                = -pars.a;
 	end
 
 	numIt                = 0;
-	while ((Ract < R - 0.01) || (Ract > R + 0.01))
-        if contains      (options, '-e')
-    		disp         ([Ract R]);
+	while ((Ract < pars.R - 0.01) || (Ract > pars.R + 0.01))
+        if pars.e
+    		disp         ([Ract pars.R]);
         end
-		iNN              = zeros (N, 1);
-		dR               = abs   (R - Ract);
-		for counterNN    = 1 : N
-			if contains   (options, '-3d')
+		iNN              = zeros (pars.N, 1);
+		dR               = abs   (pars.R - Ract);
+		for counterNN    = 1 : pars.N
+			if pars.dim3
 				d        = sqrt ( ...
 					(X (counterNN) - X).^2 + ...
 					(Y (counterNN) - Y).^2 + ...
@@ -186,15 +171,15 @@ if (epsilon > 0) % volume exclusion (epsilon is the minimum distance between poi
 			end
 			d (counterNN) = inf;
 			movedPoint   = 0;
-			neighbors    = N - 1;
+			neighbors    = pars.N - 1;
 			while ((movedPoint == 0) && (neighbors > 0))
 				
 				[~, i1]  = min (d);
 				iNN (counterNN) = i1;
 				dX       = (X (counterNN) - X (iNN (counterNN)));
 				dY       = (Y (counterNN) - Y (iNN (counterNN)));
-				newx     = X (counterNN) + dR * a * dX;
-				newy     = Y (counterNN) + dR * a * dY;
+				newx     = X (counterNN) + dR * pars.a * dX;
+				newy     = Y (counterNN) + dR * pars.a * dY;
 				if (newx < -100)
 					newx = -100;
 				end
@@ -207,9 +192,9 @@ if (epsilon > 0) % volume exclusion (epsilon is the minimum distance between poi
 				if (newy > 100)
 					newy = 100;
 				end
-				if contains (options, '-3d')
+				if pars.dim3
 					dZ   = (Z (counterNN) - Z (iNN (counterNN)));
-					newz = Z (counterNN) + dR * a * dZ;
+					newz = Z (counterNN) + dR * pars.a * dZ;
 					if (newz < -100)
 						newz = -100;
 					end
@@ -226,10 +211,10 @@ if (epsilon > 0) % volume exclusion (epsilon is the minimum distance between poi
 						(Y (counterNN) - Y).^2);
 				end
 				distance (counterNN) = inf;
-				if (sum(distance < epsilon) == 0) % no intersections
+				if (sum(distance < pars.epsilon) == 0) % no intersections
 					X (counterNN) = newx;
 					Y (counterNN) = newy;
-					if contains (options, '-3d')
+					if pars.dim3
 						Z (counterNN) = newz;
 					end
 					movedPoint = 1;
@@ -242,30 +227,31 @@ if (epsilon > 0) % volume exclusion (epsilon is the minimum distance between poi
 			end
         end
         
-		if contains       (options, '-3d')
+		if pars.dim3
 			P            = [X, Y, Z];
 			t            = struct ( ...
 				'X', X, ...
 				'Y', Y, ...
 				'Z', Z);
-			Ract         = r_mc_tree (t, alpha, n_mc, level, '-3d');
+			Ract         = r_mc_tree (t, pars.alpha, pars.n_mc, pars.level);
 		else
 			P            = [X, Y];
 			t            = struct ( ...
 				'X', X, ...
 				'Y', Y, ...
 				'Z', 0 * X);
-			Ract         = r_mc_tree (t, alpha, n_mc, level, '-2d');
-		end
+			Ract         = r_mc_tree (t, pars.alpha, pars.n_mc, pars.level, '-dim2');
+        end
+        Ract             = Ract.R;
 		Rvalues          = [Rvalues, Ract];
 		
-		if (((Ract > R) && (a > 0)) || ((Ract < R) && (a < 0)))
-			a            = -a;
+		if (((Ract > pars.R) && (pars.a > 0)) || ((Ract < pars.R) && (pars.a < 0)))
+			pars.a            = -pars.a;
 		end
 		
-		if contains       (options, '-m')
+		if pars.m
 			clf; hold    on;
-			if contains   (options, '-3d')
+			if pars.dim3
 				plot3    (X, Y, Z, 'k.');
                 view     (3)
 			else
@@ -279,26 +265,27 @@ if (epsilon > 0) % volume exclusion (epsilon is the minimum distance between poi
 	end
 	
 else % no volume exclusion
-	xini                 = ceil (rand ((N - 1), 1) * 200 - 100);
-	yini                 = ceil (rand ((N - 1), 1) * 200 - 100);
+	xini                 = ceil (rand ((pars.N - 1), 1) * 200 - 100);
+	yini                 = ceil (rand ((pars.N - 1), 1) * 200 - 100);
 	X                    = [0; xini];
 	Y                    = [0; yini];
-	if contains           (options, '-3d')
-		zini             = ceil (rand ((N - 1), 1) * 200 - 100);
+	if pars.dim3
+		zini             = ceil (rand ((pars.N - 1), 1) * 200 - 100);
 		Z                = [0; zini];
 		P                = [X, Y, Z];
 		t                = struct ('X', X, 'Y', Y, 'Z', Z);
-		Ract             = r_mc_tree (t, alpha, n_mc, level, '-3d'); 
+		Ract             = r_mc_tree (t, pars.alpha, pars.n_mc, pars.level); 
 	else
 		P                = [X, Y];
 		t                = struct ('X', X, 'Y', Y, 'Z', 0*X);
-		Ract             = r_mc_tree (t, alpha, n_mc, level, '-2d'); 
-	end
+		Ract             = r_mc_tree (t, pars.alpha, pars.n_mc, pars.level, '-dim2'); 
+    end
+    Ract                 = Ract.R;
 	Rvalues              = Ract; % initial R value
 
-	if contains           (options, '-m')
+	if pars.m
 		clf;
-		if contains       (options, '-3d')
+		if pars.dim3
 			plot3        (X, Y, Z, 'k.');
             view         (3);
 		else
@@ -309,19 +296,19 @@ else % no volume exclusion
 		drawnow;
 	end
 
-	if (((Ract > R) && (a > 0)) || ((Ract < R) && (a < 0)))
-		a                = -a;
+	if (((Ract > pars.R) && (pars.a > 0)) || ((Ract < pars.R) && (pars.a < 0)))
+		pars.a                = -pars.a;
 	end
 
 	numIt                = 0;
-	while ((Ract < R - 0.01) || (Ract > R + 0.01))
-        if contains      (options, '-e')
-    		disp         ([Ract R]);
+	while ((Ract < pars.R - 0.01) || (Ract > pars.R + 0.01))
+        if pars.e
+    		disp         ([Ract pars.R]);
         end
-		iNN              = zeros (N, 1);
-		dR               = abs   (R - Ract);
-		for counterNN    = 1 : N
-			if contains   (options, '-3d')
+		iNN              = zeros (pars.N, 1);
+		dR               = abs   (pars.R - Ract);
+		for counterNN    = 1 : pars.N
+			if pars.dim3
 				d        = sqrt ( ...
                     (X (counterNN) - X).^2 + ...
                     (Y (counterNN) - Y).^2 + ...
@@ -337,35 +324,36 @@ else % no volume exclusion
 		end
 		dX               = (X - X (iNN));
 		dY               = (Y - Y (iNN));
-		X                = X + dR * a * dX;
-		Y                = Y + dR * a * dY;
+		X                = X + dR * pars.a * dX;
+		Y                = Y + dR * pars.a * dY;
 		X (X < -100)     = -100;
 		Y (Y < -100)     = -100;
 		X (X >  100)     =  100;
 		Y (Y >  100)     =  100;
 		
-		if contains       (options, '-3d')
+		if pars.dim3
 			dZ           = (Z - Z (iNN));
-			Z            = Z + dR * a * dZ;
+			Z            = Z + dR * pars.a * dZ;
 			Z (Z < -100) = -100;
 			Z (Z >  100) =  100;
 			P            = [X, Y, Z];
 			t            = struct ('X', X, 'Y', Y, 'Z', Z);
-			Ract         = r_mc_tree (t, alpha, n_mc, level, '-3d');
+			Ract         = r_mc_tree (t, pars.alpha, pars.n_mc, pars.level);
 		else
 			P            = [X, Y];
 			t            = struct ('X', X, 'Y', Y, 'Z', 0 * X);
-			Ract         = r_mc_tree (t, alpha, n_mc, level, '-2d');
-		end
-		Rvalues = [Rvalues, Ract];
+			Ract         = r_mc_tree (t, pars.alpha, pars.n_mc, pars.level, '-dim2');
+        end
+        Ract             = Ract.R;
+		Rvalues          = [Rvalues, Ract];
 		
-		if ( ((Ract > R) && (a > 0)) || ((Ract < R) && (a < 0)))
-			a = -a;
+		if ( ((Ract > pars.R) && (pars.a > 0)) || ((Ract < pars.R) && (pars.a < 0)))
+			pars.a = -pars.a;
 		end
 
-		if contains (options, '-m')
+		if pars.m
 			clf;
-			if contains (options, '-3d')
+			if pars.dim3
 				plot3 (X, Y, Z, 'k.');
                 view (3);
 			else
@@ -381,10 +369,10 @@ else % no volume exclusion
 
 end
 
-if contains      (options, '-s')
+if pars.s
     clf;
     hold         on;
-    if contains   (options, '-3d')
+    if pars.dim3
         plot3    (X, Y, Z, 'k.');
     else
         plot     (X, Y, 'k.');

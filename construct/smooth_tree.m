@@ -41,30 +41,20 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function  tree = smooth_tree (intree, pwchild, p, n, options)
+function  tree = smooth_tree (intree, varargin)
 
 ver_tree     (intree); % verify that input is a tree structure
 tree         = intree;
 
-if (nargin < 2) || isempty (pwchild)
-    % {DEFAULT: minimum asymmetry}
-    pwchild  = 0.5;
-end
-
-if (nargin < 3) || isempty (p)
-    % {DEFAULT: strong smoothing at each iteration}
-    p        = 0.9; 
-end
-
-if (nargin < 4) || isempty (n)
-    % {DEFAULT: five smoothing iterations}
-    n        = 5; 
-end
-
-if (nargin < 5) || isempty (options)
-    % {DEFAULT: waitbar option}
-    options  = '-w';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('pwchild', 0.5)
+p.addParameter('p', 0.9)
+p.addParameter('n', 5)
+p.addParameter('w', true)
+p.addParameter('s', false)
+pars = parseArgs(p, varargin, {'pwchild', 'p', 'n'}, {'w', 's'});
+%==============================================================================%
 
 % starting and end points of all branches:
 sect             = dissect_tree (tree);
@@ -75,14 +65,14 @@ idpar            = ipar         (:, 2);
 % number of daugther nodes:
 nchild           = child_tree   (tree);
 
-if contains      (options, '-w')       % waitbar option: initialization
+if pars.w       % waitbar option: initialization
     HW           = waitbar (0, 'finding heavy sub-branches...');
     set      (    HW, ...
         'Name',                '..PLEASE..WAIT..YEAH..');
 end
 counter          = 1;
 while counter    <= size (sect, 1)
-    if contains  (options, '-w')   % waitbar option: update
+    if pars.w   % waitbar option: update
         if mod   (counter, 500) == 0
             waitbar (counter / (size (sect, 1)), HW);
         end
@@ -97,7 +87,7 @@ while counter    <= size (sect, 1)
     wchild       = nchild (dchildren);
     % relative weight of child trees
     rwchild      = wchild ./ sum (wchild);
-    if sum       (rwchild > pwchild)
+    if sum       (rwchild > pars.pwchild)
         [~, i2]  = max (rwchild);
         % sub tree of heaviest child tree
         [subs, ~] = ind2sub (size (ipar), find (ipar == dchildren (i2)));
@@ -110,11 +100,11 @@ while counter    <= size (sect, 1)
     end
 end
 
-if contains      (options, '-w')   % waitbar option: reinitialization
+if pars.w   % waitbar option: reinitialization
     waitbar      (0, HW, 'smoothing heavy sub-branches...');
 end
 for counter      = 1 : size (sect, 1)
-    if contains   (options, '-w')   % waitbar option: update
+    if pars.w   % waitbar option: update
         waitbar  (counter / (size (sect, 1)), HW);
     end
     % corresponds to "plotsect_tree":
@@ -124,16 +114,16 @@ for counter      = 1 : size (sect, 1)
     [Xs, Ys, Zs] = smoothbranch ( ...
         tree.X (indi2), ...
         tree.Y (indi2), ...
-        tree.Z (indi2), p, n);
+        tree.Z (indi2), pars.p, pars.n);
     tree.X (indi2) = Xs;
     tree.Y (indi2) = Ys;
     tree.Z (indi2) = Zs;
 end
-if contains      (options, '-w')   % waitbar option: close
+if pars.w   % waitbar option: close
     close        (HW);
 end
 
-if contains      (options, '-s')   % show option
+if pars.s   % show option
     clf;
     hold         on;
     plot_tree    (intree);

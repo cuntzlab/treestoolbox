@@ -1,7 +1,7 @@
 % AdExLIF_tree   Adaptive exponential LIF in full morphology
 % (trees package)
 %
-% [v, sp, w] = AdExLIF_tree (intree, time, I, ge, gi, options)
+% [v, sp, w] = AdExLIF_tree (intree, time, I, ge, gi)
 % -----------------------------------------------------------------
 %
 % Calculates passive or spiking responses to synaptic inputs with dynamic
@@ -12,9 +12,6 @@
 % - intree ::integer: index of tree in trees or structured tree
 % - time   ::vector: in [ms]
 % - I      ::NxT matrix: currents injected in each node per time
-% - options::string: {DEFAULT: ''}
-%     '-s' : show
-%     '-full' : outputs voltage traces for all nodes
 %
 % The input tree needs to have the following fields:
 % - Cm     : Membrane capacitance {DEFAULT: 1 uF/cm2}
@@ -40,7 +37,7 @@
 %
 % Example
 % -------
-% AdExLIF_tree (sample_tree, 100,  95, '-s')
+% AdExLIF_tree (sample_tree)
 %
 % See also syn_tree M_tree sse_tree syncat_tree
 % Uses M_tree ver_tree
@@ -48,33 +45,34 @@
 % the TREES toolbox: edit, visualize and analyze neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [v, sp, w] = AdExLIF_tree (intree, time, I, ge, gi, options)
+function [v, sp, w] = AdExLIF_tree (intree, varargin)
 
 ver_tree     (intree);
 tree         = intree;
 
-if (nargin < 2)  || isempty (time)
-    time     = 0 : 0.1 : 1000;
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('time', 0 : 0.1 : 1000)
+p.addParameter('I', [])
+p.addParameter('ge', [])
+p.addParameter('gi', [])
+pars = parseArgs(p, varargin, {'time', 'I', 'ge', 'gi'}, {});
+%==============================================================================%
 
 M            = M_tree (tree);
 N            = size   (M, 1);
-T            = size   (time, 2);
+T            = size   (pars.time, 2);
 
-if (nargin < 3) || isempty (I)
-    I        = sparse (N, T);
+if isempty (pars.I)
+    pars.I   = sparse (N, T);
 end
 
-if (nargin < 4) || isempty (ge)
-    ge       = sparse (N, T);
+if isempty (pars.ge)
+    pars.ge  = sparse (N, T);
 end
 
-if (nargin < 5) || isempty (gi)
-    gi       = sparse (N, T);
-end
-
-if (nargin < 6)  || isempty (options)
-    options  = '';
+if isempty (pars.gi)
+    pars.gi  = sparse (N, T);
 end
 
 if ~isfield (tree, 'Ri')
@@ -143,37 +141,37 @@ end
 
 
 
-dt               = diff (time (1 : 2)) / 1000;
+dt               = diff (pars.time (1 : 2)) / 1000;
 surf             = surf_tree (tree) / 100000000; % now [cm2]
 Msurf            = spdiags   (surf, 0, N, N);
 Mcm              = (Msurf .* tree.Cm) / dt; % given in micro Farad!!!!
 M                = M + Mcm;
 Mgm              = Msurf .* tree.Gm.* 1000000;
 Mcm_vec          = full (diag (Mcm)); % get capacitance vector
-Mgm_vec          = full (diag (Mgm)) ;
+Mgm_vec          = full (diag (Mgm));
 v                = zeros (size (tree.X));
 w                = zeros (size (tree.X));
 sp               = [];
 for counterT     = 1 : T - 1
     if mod (counterT, 500) == 1
-        disp     (time (counterT));
+        disp     (pars.time (counterT));
     end
     M1           = M;
     % feed into M the synaptic conductances
     M1           = M1 +  ...
-        spdiags (ge (:, counterT), 0, N, N) + ...
-        spdiags (gi (:, counterT), 0, N, N);
+        spdiags    (pars.ge (:, counterT), 0, N, N) + ...
+        spdiags    (pars.gi (:, counterT), 0, N, N);
 
     w (:, counterT + 1) = ...
         (tree.a * (v (:, counterT) - tree.EL) - w (:, counterT)) ...
         / tree.tauw * dt + w (:, counterT);
 
     v (:, counterT + 1) = M1 \ (...
-        (ge   (:, counterT) .* tree.Ee') + ...
-        (gi   (:, counterT) .* tree.Ei') + ...
-        I     (:, counterT) - ...
-        w     (:, counterT) + ...
-        v     (:, counterT) .* Mcm_vec);
+        (pars.ge   (:, counterT) .* tree.Ee') + ...
+        (pars.gi   (:, counterT) .* tree.Ei') + ...
+        pars.I     (:, counterT) - ...
+        w          (:, counterT) + ...
+        v          (:, counterT) .* Mcm_vec);
 
     v (tree.iroot, counterT + 1) = ...
         v (tree.iroot, counterT + 1) + ...

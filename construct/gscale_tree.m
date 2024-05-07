@@ -39,11 +39,14 @@
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
 % Copyright (C) 2009 - 2023  Hermann Cuntz
 
-function [spanning, ctrees] = gscale_tree (intrees, options)
+function [spanning, ctrees] = gscale_tree (intrees, varargin)
 
-if (nargin < 2) || isempty (options)
-    options  = 'none';
-end
+%=============================== Parsing inputs ===============================%
+p = inputParser;
+p.addParameter('s', false)
+p.addParameter('w', false)
+pars = parseArgs(p, varargin, {}, {'s', 'w'});
+%==============================================================================%
 
 for counterT     = 1 : length (intrees)
     intrees {counterT} = tran_tree (intrees{counterT});
@@ -68,14 +71,14 @@ spanning.zmass   = cell   (1, lenr);
 spanning.iR      = cell   (1,    1);
 spanning.nBT     = cell   (1,    1);
 dR               = zeros  (1, lenr); % empty region flag
-if contains      (options, '-w') % waitbar option: initialization
+if pars.w % waitbar option: initialization
     HW           = waitbar (0, ...
         'scanning spanning fields region by region...');
     set          (HW, ...
         'Name',                '..PLEASE..WAIT..YEAH..');
 end
 for counterR     = 1 : length (spanning.regions)
-    if contains  (options, '-w') % waitbar option: update
+    if pars.w % waitbar option: update
         waitbar  (counterR / length (spanning.regions), HW);
     end
     flag         = 0;
@@ -179,7 +182,7 @@ end
 % parameters:
 qtrees           = cell (1, 1);
 for counterT     = 1 : length (intrees)
-    if contains  (options, '-w') % waitbar option: update
+    if pars.w % waitbar option: update
         waitbar  (counterT / length (intrees), HW);
     end
     qtrees{counterT} = quaddiameter_tree (intrees {counterT});
@@ -189,7 +192,7 @@ end
 % (can be expanded):
 spanning.wriggles = zeros (length (intrees), 2);
 for counterT     = 1 : length (intrees)
-    if contains  (options, '-w') % waitbar option: update
+    if pars.w % waitbar option: update
         waitbar  (counterT / length (intrees), HW);
     end
     tree         = intrees{counterT};
@@ -253,7 +256,7 @@ spanning.Y       = cell (1, 1);
 spanning.Z       = cell (1, 1);
 spanning.qdiam   = cell (1, 1);
 for counterR     = 1 : length (spanning.regions)
-    if contains  (options, '-w') % waitbar option: update
+    if pars.w % waitbar option: update
         waitbar  (counterR / length (spanning.regions), HW);
     end
     spanning.qdiam{counterR} = [];
@@ -329,11 +332,11 @@ for counterR     = 1 : lenr
     spanning.stdnBT (counterR) = std  (cat (2, spanning.nBT{counterR}{:}));
 end
 
-if contains      (options, '-w') % waitbar option: close
+if pars.w % waitbar option: close
     close        (HW);
 end
 
-if contains      (options, '-s')
+if pars.s
     clf;
     hold         on;
     cX           = [ ...
