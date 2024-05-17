@@ -349,7 +349,7 @@ classdef Trees < handle
                      out = self.subsref(s(2:end));
                      mat = nan(numel(out), 1);
                      for i=1:numel(out)
-                         mat(i) = max(out{i}, 'omitnan');
+                         mat(i) = max(out{i}, [], 'omitnan');
                      end
                      out = mat';
                  elseif strcmp(s(1).subs, 'bptp')

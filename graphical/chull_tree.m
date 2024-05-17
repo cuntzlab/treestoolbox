@@ -1,12 +1,21 @@
-% CHULL_TREE   Convex hull around whole or part of a tree.
+% CHULL_TREE   Convex hull
 % (trees package)
 %
 % [HP hull] = chull_tree (intree, ipart, color, DD, alpha, options)
 % -----------------------------------------------------------------
 %
-% Plots a convex hull around indexed nodes (ipart) of a tree. If tree is
-% 100% flat 3D convex hull doesn't work. If number of selected nodes is 2
-% draw a straight line. If number of selected nodes is 1 plot a point.
+% Plots a convex hull around nodes with index ipart of tree intree (intree
+% can also simply be an *Nx3* matrix of XYZ points). Hull patch is offset by
+% XYZ 3-tupel DD and coloured with RGB 3-tupel color. alpha sets the
+% transparency of the patch (by default .2). Option '-2d' restricts the
+% hull patch to two dimensions. HP is the handle to the graphical object.
+% Set options to 'none' to avoid graphical output. Output hull is a
+% structure containing in hull.XY(Z) the coordinates and in hull.ch the
+% indices to the convex hull (see Matlab function �convhull�).
+%
+% If the tree is 100% flat 3D convex hull doesn't work. If selected nodes
+% are two draws a straight line. If selected nodes are one plots a point. 
+%
 %
 % Input
 % -----

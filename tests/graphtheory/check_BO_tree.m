@@ -1,6 +1,7 @@
 %% check_BO_tree
 
 %% test 1
+tic
 dLPTCs           = load_tree ('dLPTCs.mtr');
 for counterN     = 1 : 500
     for counter  = 1 : length (dLPTCs{1})
@@ -8,13 +9,15 @@ for counterN     = 1 : 500
         BO_tree (tree);
     end
 end
+toc
+disp ('This until now usually takes <5 secs')
 
 %% test 2
 BO_tree          (sample_tree, '-s');
 tprint           ('./panels/BO_tree1', ...
     '-jpg -HR',                [10 10]);
 
-%% test 3
+%% test 3 -DOCUMENTATION
 clf;
 tree             = sample2_tree;
 plot_tree        (tree, BO_tree (tree));
@@ -33,4 +36,6 @@ set              (HP, ...
 tprint           ('./panels/BO_tree3', ...
     '-jpg -HR',                [10 10]);
 
-
+%% Object oriented testing
+T                = trees.Trees ({sample_tree, sample2_tree});
+T.max.BO

@@ -36,12 +36,12 @@ ver_tree     (intree); % verify that input is a tree structure
 dA           = intree.dA;
 
 %=============================== Parsing inputs ===============================%
-p = inputParser;
-p.addParameter('s', false, @isBinary)
-pars = parseArgs(p, varargin, {}, {'s'});
+p            = inputParser;
+p.addParameter ('s', false, @isBinary)
+pars         = parseArgs (p, varargin, {}, {'s'});
 %==============================================================================%
 
-N                = size(dA, 1); % number of nodes in tree
+N                = size (dA, 1); % number of nodes in tree
 % type (2:B, 1:C, 0:T) on the spot in a matrix sdA:
 % 2s potentiate and then taking the log2 to indicate branching point on the
 % way..
