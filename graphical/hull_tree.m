@@ -52,18 +52,20 @@
 
 function [c, M, HP] = hull_tree (intree, varargin)
 
-%=============================== Parsing inputs ===============================%
-p = inputParser;
-p.addParameter('thr', 25)
-p.addParameter('bx', 50)
-p.addParameter('by', 50)
-p.addParameter('bz', 50)
-p.addParameter('s', true, @isBinary)
-p.addParameter('w', true, @isBinary)
-p.addParameter('F', true, @isBinary)
-p.addParameter('dim2', false, @isBinary)
-pars = parseArgs(p, varargin, {'thr', 'bx', 'by', 'bz'}, {'s', 'w', 'F', 'dim2'});
-%==============================================================================%
+%=============================== Parsing inputs ==========================%
+p            = inputParser;
+p.addParameter ('thr',  25)
+p.addParameter ('bx',   50)
+p.addParameter ('by',   50)
+p.addParameter ('bz',   50)
+p.addParameter ('s',    true)
+p.addParameter ('w',    true)
+p.addParameter ('F',    true)
+p.addParameter ('dim2', false)
+pars         = parseArgs (p, varargin, ...
+    {'thr', 'bx', 'by', 'bz'}, ...
+    {'s', 'w', 'F', 'dim2'});
+%=========================================================================%
 
 % use node position for this function
 if isnumeric (intree) && numel (intree) > 1
@@ -80,13 +82,13 @@ else
 end
 
 % calculate bx / by / bz values for the grid:
-if numel (pars.bx)    == 1
+if isscalar (pars.bx)
     pars.bx           = ...
         min (X) - 2 * pars.thr : ...
         (4 * pars.thr + max (X) - min (X)) / pars.bx : ...
         max (X) + 2 * pars.thr;
 end
-if numel (pars.by)    == 1
+if isscalar (pars.by)
     pars.by           = ...
         min (Y) - 2 * pars.thr : ...
         (4 * pars.thr + max (Y) - min (Y)) / pars.by : ...
@@ -94,7 +96,7 @@ if numel (pars.by)    == 1
 end
 
 if ~pars.dim2  % 3D option
-    if numel     (pars.bz) == 1                   % only here do you need bz
+    if isscalar     (pars.bz)                   % only here do you need bz
         pars.bz       = ...
             min (Z) - 2 * pars.thr : ...
             (4 * pars.thr + max (Z) - min (Z)) / pars.bz : ...

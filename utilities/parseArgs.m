@@ -1,4 +1,4 @@
-function pars = parseArgs(p, inputArgs, argNames, optionsNames)
+function pars = parseArgs (p, inputArgs, argNames, optionsNames)
 
 numArgs = numel(inputArgs);
 if (numArgs > 0 && ...
@@ -17,7 +17,7 @@ pars = p.Results;
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function args = parsePositionalArgs(inputArgs, argNames, optionsNames)
+function args = parsePositionalArgs (inputArgs, argNames, optionsNames)
 
 optionsPos = numel(argNames) + 1; % Always comes at the end after all the other arguments
 % Check if the options argument is provided
