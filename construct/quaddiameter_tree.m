@@ -23,14 +23,14 @@
 %     {DEFAULT: 0.5}
 % - offset   ::value: added base diameter
 %     {DEFAULT: 0.5}
-% - options  ::string:
-%     '-s'    : show
-%     '-w'    : waitbar
-%     {DEFAULT ''}
 % - P        ::matrix of three columns: parameters for the quadratic
 %     equation in dependence of the root to tip length given in:
 % - ldend    ::vertical vector, same length as P: typical lengths at which
 %     P are given
+% - options  ::string:
+%     '-s'    : show
+%     '-w'    : waitbar
+%     {DEFAULT ''}
 %
 % Output
 % ------
@@ -45,7 +45,7 @@
 % Uses Pvec_tree ipar_tree T_tree ver_tree dA D
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2023  Hermann Cuntz
+% Copyright (C) 2009 - 2024  Hermann Cuntz
 
 function  tree = quaddiameter_tree (intree, varargin)
 
@@ -53,16 +53,18 @@ ver_tree     (intree); % verify that input is a tree structure
 % use full tree for this function
 tree         = intree;
 
-%=============================== Parsing inputs ===============================%
-p = inputParser;
-p.addParameter('scale', 0.5)
-p.addParameter('offset', 0.5)
-p.addParameter('P', [])
-p.addParameter('ldend', [])
-p.addParameter('s', false)
-p.addParameter('w', false)
-pars = parseArgs(p, varargin, {'scale', 'offset', 'P', 'ldend'}, {'s', 'w'});
-%==============================================================================%
+% =============================== Parsing inputs ======================== %
+p            = inputParser;
+p.addParameter ('scale', 0.5)
+p.addParameter ('offset', 0.5)
+p.addParameter ('P', [])
+p.addParameter ('ldend', [])
+p.addParameter ('s', false)
+p.addParameter ('w', false)
+pars         = parseArgs (p, varargin, ...
+    {'scale', 'offset', 'P', 'ldend'}, ...
+    {'s', 'w'});
+% ======================================================================= %
 
 P            = pars.P;
 ldend        = pars.ldend;

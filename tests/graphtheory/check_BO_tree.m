@@ -37,5 +37,5 @@ tprint           ('./panels/BO_tree3', ...
     '-jpg -HR',                [10 10]);
 
 %% Object oriented testing
-T = Trees ({sample_tree, sample2_tree});
+T                = trees.Trees ({sample_tree, sample2_tree});
 T.max.BO
