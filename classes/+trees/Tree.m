@@ -143,6 +143,13 @@ classdef Tree < handle
             if nargin > 0
                self.tree_ = varargin{1};
                % props = properties(class(self))
+               self.set_prop('dA', varargin{1}.dA)
+               self.set_prop('X', varargin{1}.X)
+               self.set_prop('Y', varargin{1}.Y)
+               self.set_prop('Z', varargin{1}.Z)
+               self.set_prop('D', varargin{1}.D)
+               self.set_prop('R', varargin{1}.R)
+               self.set_prop('rnames', varargin{1}.rnames)
                self.dA      = varargin{1}.dA;
                self.X       = varargin{1}.X;
                self.Y       = varargin{1}.Y;
@@ -153,11 +160,11 @@ classdef Tree < handle
             else
                self.tree_ = {};
             end
-            if nargin > 1
-               self.props_ = varargin{2};
-            else
-               self.props_ = {};
-            end
+            % if nargin > 1
+            %    self.props_ = varargin{2};
+            % else
+            %    self.props_ = {};
+            % end
         end
         
         function self = repair(self)
@@ -176,6 +183,11 @@ classdef Tree < handle
                        varargout{1} = varargout{1}(T_tree(t) | B_tree(t));
                    elseif find(ismember(methods(self), name))
                        [varargout{1:nargout}] = builtin('subsref', self, s);
+                   elseif find(ismember(properties(self), name))
+                       [varargout{1:nargout}] = builtin('subsref', self, s);
+                       % self.tree_.name = varargout{1:nargout};
+                       self.set_prop(name, varargout)
+                       % self.name = varargout{1:nargout};
                    elseif isfield(self.tree(), name)
                        [varargout{1:nargout}] = builtin('subsref', self.tree(), s);
                    else
