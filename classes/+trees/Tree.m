@@ -185,9 +185,8 @@ classdef Tree < handle
                        [varargout{1:nargout}] = builtin('subsref', self, s);
                    elseif find(ismember(properties(self), name))
                        [varargout{1:nargout}] = builtin('subsref', self, s);
-                       % self.tree_.name = varargout{1:nargout};
+                       self.tree_.(name) = varargout{1:nargout};
                        self.set_prop(name, varargout)
-                       % self.name = varargout{1:nargout};
                    elseif isfield(self.tree(), name)
                        [varargout{1:nargout}] = builtin('subsref', self.tree(), s);
                    else
