@@ -142,14 +142,6 @@ classdef Tree < handle
 
             if nargin > 0
                self.tree_ = varargin{1};
-               % props = properties(class(self))
-               self.set_prop('dA', varargin{1}.dA)
-               self.set_prop('X', varargin{1}.X)
-               self.set_prop('Y', varargin{1}.Y)
-               self.set_prop('Z', varargin{1}.Z)
-               self.set_prop('D', varargin{1}.D)
-               self.set_prop('R', varargin{1}.R)
-               self.set_prop('rnames', varargin{1}.rnames)
                self.dA      = varargin{1}.dA;
                self.X       = varargin{1}.X;
                self.Y       = varargin{1}.Y;
@@ -185,8 +177,8 @@ classdef Tree < handle
                        [varargout{1:nargout}] = builtin('subsref', self, s);
                    elseif find(ismember(properties(self), name))
                        [varargout{1:nargout}] = builtin('subsref', self, s);
-                       self.tree_.(name) = varargout{1:nargout};
-                       self.set_prop(name, varargout)
+                       self.tree_.(name) = varargout{:};
+                       self.set_prop(name, varargout{:});
                    elseif isfield(self.tree(), name)
                        [varargout{1:nargout}] = builtin('subsref', self.tree(), s);
                    else
