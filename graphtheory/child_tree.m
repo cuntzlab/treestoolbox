@@ -42,7 +42,7 @@ N            = size      (ipar, 1);
 
 %=============================== Parsing inputs ===============================%
 p = inputParser;
-p.addParameter('v', ones (N, 1), @isnumeric) % TODO check the size and type of v
+p.addParameter('v', ones (N, 1)) % TODO check the size and type of v
 p.addParameter('s', false, @isBinary)
 pars = parseArgs(p, varargin, {'v'}, {'s'});
 %==============================================================================%
