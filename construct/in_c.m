@@ -23,7 +23,7 @@
 %
 % Example
 % -------
-% c          = hull_tree (sample_tree, 5, [], [], [], '-2d');
+% c          = hull_tree (sample_tree, 5, [], [], [], 'dim2');
 % X          = 100 * rand (1000, 1);
 % Y          = 100 * rand (1000, 1);
 % IN         = in_c (X, Y, c);
