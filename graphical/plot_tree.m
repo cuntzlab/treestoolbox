@@ -476,8 +476,8 @@ if contains      (options, '-p')
     shift_vec    = reshape (shift_vec', 4, res * N)';
     poly_array   = poly_array + shift_vec;
     if  (...
-            (size (color, 1) == numel(tree.X)) && (size (color, 2) == 1)) ||  ...
-            (size (color, 2) == numel(tree.X)) && (size (color, 1) == 1)
+            (size (color, 1) == numel(ipart)) && (size (color, 2) == 1)) ||  ...
+            (size (color, 2) == numel(ipart)) && (size (color, 1) == 1)
         if (size (color, 2) > 1) && (size (color, 1) == 1)
             color = color';
         end

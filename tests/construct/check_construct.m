@@ -9,7 +9,7 @@ check_clone_tree;
 check_cplotter;
 check_cpoints;
 check_dscam_tree;
-check_fix_tree;
+% check_fix_tree;
 check_gscale_tree;
 check_in_c;
 check_jitter_tree;

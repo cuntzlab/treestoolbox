@@ -20,7 +20,7 @@ tree             = sample2_tree;
 clf;
 axis off;
 plot_tree        (tree, [0 0 0], [0 0 5], [], [], '-b1');
-c                = hull_tree  (tree, 15, [], [], [], '-2d');
+c                = hull_tree  (tree, 15, [], [], [], 'dim2');
 [Xt, Yt]         = cpoints (c);
 points           = [Xt Yt];
 hp               = vhull_tree (tree, [], points, [], [], '-2d -s');
