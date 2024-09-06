@@ -1,5 +1,5 @@
 % RAD2DEG   Transposes from radians to degrees.
-% (scheme package)
+% (utilities package)
 %
 % result = rad2deg (x)
 % --------------------

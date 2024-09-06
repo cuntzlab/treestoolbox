@@ -1,5 +1,5 @@
 % GIFMAKER    Simple movie on transparent background.
-% (scheme package)
+% (utilities package)
 %
 % gifmaker (action, name, Tsize, delaytime)
 % -----------------------------------------

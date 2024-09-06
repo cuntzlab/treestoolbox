@@ -1,5 +1,5 @@
 % GAUSS   Gauss function output.
-% (scheme package)
+% (utilities package)
 %
 % y = gauss (x, mu, sigma)
 % ------------------------

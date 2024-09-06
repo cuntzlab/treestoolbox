@@ -1,5 +1,5 @@
 % SCALEBAR   Add a scalebar to an axis.
-% (scheme package)
+% (utilities package)
 %
 % HP = scalebar (unit, pos)
 % -------------------------

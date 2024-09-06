@@ -1,5 +1,5 @@
 % TPRINT   Simplified printing.
-% (scheme package)
+% (utilities package)
 %
 % [name path] = tprint (name, options, fsize, shineoptions)
 % ---------------------------------------------------------

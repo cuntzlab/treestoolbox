@@ -1,5 +1,5 @@
 % ROTATION_MATRIX   Calculates rotation matrix for given angles.
-% (scheme package)
+% (utilities package)
 %
 % M = rotation_matrix (degx, degy, degz, hand)
 % --------------------------------------------
@@ -34,29 +34,36 @@ if (nargin < 4) || isempty (hand)
     hand     = 'right';
 end
 
-if strcmp    (hand, 'left')
-    M        = [ ...
-        (cos  (degy) * cos (degz)) ...
-        (sin  (degx) * sin (degy) * cos (degz) - cos (degx) * sin (degz))  ...
-        (cos  (degx) * sin (degy) * cos (degz) + sin (degx) * sin (degz)); ...
-        (cos  (degy) * sin (degz)) ...
-        (sin  (degx) * sin (degy) * sin (degz) + cos (degx) * cos (degz))  ...
-        (cos  (degx) * sin (degy) * sin (degz) - sin (degx) * cos (degz)); ...
-        (-sin (degy)) ...
-        (sin  (degx) * cos (degy)) ...
-        (cos  (degx) * cos (degy))];
-else
-    M        = [ ...
-        (cos  (degy) * cos (degz)) ...
-        (sin  (degx) * sin (degy) * cos (degz) - cos (degx) * sin (degz))  ...
-        (cos  (degx) * sin (degy) * cos (degz) + sin (degx) * sin (degz)); ...
-        (cos  (degy) * sin (degz)) ...
-        (sin  (degx) * sin (degy) * sin (degz) + cos (degx) * cos (degz))  ...
-        (cos  (degx) * sin (degy) * sin (degz) - sin (degx) * cos (degz)); ...
-        (-sin (degy)) ...
-        (sin  (degx) * cos (degy)) ...
-        (cos  (degx) * cos (degy))];
+if strcmp(hand, 'left') % 'left'
+
+    Rx = [1, 0, 0;
+        0, cos(degx), sin(degx);
+        0, -sin(degx), cos(degx)];
+
+    Ry = [cos(degy), 0, -sin(degy);
+        0, 1, 0;
+        sin(degy), 0, cos(degy)];
+
+    Rz = [cos(degz), sin(degz), 0;
+        -sin(degz), cos(degz), 0;
+        0, 0, 1];
+
+else  % 'right'
+
+    Rx = [1, 0, 0;
+        0, cos(degx), -sin(degx);
+        0, sin(degx), cos(degx)];
+
+    Ry = [cos(degy), 0, sin(degy);
+        0, 1, 0;
+        -sin(degy), 0, cos(degy)];
+
+    Rz = [cos(degz), -sin(degz), 0;
+        sin(degz), cos(degz), 0;
+        0, 0, 1];
+
 end
 
-
+M = Rz * Ry * Rx;
+end
 

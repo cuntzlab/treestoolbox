@@ -1,13 +1,5 @@
 %% check_swc_tree
 
 %% test 1
-
-
-
-
-%% test 2
-
-
-
-tprint           ('./panels/_tree1', ...
-    '-jpg -HR',                [10 10]);
+tree         = sample_tree;
+swc_tree     (tree, './test_save/swc_tree1.swc');

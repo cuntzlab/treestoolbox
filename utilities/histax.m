@@ -1,5 +1,5 @@
 % HISTAX   Corrected histogram counts.
-% (scheme package)
+% (utilities package)
 %
 % yax = histax (x, xax)
 % ---------------------

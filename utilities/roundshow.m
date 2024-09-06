@@ -1,5 +1,5 @@
 % ROUNDSHOW a 3D round show of a plot.
-% (scheme package)
+% (utilities package)
 %
 % Roundshow (pause)
 % -----------------

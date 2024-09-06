@@ -1,5 +1,5 @@
 % DEG2RAD   Transposes from degrees to radians.
-% (scheme package)
+% (utilities package)
 %
 % result = deg2rad (x)
 % --------------------
@@ -8,11 +8,11 @@
 %
 % Input
 % -----
-% - x        ::vector: vector of values in radian
+% - x        ::vector: vector of values in degrees
 %
 % Output
 % ------
-% - result   ::vector: vector of values in degrees
+% - result   ::vector: vector of values in radians
 %
 % Example
 % -------

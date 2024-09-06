@@ -1,5 +1,5 @@
 % TPRINT0   Simplified printing.
-% (Utilities package)
+% (utilities package)
 %
 % [name, path] = tprint (name, fsize)
 % -----------------------------------
