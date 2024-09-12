@@ -7,4 +7,4 @@ plot_tree   (tree);
 title       ('HSS tree');
 axis        off;
 tprint      ('./panels/hss_tree1', ...
-    '-jpg -HR',                [10 10]); % documentation
+    '-jpg -HR',                [10 10]);    % documentation

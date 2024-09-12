@@ -26,7 +26,7 @@ for counterN         = 1 : 10
     end
 end
 tprint           ('./panels/plot_tree2', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 3
 clf;
@@ -59,5 +59,11 @@ plot_tree        (tree, [ ...
     (BO * 0)]);
 tprint           ('./panels/plot_tree5', ...
     '-jpg -HR',                [10 10]);
+
+%% test 6
+clf;
+plot_tree   (sample_tree);
+tprint           ('./panels/plot_tree6', ...
+    '-jpg -HR',                [10 10]);    % documentation
 
 

@@ -15,4 +15,4 @@ end
 %% test 2
 elen_tree            (sample_tree, '-s')
 tprint               ('./panels/elen_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation

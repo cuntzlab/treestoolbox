@@ -11,4 +11,4 @@ pointer_tree     (tree, 30, [], [], [0 0 10], '-l');
 pointer_tree     (tree, 50, [], [], [0 0 10], '-v');
 pointer_tree     (tree, 60, [], [], [0 0 10], '-s');
 tprint           ('./panels/pointer_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation

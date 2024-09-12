@@ -4,7 +4,7 @@ tree         = resample_tree (sample2_tree, 1, '-d');
 %% test 1
 quadfit_tree (tree, '-s');
 tprint       ('./panels/quadfit1_tree', ...
-    '-jpg -HR',               [10 10]);
+    '-jpg -HR',               [10 10]);    % documentation
 
 %% test 2
 clf;

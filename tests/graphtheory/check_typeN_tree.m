@@ -13,7 +13,7 @@ end
 %% test 2
 typeN_tree       (sample_tree, '-s -bct');
 tprint           ('./panels/typeN_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 3
 typeN_tree       (sample2_tree, '-s');

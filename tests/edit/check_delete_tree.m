@@ -18,7 +18,7 @@ tree         = sample_tree;
 delete_tree  (tree, ...
     find     (BO_tree (tree) > 5), '-w -s');
 tprint       ('./panels/delete_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 4 - check that right regions are deleted:
 tree         = sample_tree;

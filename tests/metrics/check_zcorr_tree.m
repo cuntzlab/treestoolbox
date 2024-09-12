@@ -4,7 +4,7 @@
 tree                = sample_tree;
 zcorr_tree          (tree, 4,  '-s -m');
 tprint              ('./panels/zcorr_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 
 %% test 2

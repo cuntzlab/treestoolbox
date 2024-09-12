@@ -15,7 +15,7 @@ tprint           ('./panels/resample_tree1', ...
 %% test 3
 tree             = resample_tree (sample_tree, 5, '-s -e');
 tprint           ('./panels/resample_tree2', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 
 

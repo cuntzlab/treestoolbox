@@ -4,7 +4,7 @@
 tree         = resample_tree (sample_tree, 1, 'none');
 spines_tree  (tree, [], [], [], [], [],[], '-s');
 tprint       ('./panels/spines_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 2
 tree         = resample_tree (sample2_tree, 0.2, '-d');

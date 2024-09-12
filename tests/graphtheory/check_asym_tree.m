@@ -15,7 +15,7 @@ end
 %% test 2
 asym_tree        (sample_tree, [], '-m -s')
 tprint           ('./panels/asym_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 3
 clf;

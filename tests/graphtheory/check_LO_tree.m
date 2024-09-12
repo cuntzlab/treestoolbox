@@ -12,7 +12,7 @@ end
 %% test 2
 LO_tree          (sample_tree, '-s');
 tprint           ('./panels/LO_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 
 

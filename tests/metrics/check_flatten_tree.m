@@ -15,7 +15,7 @@ flatten_tree     (sample_tree, '-m');
 %% test 3
 flatten_tree     (sample_tree, '-s -w');
 tprint           ('./panels/flatten_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 4
 flatten_tree     (hss_tree,    '-s -w');

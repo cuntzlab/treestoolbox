@@ -15,7 +15,7 @@ end
 %% test 3
 angleB_tree      (sample_tree, '-s');
 tprint           ('./panels/angleB_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 4
 tree             = sample2_tree;

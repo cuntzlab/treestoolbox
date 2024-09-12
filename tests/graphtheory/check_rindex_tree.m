@@ -12,6 +12,6 @@ end
 %% test 2
 rindex_tree      (sample2_tree, '-s');
 tprint           ('./panels/rindex_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 

@@ -12,7 +12,7 @@ end
 %% test 2
 PL_tree          (sample_tree, '-s');
 tprint           ('./panels/PL_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 
 

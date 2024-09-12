@@ -12,7 +12,7 @@ end
 %% test 2
 insertp_tree (sample_tree, 43, 50 : 10 : 100, '-s');
 tprint       ('./panels/insertp_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 
 

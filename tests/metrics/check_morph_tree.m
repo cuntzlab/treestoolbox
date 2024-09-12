@@ -15,7 +15,7 @@ morph_tree       (sample_tree, [], '-m');
 %% test 3
 morph_tree       (sample_tree, [], '-s');
 tprint           ('./panels/morph_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 4
 clf;

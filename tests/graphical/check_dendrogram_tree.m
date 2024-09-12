@@ -17,7 +17,7 @@ tprint           ('./panels/dendrogram_tree1', ...
 clf;
 dendrogram_tree  (sample2_tree)
 tprint           ('./panels/dendrogram_tree2', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 3
 clf;

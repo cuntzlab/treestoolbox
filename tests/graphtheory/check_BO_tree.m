@@ -15,7 +15,7 @@ disp ('This until now usually takes <5 secs')
 %% test 2
 BO_tree          (sample_tree, '-s');
 tprint           ('./panels/BO_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 3 -DOCUMENTATION
 clf;

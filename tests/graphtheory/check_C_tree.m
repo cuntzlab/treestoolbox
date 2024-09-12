@@ -12,4 +12,4 @@ end
 %% test 2
 C_tree           (sample_tree, '-s')
 tprint           ('./panels/C_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation

@@ -5,7 +5,7 @@ clf;
 tree         = resample_tree     (sample2_tree, 1, 'none');
 qtree        = quaddiameter_tree (tree, 1, 1,[],[],'-s');
 tprint       ('./panels/quaddiameter1_tree', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 2
 clf;
@@ -23,7 +23,7 @@ for counter  = 1 : 10
 end
 axis         off tight
 tprint       ('./panels/quaddiameter2_tree', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 3
 clf;

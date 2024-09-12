@@ -4,7 +4,7 @@
 dLPTCs               = load_tree ('dLPTCs.mtr');
 spread_tree          (dLPTCs{1}, [], [], '-s');
 tprint               ('./panels/spread_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 2
 dLPTCs               = load_tree ('dLPTCs.mtr');

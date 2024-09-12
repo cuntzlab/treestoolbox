@@ -9,7 +9,7 @@ end
 %% test 2
 clean_tree   (sample_tree, 20, '-s -w');
 tprint       ('./panels/clean_tree1', ...
-    '-jpg -HR', [10 10]);
+    '-jpg -HR', [10 10]);    % documentation
 
 %% test 3
 clean_tree   (hsn_tree,    20, '-s -w');

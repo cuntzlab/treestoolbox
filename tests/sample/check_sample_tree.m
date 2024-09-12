@@ -7,4 +7,4 @@ plot_tree   (tree);
 title       ('Sample tree');
 axis        off;
 tprint      ('./panels/sample_tree1', ...
-    '-jpg -HR',                [10 10]); % documentation
+    '-jpg -HR',                [10 10]);    % documentation

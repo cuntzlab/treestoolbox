@@ -16,10 +16,10 @@ end
 clf;
 sse_tree             (sample_tree, [], '-s');
 tprint               ('./panels/sse_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 2
 clf;
 sse_tree             (sample_tree, 100, '-s')
 tprint               ('./panels/sse_tree2', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation

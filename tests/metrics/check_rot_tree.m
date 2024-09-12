@@ -12,7 +12,7 @@ end
 %% test 2
 rot_tree         (sample_tree, [], '-s -m3dX');
 tprint           ('./panels/rot_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 3
 rot_tree         (sample_tree, [], '-s -m3dY');

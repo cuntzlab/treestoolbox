@@ -15,4 +15,4 @@ end
 %% test 2
 gi_tree          (sample_tree, '-s')
 tprint           ('./panels/gi_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation

@@ -12,7 +12,7 @@ end
 %% test 2
 recon_tree   (sample_tree, 105, 160, '-s');
 tprint       ('./panels/recon_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 3
 recon_tree   (sample_tree, 105, 160, '-s -h');

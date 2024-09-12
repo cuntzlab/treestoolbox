@@ -12,7 +12,7 @@ end
 %% test 2
 Pvec_tree        (sample_tree, [], '-s');
 tprint           ('./panels/Pvec_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 3
 Pvec_tree        (sample_tree, BO_tree (sample_tree), '-s');

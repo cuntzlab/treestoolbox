@@ -4,7 +4,7 @@
 tree         = sample_tree;
 dstats_tree  (stats_tree (sample_tree), [], '-g -d')
 tprint       ('./panels/dstats_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 2
 trees        = {{sample_tree, sample2_tree}, {hss_tree, hsn_tree}};

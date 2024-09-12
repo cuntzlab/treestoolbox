@@ -12,5 +12,5 @@ end
 %% test 2
 redirect_tree    (sample2_tree, 5, '-s');
 tprint           ('./panels/redirect_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 

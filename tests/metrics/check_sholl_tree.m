@@ -4,7 +4,7 @@
 tree             = sample_tree;
 sholl_tree       (tree, 20, '-s')
 tprint           ('./panels/sholl_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 2
 sholl_tree       (tree, 20, '-s3 -o')

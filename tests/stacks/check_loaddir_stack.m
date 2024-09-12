@@ -10,4 +10,4 @@
 
 
 tprint           ('./panels/_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation

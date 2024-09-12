@@ -19,4 +19,4 @@ dtree            = redirect_tree (tree, iB);
 display          (ntrif);
 axis             off
 tprint           ('./panels/elimt_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation

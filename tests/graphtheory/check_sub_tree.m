@@ -14,6 +14,6 @@ end
 %% test 2
 sub              = sub_tree (sample_tree, 166, '-s');
 tprint           ('./panels/sub_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 

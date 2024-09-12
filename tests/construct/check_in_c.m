@@ -10,7 +10,7 @@ Y          = 100 * rand (1000, 1);
 IN         = in_c (X, Y, c);
 plot       (X (IN), Y (IN), 'k.');
 tprint       ('./panels/in_c1', ...
-    '-jpg -HR', [10 10]);
+    '-jpg -HR', [10 10]);    % documentation
 
 %% test 2
 
@@ -23,5 +23,5 @@ dx = 10;
 dy = 10;
 IN         = in_c (X, Y, c, dx, dy);
 plot       (X (IN), Y (IN), 'k.');
-tprint       ('./panels/in_c1', ...
+tprint       ('./panels/in_c2', ...
     '-jpg -HR', [10 10]);

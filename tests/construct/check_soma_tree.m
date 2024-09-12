@@ -5,7 +5,7 @@ tree         = resample_tree (sample_tree, 1, 'none');
 tree         = redirect_tree (tree, 10, 'none');
 soma_tree    (tree, 20, 30, '-s'); % WRONG MEASURES!!!!
 tprint       ('./panels/soma_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 2
 clf;
@@ -25,7 +25,7 @@ for counter  = 1 : 10
 end
 axis         off tight;
 tprint       ('./panels/soma_tree2', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 3
 clf;

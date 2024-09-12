@@ -12,6 +12,6 @@ end
 %% test 2
 cvol_tree        (sample_tree, '-s');
 tprint           ('./panels/cvol_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 

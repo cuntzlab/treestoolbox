@@ -20,4 +20,4 @@ tree.Z (5)   = tree.Z (4);
 etree        = elim0_tree (tree, '-s');
 axis         off
 tprint       ('./panels/elim0_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation

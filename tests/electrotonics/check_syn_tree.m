@@ -15,7 +15,7 @@ end
 %% test 2
 syn_tree         (sample_tree, 100,  95, [], [], [], '-s')
 tprint           ('./panels/syn_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 3
 syn_tree         (sample_tree, 100,  105, [], [], [], '-s')

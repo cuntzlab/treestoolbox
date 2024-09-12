@@ -4,7 +4,7 @@
 tree             = sample_tree;
 tran_tree        (tree, [20 10 14], '-s');
 tprint           ('./panels/tran_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 2
 tran_tree        (tree, 5, '-s')
