@@ -4,15 +4,14 @@
 %
 % Files
 %   bezahlt             - Make string from number.
-%   colorcet            - Perceptually uniform color maps.
 %   deg2rad             - Transposes from degrees to radians.
 %   eucdist             - 2D Euclidean distances between two sets of points.
 %   gauss               - Gauss function output.
 %   gifmaker            - Simple movie on transparent background.
 %   histax              - Corrected histogram counts.
 %   hotcold             - Custom blue to red colormap with white in the center.
+%   pov_patch           - POV-Ray rendering of a Matlab patch element.
 %   isBinary            - Checks if input is 0 or 1.
-%   LIF                 - Leaky Integrate and Fire
 %   parseArgs           - Parsing arguments
 %   pov_patch           - POV-Ray rendering of a Matlab patch element.
 %   rad2deg             - Transposes from radians to degrees.

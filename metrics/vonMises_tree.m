@@ -13,8 +13,8 @@
 % - input    ::integer, vector, or cell array:  index of tree in trees or
 %     structured tree, vector of root angles, or cell array of trees
 % - options  ::string:
-%     '-3d'  : three-dimensional distribution (Careful, it used to be '-3d')
-%     '-2d'  : two-dimensional distribution (Careful, it used to be '-2d')
+%     '-dim3'  : three-dimensional distribution (Careful, it used to be '-3d')
+%     '-dim2'  : two-dimensional distribution (Careful, it used to be '-2d')
 %     '-s'   : show
 %     {DEFAULT: '-dim3'}
 %

@@ -1,4 +1,4 @@
-% LIF_TREE   Leaky integrate-and-fire in full morphology
+% LIF_TREE   Leaky integrate-and-fire in full morphology.
 % (trees package)
 %
 % [v, sp] = LIF_tree (intree, time, Vzone, ge, gi, Ee, Ei, ...

@@ -12,6 +12,8 @@
 %   cplotter          - Plots a contour.
 %   cpoints           - Returns points on a contour.
 %   dscam_tree        - Simulates an oversimplified DSCAM mutation.
+%   finetune_fix_tree 
+%   fix_tree          - Minimum spanning tree based tree repair tool.
 %   gscale_tree       - Scales trees from a set of trees to mean tree size.
 %   in_c              - Applies inpolygon on contour.
 %   isBCT_tree        - Checks if tree is sorted to be BCT conform.
