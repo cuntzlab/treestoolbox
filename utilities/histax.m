@@ -30,6 +30,9 @@
 
 function yax = histax (x, xax)
 
+% if (size (x, 2) > 1) & (size (xax, 1) > 1)
+    % xax = xax';
+% end
 
 xax = [(xax-(xax(2)-xax(1))/2) (xax(end)+(xax(2)-xax(1))/2)];
 yax = histcounts (x, xax);

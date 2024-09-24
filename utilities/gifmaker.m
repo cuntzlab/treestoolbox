@@ -68,7 +68,7 @@ switch action
     case 'init'
         ZZZZZZ   = {};
         set      (gcf, 'doublebuffer', 'on');
-        colormap gray (256);
+        colormap (gray (256));
     case 'loop'
         drawnow;
         tprint   ('zzzzzz', '-tif', Tsize);

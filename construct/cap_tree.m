@@ -87,7 +87,7 @@ for l            = lin (2 : end)
             [(tree.X (1)) (tree.Y (1)) (tree.Z (1))] - ...
             (l * direction (2, :)), d, (idpar (end))],'none');
     else
-       warning   ('diameter was zero or less. skipped') 
+       % warning   ('diameter was zero or less. skipped') 
     end
 end
 tree.R (idpar)   = tree.R (idpar (1)); % give region same as root

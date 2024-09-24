@@ -164,13 +164,13 @@ switch               format
             end
         end
         % allow region vectors
-        if strfind   (options, '-ks')
+        if contains (options, '-ks')
             strings  = a1;
         else
             strings      = cell (1, nsec);
             for counter  = 1 : nsec
                 sa       = char (a1 (counter));
-                insa     = findstr (sa, '[');
+                insa     = strfind (sa, '[');
                 if ~isempty (insa)
                     sa   = [(sa (1 : insa - 1)) '[]'];
                 end

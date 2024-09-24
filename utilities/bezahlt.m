@@ -8,8 +8,8 @@
 %
 % Input
 % -----
-% - zahl     ::integer: length of string
-% - num      ::integer: number to be stringed
+% - zahl     ::integer: number to be stringed
+% - num      ::integer: length of string
 %
 % Output
 % ------
