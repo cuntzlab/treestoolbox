@@ -16,7 +16,7 @@ for counter      = 1 : length (x)
 end
 xlabel           ('x');
 tprint           ('./panels/xdend_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 
 

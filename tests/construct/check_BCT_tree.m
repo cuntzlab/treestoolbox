@@ -9,7 +9,7 @@ end
 %% test 2
 BCT_tree         ([1 2 1 0 2 0 0], '-s');
 tprint           ('./panels/BCT_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 3
 hsn              = hsn_tree;

@@ -1,5 +1,5 @@
 % SHINE   Add some effects on current axis.
-% (scheme package)
+% (utilities package)
 %
 % shine (options)
 % ---------------

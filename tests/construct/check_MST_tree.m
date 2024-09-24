@@ -15,7 +15,7 @@ set          (HP, 'markersize', 8);
 xlim         ([-5 105]);
 ylim         ([-5 105]);
 tprint       ('./panels/MST_tree1', ...
-    '-jpg -HR', [10 10]);
+    '-jpg -HR', [10 10]);    % documentation
 
 %% test 2
 for counter  = 1 : 20

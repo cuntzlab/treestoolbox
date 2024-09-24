@@ -16,7 +16,7 @@ for counter  = 1 : 10
 end
 axis         off tight
 tprint       ('./panels/jitter_tree1', ...
-    '-jpg -HR', [10 10]);
+    '-jpg -HR', [10 10]);    % documentation
 
 %% test 2
 clf;

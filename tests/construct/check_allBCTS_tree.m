@@ -4,7 +4,7 @@
 allBCTs_tree     (11, '-s -w');
 tprint           ( ...
     './panels/allBCTs_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test2
 xd               = 70;

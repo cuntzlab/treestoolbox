@@ -6,7 +6,7 @@ dLPTCs           = load_tree ('dLPTCs.mtr');
 gene_tree        (dLPTCs, '-s');
 axis             off tight;
 tprint           ('./panels/gene_tree1', ...
-    '-jpg -HR',                [10 30]);
+    '-jpg -HR',                [10 30]);    % documentation
 
 %% test 2
 clf;

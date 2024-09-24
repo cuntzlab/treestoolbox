@@ -1,5 +1,5 @@
 % EUCDIST   2D Euclidean distances between two sets of points.
-% (scheme package)
+% (utilities package)
 %
 % M = eucdist (X1, X2, Y1, Y2)
 % ----------------------------

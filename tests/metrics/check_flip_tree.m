@@ -12,7 +12,7 @@ end
 %% test 2
 flip_tree        (sample_tree, 1, '-s');
 tprint           ('./panels/flip_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 3
 flip_tree        (sample_tree, 2, '-s');

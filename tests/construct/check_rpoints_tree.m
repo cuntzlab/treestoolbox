@@ -8,7 +8,7 @@ tree         = hsn_tree;
 c            = hull_tree (tree, 20, [], [], [], '-2d');
 rpoints_tree (M, 1290, [], dX, dY, dZ, 5, '-s');
 tprint       ('./panels/rpoints_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 2
 clf; hold on;

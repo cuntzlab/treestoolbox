@@ -27,7 +27,7 @@ end
 view         (2);
 axis         off image
 tprint       ('./panels/smoothbranch1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 3
 smoothbranch (X, Y, Z, 0.5, 300000);

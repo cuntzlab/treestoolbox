@@ -1,4 +1,4 @@
-% sharedvol_trees
+% SHARE_BOUNDARY_TREE   Calculates the shared volume of two trees.
 % Calculates the shared volume of two trees with voxelization of the two hulls.
 % Also the length of the trees inside the shared volume are calculated.
 %

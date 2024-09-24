@@ -4,7 +4,7 @@
 tree             = sample_tree;
 stats_tree       (tree, [], [], '-s');
 tprint           ('./panels/stats_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 2
 trees            = {sample_tree, sample2_tree};

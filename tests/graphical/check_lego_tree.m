@@ -18,7 +18,7 @@ shine;
 view             ([45 45]);
 axis             off;
 tprint           ('./panels/lego_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 3
 clf;

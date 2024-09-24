@@ -1,5 +1,5 @@
 % BEZAHLT   Make string from number.
-% (scheme package)
+% (utilities package)
 %
 % str = bezahlt (zahl, num)
 % -------------------------

@@ -12,7 +12,7 @@ end
 %% test 2
 repair_tree      (sample2_tree, '-s');
 tprint           ('./panels/repair_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 3
 tree             = sample2_tree;

@@ -13,14 +13,14 @@ hp               = vhull_tree (tree, BO_tree (tree), points);
 set              (hp, ...
     'facealpha',               0.1);
 tprint           ('./panels/vhull_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 2
 tree             = sample2_tree;
 clf;
 axis off;
 plot_tree        (tree, [0 0 0], [0 0 5], [], [], '-b1');
-c                = hull_tree  (tree, 15, [], [], [], '-2d');
+c                = hull_tree  (tree, 15, [], [], [], 'dim2');
 [Xt, Yt]         = cpoints (c);
 points           = [Xt Yt];
 hp               = vhull_tree (tree, [], points, [], [], '-2d -s');

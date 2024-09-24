@@ -15,4 +15,4 @@ end
 %% test 2
 lambda_tree      (sample_tree, '-s')
 tprint           ('./panels/lambda_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation

@@ -16,4 +16,4 @@ HP           = plot (X, Y, 'k.');
 set          (HP, 'markersize', 8);
 axis         off tight equal
 tprint       ('./panels/cpoints1', ...
-    '-jpg -HR', [10 10]);
+    '-jpg -HR', [10 10]);    % documentation

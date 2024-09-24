@@ -49,6 +49,8 @@ pars = parseArgs(p, varargin, {}, {'s', 'bct'});
 % sum(dA) (actually faster than sum(dA)) ;-):
 typeN            = (ones (1, size (dA, 1)) * dA)';
 typeN (typeN > 2) = 2;
+typeN_int = typeN; % copy of typeN in integer format
+
 
 if pars.bct % give a string output
     typeN        = 68 - typeN;
@@ -63,19 +65,19 @@ if pars.s % show option
     set          (HP, ...
         'facealpha',           0.2, ...
         'edgecolor',           'none');
-    T            = vtext_tree  (intree, typeN, [0 0 0]);
+    T            = vtext_tree  (intree, typeN_int, [0 0 0]);
     set          (T, ...
         'fontsize',            8);
-    ydim         = ceil (length (typeN) / 50);
-    if ischar    (typeN)
-        str      = typeN';
+    ydim         = ceil (length (typeN_int) / 50);
+    if ischar    (typeN_int)
+        str      = typeN_int';
     else
-        str      = num2str (typeN');
+        str      = num2str (typeN_int');
         str (isspace (str)) = [];
     end
     str          = reshape ([ ...
         str,  ...
-        (char (zeros (1, ydim * 50 - length (typeN))))], ...
+        (char (zeros (1, ydim * 50 - length (typeN_int))))], ...
         50, ydim)';
     T            = title (char ('branching gene:', str));
     set          (T, 'fontsize',8,'color',[0 0 0]);
@@ -86,4 +88,3 @@ if pars.s % show option
     grid         on;
     axis         image;
 end
-

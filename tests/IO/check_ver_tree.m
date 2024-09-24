@@ -1,13 +1,9 @@
 %% check_ver_tree
 
 %% test 1
-
-
-
+tree        = sample_tree;
+ver_tree    (tree);
 
 %% test 2
-
-
-
-tprint           ('./panels/_tree1', ...
-    '-jpg -HR',                [10 10]);
+tree.X      = 0;
+ver_tree    (tree);

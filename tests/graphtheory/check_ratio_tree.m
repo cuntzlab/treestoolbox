@@ -12,7 +12,7 @@ end
 %% test 2
 ratio_tree       (sample_tree, [], '-s');
 tprint           ('./panels/ratio_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 3
 ratio_tree       (sample_tree, child_tree (sample_tree), '-s');

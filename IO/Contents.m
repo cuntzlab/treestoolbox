@@ -8,6 +8,7 @@
 %   neuroml_tree         - Export tree to NeuroML format.
 %   neuron_template_tree - Export tree as NEURON file.
 %   neuron_tree          - Export tree as NEURON file.
+%   nmf_tree             - Export tree to nmf-format, our extended swc format.
 %   pov_tree             - POV-Ray rendering of trees.
 %   save_tree            - save tree/trees into a file
 %   swc_tree             - Export tree to swc-format.

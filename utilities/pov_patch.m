@@ -1,5 +1,5 @@
 % POV_PATCH   POV-Ray rendering of a Matlab patch element.
-% (trees package)
+% (utilities package)
 %
 % [name path] = pov_patch (p, name, v, options)
 % -------------------------------------------------

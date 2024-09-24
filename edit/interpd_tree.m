@@ -37,7 +37,8 @@ ver_tree         (tree)
 %=============================== Parsing inputs ===============================%
 p = inputParser;
 p.addParameter('ind', [], @isnumeric)
-pars = parseArgs(p, varargin, {'ind'}, {});
+p.addParameter('s', false, @isBinary) 
+pars = parseArgs(p, varargin, {'ind'}, {'s'}); 
 %==============================================================================%
 
 PL               = Pvec_tree (tree);
@@ -60,5 +61,16 @@ tree.D(pars.ind)      = ...
     m * (PL (pars.ind) - PL (pars.ind (1))) + ...
     tree.D (pars.ind (1));
 
-
+if pars.s   % show option 
+    clf;
+    hold         on;
+    plot_tree    (tree);
+    title        ('interpolate diameter');
+    xlabel       ('x [\mum]');
+    ylabel       ('y [\mum]');
+    zlabel       ('z [\mum]');
+    view         (2);
+    grid         on;
+    axis         image;
+end
 

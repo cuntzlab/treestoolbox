@@ -12,5 +12,5 @@ sample2      = sample2_tree;
 sample2T     = tran_tree (sample2, [55 25 0]);
 cattree      = cat_tree  (sample2, sample2T, [], [], '-s');
 tprint           ('./panels/cat_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 

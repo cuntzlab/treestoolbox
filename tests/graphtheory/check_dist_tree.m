@@ -12,7 +12,7 @@ end
 %% test 2
 dist_tree        (sample_tree, [50 100], '-s')
 tprint           ('./panels/dist_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 3
 clf;

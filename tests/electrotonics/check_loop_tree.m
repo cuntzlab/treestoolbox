@@ -15,13 +15,13 @@ end
 %% test 2
 loop_tree        (sample_tree, 1, 100, 0.001, '-s')
 tprint           ('./panels/loop_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 3
 sse              = inv (loop_tree  (sample_tree, 1, 100, 1, 'none'));
 clf;
 plot_tree        (sample_tree, sse (:, 100));
 tprint           ('./panels/loop_tree2', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 

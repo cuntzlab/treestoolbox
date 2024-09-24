@@ -12,7 +12,7 @@ end
 %% test 2
 len_tree         (sample_tree, '-s');
 tprint           ('./panels/len_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 3
 len_tree         (sample_tree, '-s -2d');

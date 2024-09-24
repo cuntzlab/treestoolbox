@@ -12,7 +12,7 @@ end
 %% test 2
 eucl_tree        (sample_tree, [], '-s')
 tprint           ('./panels/eucl_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 3
 eucl_tree        (sample_tree, [50 50 0], '-s')

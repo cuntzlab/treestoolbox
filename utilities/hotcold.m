@@ -1,6 +1,27 @@
-% Custom blue to red colormap with white in the center
-% Input argument defines the resolution/number of colors
-% Returns 2-D matrix with 3 columns (RGB) and n rows (n = number of colors)
+% HOTCOLD   Custom blue to red colormap with white in the center.
+% (utilities package)
+%
+% [map] = hotcold (n_colors)
+% ------------------------
+%
+% Input
+% -----
+% - n_colors ::value: resolution/number of colors
+%
+% Output
+% ------
+% - map      ::matrix nx3: n (number of colors) rows x 3 columns (RGB) 
+%
+% Example
+% -------
+% hotcold   ();
+%
+% See also
+% Uses
+%
+% the TREES toolbox: edit, generate, visualise and analyse neuronal trees
+% Copyright (C) 2009 - 2016  Hermann Cuntz
+
 function [map] = hotcold (n_colors)
 
 % Define start/end color values

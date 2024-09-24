@@ -12,7 +12,7 @@ end
 %% test 2
 sort_tree        (sample2_tree, '-s');
 tprint           ('./panels/sort_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 3
 sort_tree        (sample2_tree, '-s -LO');

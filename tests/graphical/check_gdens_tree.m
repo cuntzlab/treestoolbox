@@ -20,7 +20,7 @@ plot_tree        (sample_tree);
 shine;
 axis             off;
 tprint           ('./panels/gdens_tree2', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 3
 clf;

@@ -8,10 +8,10 @@ tprint           ('./panels/load_tree1', ...
 
 %% test 2
 clf;
-hss              = load_tree ('25HSS.swc');
-plot_tree        (hss, [], [], [], [], '-b');
+hss              = load_tree ('25HSS.swc','-s');
+% plot_tree        (hss, [], [], [], [], '-b');
 tprint           ('./panels/load_tree2', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);	% documentation
 
 %% no test for .neu yet or .swc with multiple trees!
 clf;

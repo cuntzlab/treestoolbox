@@ -12,4 +12,4 @@ end
 %% test 2
 scale_tree       (sample_tree, 1.2, '-s');
 tprint           ('./panels/scale_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation

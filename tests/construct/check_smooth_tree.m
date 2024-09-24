@@ -3,7 +3,7 @@
 %% test 1
 smooth_tree (sample2_tree, 0.5, 0.5, 10, '-s');
 tprint       ('./panels/smooth_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 2
 clf; hold on;
@@ -23,7 +23,7 @@ for counter  = 1 : 10
 end
 axis         off tight;
 tprint       ('./panels/smooth_tree2', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 %% test 3
 clf; hold on;

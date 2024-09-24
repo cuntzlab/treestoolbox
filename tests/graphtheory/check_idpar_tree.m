@@ -12,7 +12,7 @@ end
 %% test 2
 idpar_tree       (sample2_tree, '-s');
 tprint           ('./panels/idpar_tree1', ...
-    '-jpg -HR',                [10 10]);
+    '-jpg -HR',                [10 10]);    % documentation
 
 
 
