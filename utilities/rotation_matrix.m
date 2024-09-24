@@ -34,6 +34,7 @@ if (nargin < 4) || isempty (hand)
     hand     = 'right';
 end
 
+
 if strcmp(hand, 'left') % 'left'
 
     Rx = [1, 0, 0;
@@ -49,6 +50,7 @@ if strcmp(hand, 'left') % 'left'
         0, 0, 1];
 
 else  % 'right'
+
 
     Rx = [1, 0, 0;
         0, cos(degx), -sin(degx);
