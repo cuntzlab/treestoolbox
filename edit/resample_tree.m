@@ -208,7 +208,7 @@ tree             = delete_tree (ntree, 2 : N, doptions); % resampled tree
 
 if ~contains (options, '-v')
     % a bit complicated for collapsing multifurcations:
-    iF           = [1; (N + 1 : size (ntree.dA))'];
+    iF           = [1; (N + 1 : size (ntree.dA,1))'];
     % collapse small angle branches:
     Bs           = find (sum (tree.dA) > 1)'; % multibranch point indices
     ipar_ntree   = ipar_tree (ntree); % all parent relationships of ntree
