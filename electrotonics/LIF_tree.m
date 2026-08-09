@@ -152,12 +152,12 @@ if isempty (pars.Aspike)
 end
 
 plset            = zeros (N, 1);
-if pars.t
-    lambda       = 100;
-    xoffset      = 600;
-    Pvec         = Pvec_tree (tree);
-    plset        = 1 ./ (1 + exp  (-(Pvec - xoffset) / lambda));
-end
+% if pars.t
+%     lambda       = 100;
+%     xoffset      = 600;
+%     Pvec         = Pvec_tree (tree);
+%     plset        = 1 ./ (1 + exp  (-(Pvec - xoffset) / lambda));
+% end
 
 surf             = surf_tree (tree) / 100000000; % now [cm2]
 Msurf            = spdiags   (surf, 0, N, N);
@@ -167,11 +167,11 @@ Mcm_vec          = full      (diag (Mcm)); % get capacitance vector
 v                = zeros     (size (pars.I));
 sp               = [];
 for counterT     = 1 : T - 1
-    if pars.e
+    % if pars.e
         if mod (counterT - 1, 100) == 0
             disp (pars.time (counterT));
         end
-    end
+    % end
     M1           = M;
     % feed into M the synaptic conductances
     M1           = M1 +  ...
