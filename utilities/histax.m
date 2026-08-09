@@ -26,16 +26,13 @@
 % Uses
 %
 % the TREES toolbox: edit, generate, visualise and analyse neuronal trees
-% Copyright (C) 2009 - 2020  Hermann Cuntz
+% Copyright (C) 2009 - 2026  Hermann Cuntz
 
 function yax = histax (x, xax)
 
-% if (size (x, 2) > 1) & (size (xax, 1) > 1)
-    % xax = xax';
-% end
-
-xax = [(xax-(xax(2)-xax(1))/2) (xax(end)+(xax(2)-xax(1))/2)];
-yax = histcounts (x, xax);
+xax          = xax(:)'; % make sure it is a horizontal vector
+xax          = [(xax-(xax(2)-xax(1))/2) (xax(end)+(xax(2)-xax(1))/2)];
+yax          = histcounts (x, xax);
 
 
 
