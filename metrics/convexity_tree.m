@@ -52,7 +52,7 @@ if pars.dim3 % 3d case
     Y = intree.Y(T);
     Z = intree.Z(T);
 
-    [k, ~] = boundary(X, Y, Z, 0);
+    [k, ~] = boundary(X, Y, Z, 1);
     figure1 = figure;
     K = trisurf(k, X, Y, Z);
 
@@ -102,7 +102,7 @@ if pars.dim3 % 3d case
             Inds(i) = 1;
         end
     end
-    c = 1 - nnz(Inds) / (nS1 * nS2);
+    c = nnz(Inds) / (nS1 * nS2);
     close(figure1)
 else % 2d case
     T = T_tree(intree);
