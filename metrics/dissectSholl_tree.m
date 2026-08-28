@@ -201,10 +201,6 @@ elseif pars.dim3
 
     %--------------- True Sholl -----------------------
     eucs = eucl_tree(ttree);
-    rmax = max(eucs(:));
-    if rmax > 500
-        sf = 2;
-    end
     RVec = linspace(0, rmax, RRes);
 
     [Strue] = sholl_tree(ttree, 2*RVec); % Real Sholl
